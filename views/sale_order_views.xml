@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_licencia_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.licencia.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <page string="Licencias" name="licencias_tab">
+                    <field name="licencia_ids">
+                        <list editable="bottom">
+                            <field name="name" string="Número de Serie"/>
+                            <field name="fecha_vencimiento"/>
+                            <field name="vendedor_id" widget="many2one_avatar_user"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_sales_order_filter_licencia_inherit" model="ir.ui.view">
+        <field name="name">sale.order.search.licencia.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="licencia_ids" string="Número de Serie"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
