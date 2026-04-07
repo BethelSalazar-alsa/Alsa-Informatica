@@ -66,8 +66,7 @@
             <div id="snippet_licencias_cat" class="o_panel">
                 <div class="o_panel_header">Gestión de Licencias</div>
                 <div class="o_panel_body">
-                    <t t-snippet="gestion_licencias.s_formulario_licencia_snippet" 
-                       t-thumbnail="/gestion_licencias/static/description/icon.png"/>
+                    <t t-snippet="gestion_licencias.s_formulario_licencia_snippet"/>
                 </div>
             </div>
         </xpath>
