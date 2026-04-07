@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_partner_form_licencias_inherit" model="ir.ui.view">
+        <field name="name">res.partner.form.licencias.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name="arch" type="xml">
+            
+            <!-- 1. Insertar el BOTÓN inteligente arriba a la derecha -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_licencias" 
+                        type="object" 
+                        class="oe_stat_button" 
+                        icon="fa-id-card-o" 
+                        invisible="licencia_count == 0">
+                    <field name="licencia_count" widget="statinfo" string="Licencias"/>
+                </button>
+            </xpath>
+
+            <!-- 2. Insertar la PESTAÑA de licencias en el cuerpo del formulario -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Licencias" name="licencias_contpaqi">
+                    <field name="licencia_ids">
+                        <list>
+                            <field name="name" string="Serie"/>
+                            <field name="fecha_vencimiento"/>
+                            <field name="vendedor_id" widget="many2one_avatar_user"/>
+                        </list>
+                    </field>
+                </page>
+            </xpath>
+            
+        </field>
+    </record>
+</odoo>
