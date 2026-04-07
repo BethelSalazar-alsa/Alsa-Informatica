@@ -43,14 +43,13 @@ class LicenciaContpaqi(models.Model):
         """Auto-carga el cliente y producto desde la venta seleccionada"""
         if self.sale_order_id:
             # Pre-cargar el cliente de la venta
-            self.partner_id = self.sale_order_id.partner_id.id
+            self.partner_id = self.sale_order_id.partner_id
             
             # Buscar producto licenciable en las líneas de la venta
-            # (en general, los primeros productos en ventas de software)
             for line in self.sale_order_id.order_line:
                 if line.product_id and line.product_id.type in ['service', 'product']:
-                    self.product_id = line.product_id.id
-                    break  # Tomar el primer producto encontrado
+                    self.product_id = line.product_id
+                    break
         else:
             # Si se quita la venta, limpiar producto
             self.product_id = False

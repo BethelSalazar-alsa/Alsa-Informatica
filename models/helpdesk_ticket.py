@@ -15,7 +15,7 @@ class HelpdeskTicket(models.Model):
         """Cuando se selecciona una venta, pre-carga el cliente y sus licencias"""
         if self.sale_order_id:
             # Pre-cargar cliente de la venta
-            self.partner_id = self.sale_order_id.partner_id.id
+            self.partner_id = self.sale_order_id.partner_id
             
             # Pre-cargar licencias del cliente
             licencias = self.env['licencia.contpaqi'].search([
