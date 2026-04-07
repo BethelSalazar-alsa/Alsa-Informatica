@@ -18,8 +18,15 @@ class LicenciaContpaqi(models.Model):
         ('otro', 'Otro')
     ], string='Tipo de Software', default='contpaqi', required=True, tracking=True)
 
+    # NUEVOS CAMPOS PARA EVITAR REDUNDANCIA
+    sale_order_id = fields.Many2one('sale.order', string='Orden de Venta Relacionada', 
+                                      tracking=True, help='La venta de donde viene esta licencia')
+    product_id = fields.Many2one('product.product', string='Producto', tracking=True, 
+                                  help='Detectado automáticamente desde la venta')
+    
     partner_id = fields.Many2one('res.partner', string='Cliente', required=False, index=True, 
-                                 default=lambda self: self.env.context.get('default_partner_id'))
+                                 default=lambda self: self.env.context.get('default_partner_id'),
+                                 help='Se pre-carga desde la venta si existe')
     fecha_vencimiento = fields.Date(string='Fecha de Vencimiento', tracking=True)
     vendedor_id = fields.Many2one('res.users', string='Vendedor', default=lambda self: self.env.user)
     linea_ids = fields.One2many('licencia.linea', 'licencia_id', string='Equipos')
@@ -29,6 +36,24 @@ class LicenciaContpaqi(models.Model):
         ('renovada', 'Renovada'),
         ('cancelada', 'Cancelada')
     ], string='Estado', default='activa', tracking=True)
+
+    # ONCHANGE: Cuando se selecciona una venta, pre-carga cliente y producto
+    @api.onchange('sale_order_id')
+    def _onchange_sale_order_id(self):
+        """Auto-carga el cliente y producto desde la venta seleccionada"""
+        if self.sale_order_id:
+            # Pre-cargar el cliente de la venta
+            self.partner_id = self.sale_order_id.partner_id.id
+            
+            # Buscar producto licenciable en las líneas de la venta
+            # (en general, los primeros productos en ventas de software)
+            for line in self.sale_order_id.order_line:
+                if line.product_id and line.product_id.type in ['service', 'product']:
+                    self.product_id = line.product_id.id
+                    break  # Tomar el primer producto encontrado
+        else:
+            # Si se quita la venta, limpiar producto
+            self.product_id = False
 
     def action_set_renovada(self):
         self.state = 'renovada'

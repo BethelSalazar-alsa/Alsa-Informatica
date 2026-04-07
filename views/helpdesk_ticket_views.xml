@@ -94,13 +94,24 @@
         <field name="model">helpdesk.ticket</field>
         <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
         <field name="arch" type="xml">
+            <!-- AGREGAR CAMPO sale_order_id PARA PRE-CARGAR INFORMACIÓN -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="sale_order_id" 
+                    help="Selecciona una venta para pre-cargar cliente y sus licencias"/>
+            </xpath>
+            
             <xpath expr="//notebook" position="inside">
                 <!-- Pestaña 1: Licencias -->
                 <page string="Licencias" name="licencias_soporte">
+                    <p class="oe_hint">
+                        Licencias del cliente. Se pre-cargan automáticamente cuando seleccionas cliente o venta.
+                    </p>
                     <field name="licencia_ids" context="{'default_partner_id': partner_id}">
                         <list editable="bottom">
                             <field name="name" string="Serie/Licencia"/>
+                            <field name="software_type"/>
                             <field name="fecha_vencimiento"/>
+                            <field name="state" widget="badge"/>
                             <field name="vendedor_id" widget="many2one_avatar_user"/>
                         </list>
                     </field>
@@ -109,12 +120,15 @@
                 <!-- Pestaña 2: Equipos -->
                 <page string="Equipos/Instalaciones" name="equipos_soporte">
                     <!-- El dominio filtra equipos cuyo dueño de licencia sea el cliente del ticket -->
+                    <p class="oe_hint">
+                        Equipos instalados bajo las licencias del cliente.
+                    </p>
                     <field name="equipo_ids" 
                         domain="[('licencia_id.partner_id', 'child_of', partner_id)]"
                         context="{'default_partner_id': partner_id}">
                         <list editable="bottom">
                             <field name="nombre_equipo"/>
-                            <field name="tipo"/>
+                            <field name="tipo" widget="badge"/>
                             <field name="caracteristicas"/>
                             <field name="licencia_id" string="Serie Relacionada"/>
                         </list>
