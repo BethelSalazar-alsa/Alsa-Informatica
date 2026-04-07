@@ -43,12 +43,30 @@
                     <div class="oe_title">
                         <h1><field name="name" placeholder="Número de Serie / Licencia"/></h1>
                     </div>
-                    <group>
+                    
+                    <!-- SECCIÓN 1: Origen de la Licencia (Venta) -->
+                    <group string="Origen - Venta (Si aplica)">
                         <group>
-                            <field name="partner_id"/>
+                            <!-- sale_order_id: Para pre-cargar datos -->
+                            <field name="sale_order_id" 
+                                help="Selecciona una venta para auto-cargar cliente y producto"/>
+                            <!-- product_id: Auto-detectado desde la venta (readonly) -->
+                            <field name="product_id" readonly="1" 
+                                help="Se carga automáticamente desde la venta"/>
+                        </group>
+                    </group>
+                    
+                    <!-- SECCIÓN 2: Datos del Cliente y Licencia -->
+                    <group string="Información de la Licencia">
+                        <group>
+                            <!-- partner_id: Pre-cargado desde venta (mostramos pero es editable solo si no viene de venta) -->
+                            <field name="partner_id" 
+                                readonly="sale_order_id"
+                                help="Pre-cargado desde la venta"/>
                             <field name="vendedor_id" widget="many2one_avatar_user"/>
                         </group>
                         <group>
+                            <field name="software_type"/>
                             <field name="fecha_vencimiento"/>
                         </group>
                     </group>
