@@ -1,5 +1,4 @@
 
-
 from odoo import models, fields, api
 
 class SaleOrder(models.Model):
@@ -23,17 +22,53 @@ class SaleOrder(models.Model):
             # El comando (6, 0, [ids]) reemplaza la lista actual con los nuevos IDs
             self.licencia_ids = [(6, 0, licencias.ids)]
 
-    def action_crear_licencia_rapida(self):
-        """Abre el formulario para crear una licencia rápidamente desde la venta"""
-        # Pasar contexto con la venta pre-seleccionada
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'licencia.contpaqi',
-            'view_mode': 'form',
-            'view_type': 'form',
-            'target': 'new',  # Abre en una ventana emergente
-            'context': {
-                'default_sale_order_id': self.id,
-                'default_partner_id': self.partner_id.id,
+    def action_crear_licencia_por_producto(self):
+        """Crea licencias para cada producto que tenga número de serie y aún no tenga licencia registrada"""
+        licencias_creadas = 0
+        for line in self.order_line:
+            if line.numero_serie and not self.env['licencia.contpaqi'].search([
+                ('name', '=', line.numero_serie),
+                ('sale_order_id', '=', self.id)
+            ]):
+                # Crear licencia para cada línea con número de serie
+                self.env['licencia.contpaqi'].create({
+                    'name': line.numero_serie,
+                    'sale_order_id': self.id,
+                    'partner_id': self.partner_id.id,
+                    'product_id': line.product_id.id,
+                    'software_type': 'contpaqi',
+                    'vendedor_id': self.env.user.id,
+                })
+                licencias_creadas += 1
+        
+        if licencias_creadas > 0:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Éxito',
+                    'message': f'{licencias_creadas} licencia(s) creada(s) exitosamente',
+                    'type': 'success',
+                    'sticky': True,
+                }
             }
-        }
+        else:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': 'Información',
+                    'message': 'No hay productos con número de serie o ya tienen licencias registradas',
+                    'type': 'info',
+                    'sticky': True,
+                }
+            }
+
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+    
+    numero_serie = fields.Char(
+        string='Número de Serie/Licencia',
+        help='Número de serie del producto (ej: ABC123XYZ)'
+    )
