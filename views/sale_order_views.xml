@@ -83,16 +83,3 @@
     </record>
 
 </odoo>
-
-    <record id="view_sales_order_filter_licencia_inherit" model="ir.ui.view">
-        <field name="name">sale.order.search.licencia.inherit</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="licencia_ids" string="Número de Serie"/>
-            </xpath>
-        </field>
-    </record>
-
-</odoo>
