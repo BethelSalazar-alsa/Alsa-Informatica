@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="license_registration_form" name="Registro de Licencias">
+        <t t-call="website.layout">
+            <div id="wrap" class="container mt-5 mb-5">
+                <div class="row justify-content-center">
+                    <div class="col-lg-8 shadow p-4 bg-white rounded">
+                        <h2 class="text-center mb-4">Registro de Licencia</h2>
+                        
+                        <form action="/website/form/" method="post" enctype="multipart/form-data" class="s_website_form container-fluid" data-model_name="licencia.contpaqi" data-success_page="/contactus-thank-you">
+                            <!-- Token de seguridad (Corregido) -->
+                            <input type="hidden" name="csrf_token" t-att-value="request.csrf_token()"/>
+                            
+                            <!-- Campo: Nombre/Serie -->
+                            <div class="mb-3 s_website_form_field o_website_form_required" data-type="char" data-name="Field">
+                                <div class="row s_col_no_resize s_col_no_bgcolor">
+                                    <label class="col-form-label col-sm-4" for="name">
+                                        <span class="s_website_form_label_content">Número de Serie</span>
+                                        <span class="s_website_form_mark"> *</span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <input type="text" class="form-control s_website_form_input" name="name" id="name" required="1"/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Campo: Tipo Software -->
+                            <div class="mb-3 s_website_form_field" data-type="selection" data-name="Field">
+                                <div class="row s_col_no_resize s_col_no_bgcolor">
+                                    <label class="col-form-label col-sm-4" for="software_type">
+                                        <span class="s_website_form_label_content">Tipo de Software</span>
+                                    </label>
+                                    <div class="col-sm-8">
+                                        <select class="form-select s_website_form_input" name="software_type" id="software_type">
+                                            <option value="contpaqi">CONTPAQi</option>
+                                            <option value="office">Microsoft Office</option>
+                                            <option value="antivirus">Antivirus</option>
+                                            <option value="otro">Otro</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Botón y Contenedor de Resultado (Indispensable) -->
+                            <div class="text-center mt-4">
+                                <button type="submit" class="btn btn-primary s_website_form_send">Registrar Licencia</button>
+                                <div id="s_website_form_result" class="mt-3"></div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </t>
+    </template>
+</odoo>
