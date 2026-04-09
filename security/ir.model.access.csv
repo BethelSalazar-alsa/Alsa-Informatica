@@ -1,3 +1,6 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_licencia_contpaqi,Acceso a Licencias Contpaqi,gestion_licencias.model_licencia_contpaqi,base.group_user,1,1,1,1
 access_licencia_linea,Acceso a Líneas de Licencias,gestion_licencias.model_licencia_linea,base.group_user,1,1,1,1
+access_sale_order_basic,Acceso a Órdenes de Venta,model_sale_order,base.group_user,1,1,0,0
+access_res_partner_basic,Acceso a Clientes,model_res_partner,base.group_user,1,1,0,0
+access_helpdesk_ticket_basic,Acceso a Tickets,model_helpdesk_ticket,base.group_user,1,1,0,0
