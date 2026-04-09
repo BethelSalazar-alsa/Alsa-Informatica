@@ -10,7 +10,11 @@ class ResPartner(models.Model):
         string='Licencias Contpaqi'
     )
     
-    licencia_count = fields.Integer(compute='_compute_licencia_count', string='Número de Licencias')
+    licencia_count = fields.Integer(
+        compute='_compute_licencia_count', 
+        string='Número de Licencias',
+        store=True
+    )
 
     @api.depends('licencia_ids')
     def _compute_licencia_count(self):
