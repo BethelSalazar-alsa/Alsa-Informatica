@@ -9,7 +9,9 @@
             <xpath expr="//notebook" position="inside">
                 <!-- Pestaña 1: Licencias -->
                 <page string="Licencias" name="licencias_soporte">
-                    <field name="licencia_ids" context="{'default_partner_id': partner_id}">
+                    <field name="licencia_ids" 
+                        domain="[('partner_id', 'child_of', partner_id)]"
+                        context="{'default_partner_id': partner_id}">
                         <list editable="bottom">
                             <field name="name" string="Serie/Licencia"/>
                             <field name="product_id"/>

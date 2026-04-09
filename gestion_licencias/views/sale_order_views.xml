@@ -6,7 +6,8 @@
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
             <xpath expr="//header" position="inside">
-                <button name="action_sync_licenses_to_lines" type="object" string="Sincronizar Licencias" class="oe_highlight" invisible="state not in ['draft', 'sent', 'sale']"/>
+                <button name="action_create_licenses_from_lines" type="object" string="Generar Licencias" class="oe_highlight" invisible="state not in ['draft', 'sent']"/>
+                <button name="action_sync_licenses_to_lines" type="object" string="Sincronizar Licencias" invisible="state not in ['draft', 'sent', 'sale']"/>
             </xpath>
             <xpath expr="//notebook" position="inside">
                 <page string="Licencias" name="licencias_tab">

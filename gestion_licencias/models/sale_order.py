@@ -24,3 +24,26 @@ class SaleOrder(models.Model):
                         desc = l.name or ""
                         if licencia.name not in desc:
                             l.name = f"{desc}\n[Licencia/Serie: {licencia.name}]"
+
+    def action_create_licenses_from_lines(self):
+        """ Genera registros de licencia para los productos en las líneas que no son servicios """
+        licencia_model = self.env['licencia.contpaqi']
+        for order in self:
+            for line in order.order_line:
+                if line.product_id.type != 'service':
+                    # Evitar duplicados para el mismo pedido/producto si ya existen
+                    existing = licencia_model.search([
+                        ('partner_id', '=', order.partner_id.id),
+                        ('product_id', '=', line.product_id.id),
+                        ('state', '=', 'activa')
+                    ])
+                    if not existing:
+                        licencia_model.create({
+                            'name': f'SERIE-{order.name}-{line.id}', # Generamos un temporal
+                            'partner_id': order.partner_id.id,
+                            'product_id': line.product_id.id,
+                            'vendedor_id': order.user_id.id,
+                            'software_type': 'contpaqi',
+                        })
+            # Actualizar la lista m2m del pedido
+            order._onchange_partner_id_licencias()
