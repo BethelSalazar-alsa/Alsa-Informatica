@@ -18,11 +18,12 @@ class LicenciaContpaqi(models.Model):
         ('otro', 'Otro')
     ], string='Tipo de Software', default='contpaqi', required=True, tracking=True)
 
-    partner_id = fields.Many2one('res.partner', string='Cliente', required=False, index=True, 
+    partner_id = fields.Many2one('res.partner', string='Cliente', required=True, index=True, 
                                  default=lambda self: self.env.context.get('default_partner_id'))
+    product_id = fields.Many2one('product.product', string='Producto Relacionado', tracking=True)
     fecha_vencimiento = fields.Date(string='Fecha de Vencimiento', tracking=True)
     vendedor_id = fields.Many2one('res.users', string='Vendedor', default=lambda self: self.env.user)
-    linea_ids = fields.One2many('licencia.linea', 'licencia_id', string='Equipos')
+    linea_ids = fields.One2many('licencia.linea', 'licencia_id', string='Equipos Relacionados')
     
     state = fields.Selection([
         ('activa', 'Activa'),
@@ -94,9 +95,9 @@ class LicenciaLinea(models.Model):
 
     licencia_id = fields.Many2one('licencia.contpaqi', string='Licencia', ondelete='cascade')    
     nombre_equipo = fields.Char(string='Nombre del Equipo', required=True)
-    tipo = fields.Selection([('terminal', 'Terminal'), ('servidor', 'Servidor')], default='terminal')
+    tipo = fields.Selection([('terminal', 'Terminal'), ('servidor', 'Servidor')], string='Tipo de Equipo', default='terminal', required=True)
     caracteristicas = fields.Text(string='Características')
-    # Campos adicionales para el formulario web
+    # Campos adicionales
     empleado_id = fields.Many2one('res.users', string='Empleado asignado')
-    producto_relacionado = fields.Char(string='Producto/Software') # O Many2one a product.product
-    vencimiento_id = fields.Date(string='Fecha Vencimiento')
+    producto_relacionado = fields.Many2one('product.product', string='Software Instalado')
+    numero_serie = fields.Char(string='Número de Serie/Licencia', related='licencia_id.name', readonly=True)
