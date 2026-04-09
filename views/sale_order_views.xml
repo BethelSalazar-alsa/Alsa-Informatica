@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Agregar campo número de serie en líneas de venta -->
+    <!-- 
+    NOTA: Las vistas de herencia de líneas de venta están comentadas temporalmente
+    porque los external IDs base no existen en el módulo sale instalado.
+    Se pueden restaurar una vez que se verifiquen los IDs correctos en la versión de Odoo.
+    
     <record id="view_order_line_form_licencia_inherit" model="ir.ui.view">
         <field name="name">sale.order.line.form.licencia.inherit</field>
         <field name="model">sale.order.line</field>
@@ -12,7 +16,6 @@
         </field>
     </record>
     
-    <!-- Vista de tabla de líneas de venta con número de serie -->
     <record id="view_order_line_tree_licencia_inherit" model="ir.ui.view">
         <field name="name">sale.order.line.tree.licencia.inherit</field>
         <field name="model">sale.order.line</field>
@@ -23,6 +26,7 @@
             </xpath>
         </field>
     </record>
+    -->
     
     <record id="view_order_form_licencia_inherit" model="ir.ui.view">
         <field name="name">sale.order.form.licencia.inherit</field>
