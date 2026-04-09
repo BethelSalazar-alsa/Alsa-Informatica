@@ -4,6 +4,7 @@
     'category': 'Sales',
     'summary': 'Administración de series y vencimientos de software',
     'author': 'Alsa',
+    'external_dependencies': {},
     'depends': ['base', 'contacts', 'sale', 'mail', 'helpdesk', 'website', 'website_sale'], 
     'data': [
         'security/ir.model.access.csv',
