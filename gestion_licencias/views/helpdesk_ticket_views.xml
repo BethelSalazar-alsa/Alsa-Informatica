@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Extensión del Ticket de Helpdesk para agregar Licencias y Equipos -->
+    <record id="helpdesk_ticket_view_form_inherit_licencias" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.form.inherit.licencias</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+        <field name="arch" type="xml">
+            <!-- AGREGAR CAMPO sale_order_id PARA PRE-CARGAR INFORMACIÓN -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="sale_order_id"
+                    domain="[('partner_id', '=', partner_id)]"
+                    attrs="{'invisible': [('partner_id', '=', False)]}"
+                    help="Selecciona una venta para pre-cargar cliente y sus licencias. Se auto-filtra por cliente."/>
+            </xpath>
+            
+            <xpath expr="//notebook" position="inside">
+                <!-- Pestaña Unificada: Licencias y Equipos -->
+                <page string="📋 Licencias &amp; Equipos" name="licencias_equipos_tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Licencias del Cliente</h4>
+                            <p class="oe_hint">
+                                Licencias registradas. Se pre-cargan al seleccionar cliente o venta.
+                            </p>
+                            <field name="licencia_ids" nolabel="1" context="{'default_partner_id': partner_id}">
+                                <list editable="bottom">
+                                    <field name="name" string="Serie"/>
+                                    <field name="software_type"/>
+                                    <field name="fecha_vencimiento"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h4>Equipos Instalados</h4>
+                            <p class="oe_hint">
+                                Equipos bajo las licencias del cliente.
+                            </p>
+                            <field name="equipo_ids" nolabel="1"
+                                domain="[('licencia_id.partner_id', 'child_of', partner_id)]"
+                                context="{'default_partner_id': partner_id}">
+                                <list editable="bottom">
+                                    <field name="nombre_equipo"/>
+                                    <field name="tipo" widget="badge"/>
+                                    <field name="caracteristicas"/>
+                                    <field name="licencia_id" string="Serie"/>
+                                </list>
+                            </field>
+                        </div>
+                    </div>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

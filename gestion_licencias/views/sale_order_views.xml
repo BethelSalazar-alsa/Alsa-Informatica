@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Agregar campo número de serie en líneas de venta -->
+    <record id="view_order_line_form_licencia_inherit" model="ir.ui.view">
+        <field name="name">sale.order.line.form.licencia.inherit</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="sale.view_order_line_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="numero_serie" placeholder="Ej: ABC123XYZ" help="Número de serie o licencia del producto"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <!-- Vista de tabla de líneas de venta con número de serie -->
+    <record id="view_order_line_tree_licencia_inherit" model="ir.ui.view">
+        <field name="name">sale.order.line.tree.licencia.inherit</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="sale.view_order_line_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='product_id']" position="after">
+                <field name="numero_serie"/>
+            </xpath>
+        </field>
+    </record>
+    
+    <record id="view_order_form_licencia_inherit" model="ir.ui.view">
+        <field name="name">sale.order.form.licencia.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//notebook" position="inside">
+                <!-- PESTAÑA UNIFICADA: Licencias (Existentes + Creadas) -->
+                <page string="📋 Licencias" name="licencias_tab">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h4>Licencias del Cliente</h4>
+                            <p class="oe_hint">Licencias registradas anteriormente para este cliente</p>
+                            <field name="licencia_ids" nolabel="1">
+                                <list editable="bottom">
+                                    <field name="name" string="Serie"/>
+                                    <field name="software_type"/>
+                                    <field name="fecha_vencimiento"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </div>
+                        <div class="col-md-6">
+                            <h4>Licencias Creadas en Esta Venta</h4>
+                            <p class="oe_hint" invisible="licencia_creada_ids">
+                                No hay licencias registradas aún.
+                            </p>
+                            <field name="licencia_creada_ids" nolabel="1" readonly="1">
+                                <list>
+                                    <field name="name" string="Serie"/>
+                                    <field name="software_type"/>
+                                    <field name="fecha_vencimiento"/>
+                                    <field name="state" widget="badge"/>
+                                </list>
+                            </field>
+                        </div>
+                    </div>
+                </page>
+            </xpath>
+            
+            <!-- AGREGAR BOTÓN PARA CREAR LICENCIA POR CADA PRODUCTO -->
+            <xpath expr="//button[@name='action_quotation_send']" position="before">
+                <button name="action_crear_licencia_por_producto" string="➕ Registrar Licencias de Productos" 
+                    type="object" class="btn-info" help="Crea una licencia para cada producto que aún no tenga registro"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="view_sales_order_filter_licencia_inherit" model="ir.ui.view">
+        <field name="name">sale.order.search.licencia.inherit</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="licencia_ids" string="Número de Serie"/>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>
