@@ -18,7 +18,7 @@
         <field name="name">cotizacion.express.form</field>
         <field name="model">cotizacion.express</field>
         <field name="arch" type="xml">
-            <form>
+            <form autosave="1">
                 <header>
                     <button name="action_send_to_client" string="Enviar al Cliente" type="object" class="oe_highlight" invisible="state not in ['draft']"/>
                     <button name="action_confirm_sale_order" string="Crear Orden de Venta" type="object" class="btn-primary" invisible="state not in ['sent','confirmed']"/>
@@ -61,7 +61,6 @@
 
                         <div class="col-lg-5" style="flex: 4; padding-left: 15px; background: #f8f9fa; min-height: 600px; position: sticky; top: 0;">
                             <field name="pdf_preview" widget="pdf_viewer" nolabel="1"/>
-                            <field name="preview_trigger" widget="cotizacion_auto_save" invisible="1"/>
                         </div>
                     </div>
                 </sheet>

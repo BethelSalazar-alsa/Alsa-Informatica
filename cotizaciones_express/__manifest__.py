@@ -14,12 +14,7 @@
         'report/cotizacion_report.xml',
         'data/mail_template.xml',
     ],
-    'assets': {
-        'web.assets_backend': [
-            'cotizaciones_express/static/src/js/cotizacion_preview.js',
-            'cotizaciones_express/static/src/xml/preview_template.xml',
-        ],
-    },
+
     'installable': True,
     'application': True,
     'license': 'LGPL-3',
