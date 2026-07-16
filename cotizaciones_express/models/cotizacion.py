@@ -71,7 +71,7 @@ class CotizacionExpress(models.Model):
         self.ensure_one()
         self.state = 'sent'
         report = self.env.ref('cotizaciones_express.report_cotizacion_express')
-        pdf_content, _ = report._render_qweb_pdf(self.ids)
+        pdf_content, _ = report._render_qweb_pdf(report.id, res_ids=self.ids)
         attachment = self.env['ir.attachment'].create({
             'name': f'Cotizacion_{self.name or "sin_numero"}.pdf',
             'raw': pdf_content,
