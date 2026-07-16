@@ -79,7 +79,7 @@
         <field name="name">cotizacion.express.option.tree</field>
         <field name="model">cotizacion.express.option</field>
         <field name="arch" type="xml">
-            <tree editable="bottom">
+            <list editable="bottom">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="description" widget="html"/>
@@ -87,7 +87,7 @@
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_total" sum="IVA"/>
                 <field name="total" sum="Total"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -119,7 +119,7 @@
         <field name="name">cotizacion.express.option.line.tree</field>
         <field name="model">cotizacion.express.option.line</field>
         <field name="arch" type="xml">
-            <tree editable="bottom">
+            <list editable="bottom">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="description" widget="html"/>
@@ -129,7 +129,7 @@
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_amount" sum="IVA"/>
                 <field name="total" sum="Total"/>
-            </tree>
+            </list>
         </field>
     </record>
 
