@@ -21,7 +21,6 @@
             <form>
                 <header>
                     <button name="action_send_to_client" string="Enviar al Cliente" type="object" class="oe_highlight" invisible="state not in ['draft']"/>
-                    <button name="action_mark_crm_opportunity" string="Marcar como Oportunidad CRM" type="object" class="btn-secondary" invisible="state not in ['draft', 'sent']" confirm="¿Crear una oportunidad CRM a partir de esta cotización?"/>
                     <button name="action_confirm_sale_order" string="Crear Orden de Venta" type="object" class="btn-primary" invisible="state not in ['sent','confirmed']"/>
                     <button name="action_confirm" string="Confirmar Cotización" type="object" class="oe_highlight" invisible="state not in ['draft', 'sent']"/>
                     <button name="action_draft" string="Volver a Borrador" type="object" invisible="state == 'draft'"/>
@@ -52,7 +51,7 @@
 
                             <notebook>
                                 <page string="Opciones" name="options">
-                                    <field name="option_ids"/>
+                                    <field name="option_ids" mode="form"/>
                                 </page>
                                 <page string="Términos" name="notes">
                                     <field name="notes" widget="html"/>
