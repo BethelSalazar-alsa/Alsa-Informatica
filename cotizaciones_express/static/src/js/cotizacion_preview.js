@@ -8,7 +8,17 @@ odoo.define('cotizaciones_express.cotizacion_preview', function (require) {
     FormController.include({
         renderButtons: function () {
             this._super.apply(this, arguments);
+            this._setPreviewSrc();
             this._setupPreviewRefresh();
+        },
+
+        _setPreviewSrc: function () {
+            var iframe = document.getElementById('cotizacion_preview_iframe');
+            if (!iframe) return;
+            var resId = this.resId || (this.model && this.model.getResId && this.model.getResId());
+            if (resId) {
+                iframe.src = '/cotizacion/preview_html/' + resId;
+            }
         },
 
         _setupPreviewRefresh: function () {
@@ -25,7 +35,7 @@ odoo.define('cotizaciones_express.cotizacion_preview', function (require) {
 
         _refreshPreview: function () {
             var iframe = document.getElementById('cotizacion_preview_iframe');
-            if (iframe) {
+            if (iframe && iframe.src) {
                 iframe.src = iframe.src;
             }
         },
