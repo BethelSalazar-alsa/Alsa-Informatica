@@ -11,6 +11,7 @@ class CotizacionExpressController(http.Controller):
             return '<html><body style="font-family:sans-serif;color:#999;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><p>Cotización no encontrada</p></body></html>'
         return request.render('cotizaciones_express.cotizacion_preview_template', {
             'docs': cotizacion,
+            'preview_mode': True,
         })
 
     @http.route('/cotizacion/image/<string:model>/<int:record_id>/<string:field>', type='http', auth='user', website=False)

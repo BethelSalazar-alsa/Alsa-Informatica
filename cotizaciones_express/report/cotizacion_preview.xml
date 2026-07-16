@@ -148,5 +148,10 @@
             </t>
             </main>
         </div>
+        <t t-if="preview_mode">
+            <script>
+                (function(){function r(){var t=(new Date).getTime();window.location.href=window.location.href.split("?")[0]+"?t="+t}setTimeout(r,3e3)})();
+            </script>
+        </t>
     </template>
 </odoo>
