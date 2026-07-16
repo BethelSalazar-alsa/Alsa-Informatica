@@ -36,11 +36,13 @@ class CotizacionPreview extends Component {
     _bindFormEvents() {
         this._onFormChange = () => this._refresh();
         document.addEventListener("change", this._onFormChange, true);
+        document.addEventListener("input", this._onFormChange, true);
     }
 
     _unbindFormEvents() {
         if (this._onFormChange) {
             document.removeEventListener("change", this._onFormChange, true);
+            document.removeEventListener("input", this._onFormChange, true);
         }
     }
 }
