@@ -151,7 +151,7 @@
         <t t-if="preview_mode">
             <script>
 <![CDATA[
-(function(){var i;(function n(){var r=window.location.pathname.match(/\/preview_html\/(\d+)/),c=r?parseInt(r[1],10):0;if(c>0){i&&clearInterval(i);i=setInterval(function(){var t=(new Date).getTime();window.location.href=window.location.href.split("?")[0]+"?t="+t},3000);return}try{var e=parent.document.querySelector(".o_form_view");if(e&&e.dataset.recordId){window.location.href="/cotizacion/preview_html/"+e.dataset.recordId+"?t="+(new Date).getTime();return}}catch(t){}setTimeout(n,1500)})()})();
+(function(){function r(){try{var e=parent.location.hash.replace(/^#/,"").split("&");for(var t=0;t<e.length;t++){var n=e[t].split("=");if(n[0]==="id"&&decodeURIComponent(n[1])>0)return parseInt(decodeURIComponent(n[1]),10)}return null}catch(e){return null}}function u(t){fetch("/cotizacion/preview_html/"+t+"?t="+(new Date).getTime()).then(function(r){return r.text()}).then(function(t){document.open();document.write(t);document.close()}).catch(function(){})}function t(){var e=r();if(e&&e>0){u(e);setTimeout(t,3e3)}else{setTimeout(t,1500)}}t()})();
 ]]>
             </script>
         </t>
