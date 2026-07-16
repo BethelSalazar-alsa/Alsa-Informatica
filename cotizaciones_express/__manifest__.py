@@ -15,7 +15,9 @@
         'data/mail_template.xml',
     ],
     'assets': {
-        'web.assets_backend': [],
+        'web.assets_backend': [
+            'cotizaciones_express/static/src/js/cotizacion_preview.js',
+        ],
     },
     'installable': True,
     'application': True,
