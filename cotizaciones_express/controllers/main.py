@@ -23,8 +23,81 @@ class CotizacionExpressController(http.Controller):
         return response
 
     @http.route('/cotizacion/preview.js', type='http', auth='public', website=False)
-    def preview_js(self):
-        js = r"""(function(){function r(){try{var e=parent.location.hash.replace(/^#/,"").split("&");for(var t=0;t<e.length;t++){var n=e[t].split("=");if(n[0]==="id"&&decodeURIComponent(n[1])>0)return parseInt(decodeURIComponent(n[1]),10)}return null}catch(e){return null}}function u(t){fetch("/cotizacion/preview_html/"+t+"?t="+(new Date).getTime()).then(function(r){return r.text()}).then(function(t){document.open();document.write(t);document.close()}).catch(function(){})}function t(){var e=r();if(e&&e>0){u(e);setTimeout(t,3e3)}else{setTimeout(t,1500)}}t()})();"""
+    def preview_js(self, **kwargs):
+        js = r"""(function() {
+    try {
+        var parentDoc = parent.document;
+        if (!parentDoc) return;
+
+        function getRecordId() {
+            var formEl = parentDoc.querySelector('.o_form_view');
+            if (formEl && formEl.dataset.recordId) {
+                var id = parseInt(formEl.dataset.recordId, 10);
+                if (id > 0) return id;
+            }
+
+            var pathname = parent.window.location.pathname;
+            var match = pathname.match(/\/cotizacion\.express\/(\d+)/);
+            if (match) return parseInt(match[1], 10);
+
+            var hash = parent.window.location.hash;
+            var hashMatch = hash.match(/[#&]id=(\d+)/);
+            if (hashMatch) return parseInt(hashMatch[1], 10);
+            
+            var queryMatch = parent.window.location.search.match(/[?&]id=(\d+)/);
+            if (queryMatch) return parseInt(queryMatch[1], 10);
+
+            return 0;
+        }
+
+        var parentId = getRecordId();
+        var currentUrlMatch = window.location.pathname.match(/\/preview_html\/(\d+)/);
+        var currentId = currentUrlMatch ? parseInt(currentUrlMatch[1], 10) : 0;
+
+        var pdfLink = parentDoc.getElementById('cotizacion_pdf_link');
+        if (pdfLink) {
+            if (parentId > 0) {
+                pdfLink.href = "/report/pdf/cotizaciones_express.cotizacion_preview_template/" + parentId;
+                pdfLink.style.display = "";
+            } else {
+                pdfLink.style.display = "none";
+            }
+        }
+
+        if (currentId === 0 && parentId > 0) {
+            window.location.href = "/cotizacion/preview_html/" + parentId + "?t=" + Date.now();
+            return;
+        }
+
+        var reloadTimeout = null;
+        function triggerReload() {
+            if (reloadTimeout) clearTimeout(reloadTimeout);
+            reloadTimeout = setTimeout(function() {
+                var activeId = getRecordId();
+                if (activeId > 0 && activeId !== currentId) {
+                    window.location.href = "/cotizacion/preview_html/" + activeId + "?t=" + Date.now();
+                } else if (activeId > 0) {
+                    window.location.reload();
+                } else if (currentId > 0) {
+                    window.location.href = "/cotizacion/preview_html/0?t=" + Date.now();
+                }
+            }, 1000);
+        }
+
+        parentDoc.addEventListener('change', triggerReload, true);
+
+        var checkInterval = setInterval(function() {
+            var activeId = getRecordId();
+            if (activeId !== currentId) {
+                clearInterval(checkInterval);
+                triggerReload();
+            }
+        }, 1500);
+
+    } catch (e) {
+        console.error("Preview iframe error:", e);
+    }
+})();"""
         return request.make_response(js, [('Content-Type', 'application/javascript; charset=utf-8')])
 
     @http.route('/cotizacion/image/<string:model>/<int:record_id>/<string:field>', type='http', auth='user', website=False)
