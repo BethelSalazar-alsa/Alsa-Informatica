@@ -12,7 +12,7 @@ class CotizacionExpress(models.Model):
     partner_name = fields.Char(related='partner_id.name', string='Nombre del Cliente')
     partner_email = fields.Char(related='partner_id.email', string='Email')
     partner_phone = fields.Char(related='partner_id.phone', string='Teléfono')
-    partner_address = fields.Text(related='partner_id.contact_address', string='Dirección')
+    partner_address = fields.Char(related='partner_id.contact_address', string='Dirección')
 
     date = fields.Date(string='Fecha', default=fields.Date.today, required=True)
     city = fields.Char(string='Ciudad', default='Colima')
