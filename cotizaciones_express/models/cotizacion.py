@@ -48,7 +48,7 @@ class CotizacionExpress(models.Model):
                  'notes')
     def _compute_pdf_preview(self):
         for rec in self:
-            if not rec.id or isinstance(rec.id, models.NewId):
+            if not rec.id or 'NewId' in str(type(rec.id)):
                 rec.pdf_preview = False
                 continue
             try:
