@@ -60,7 +60,9 @@
                         </div>
 
                         <div class="col-lg-5" style="flex: 4; padding-left: 15px; background: #f8f9fa; min-height: 600px; position: sticky; top: 0;">
-                            <field name="pdf_preview" widget="pdf_viewer" nolabel="1"/>
+                            <div style="width: 100%; height: 680px; border: 1px solid #dee2e6; border-radius: 4px; overflow: hidden; background: #fff;">
+                                <field name="pdf_preview" widget="pdf_viewer" nolabel="1" style="width: 100%; height: 680px;"/>
+                            </div>
                         </div>
                     </div>
                 </sheet>

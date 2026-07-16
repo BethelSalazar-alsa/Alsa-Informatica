@@ -39,25 +39,33 @@ class CotizacionExpress(models.Model):
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string='Moneda')
     crm_lead_id = fields.Many2one('crm.lead', string='Oportunidad CRM')
     notes = fields.Html(string='Notas / Términos')
-    pdf_preview = fields.Binary(string='Vista Previa PDF', compute='_compute_pdf_preview')
+    pdf_preview = fields.Binary(string='Vista Previa PDF', attachment=False)
 
-    @api.depends('partner_id', 'date', 'city', 'state_location', 'user_id', 'signature_id',
-                 'option_ids', 'option_ids.name', 'option_ids.line_ids',
-                 'option_ids.line_ids.name', 'option_ids.line_ids.quantity',
-                 'option_ids.line_ids.price_unit', 'option_ids.line_ids.iva_percent',
-                 'notes')
-    def _compute_pdf_preview(self):
-        for rec in self:
-            if not rec.id or 'NewId' in str(type(rec.id)):
-                rec.pdf_preview = False
-                continue
-            try:
-                report = rec.env.ref('cotizaciones_express.report_cotizacion_express')
-                pdf_content, dummy = report._render_qweb_pdf(rec.ids)
-                rec.pdf_preview = base64.b64encode(pdf_content)
-            except Exception as e:
-                rec.pdf_preview = False
-                _logger.error("Error computing PDF preview: %s", e)
+    def _generate_pdf_preview(self):
+        self.ensure_one()
+        try:
+            report = self.env.ref('cotizaciones_express.report_cotizacion_express')
+            pdf_content, dummy = report._render_qweb_pdf(self.ids)
+            self.env.cr.execute(
+                "UPDATE cotizacion_express SET pdf_preview = %s WHERE id = %s",
+                (base64.b64encode(pdf_content).decode(), self.id)
+            )
+        except Exception as e:
+            _logger.error("Error generating PDF preview: %s", e)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super(CotizacionExpress, self).create(vals_list)
+        for record in records:
+            record._generate_pdf_preview()
+        return records
+
+    def write(self, vals):
+        res = super(CotizacionExpress, self).write(vals)
+        if 'pdf_preview' not in vals:
+            for record in self:
+                record._generate_pdf_preview()
+        return res
 
     def action_send_to_client(self):
         self.ensure_one()
