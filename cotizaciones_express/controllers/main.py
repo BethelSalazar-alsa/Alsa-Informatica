@@ -9,9 +9,9 @@ class CotizacionExpressController(http.Controller):
         if cotizacion_id > 0:
             cotizacion = request.env['cotizacion.express'].browse(cotizacion_id)
             if not cotizacion.exists():
-                cotizacion = request.env['cotizacion.express']
+                cotizacion = request.env['cotizacion.express'].new({'name': 'Nueva'})
         else:
-            cotizacion = request.env['cotizacion.express']
+            cotizacion = request.env['cotizacion.express'].new({'name': 'Nueva'})
 
         response = request.render('cotizaciones_express.cotizacion_preview_template', {
             'docs': cotizacion,

@@ -149,7 +149,7 @@
             </main>
         </div>
         <t t-if="preview_mode">
-            <script src="/cotizacion/preview.js"/>
+            <script src="/cotizacion/preview.js"></script>
         </t>
     </template>
 </odoo>
