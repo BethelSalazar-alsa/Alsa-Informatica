@@ -121,7 +121,7 @@ class CotizacionExpress(models.Model):
                     'name': line.name + ('\n' + line.description if line.description else ''),
                     'product_uom_qty': line.quantity,
                     'price_unit': line.price_unit,
-                    'tax_id': [(6, 0, self.env['account.tax'].search([
+                    'tax_ids': [(6, 0, self.env['account.tax'].search([
                         ('amount', '=', line.iva_percent),
                         ('type_tax_use', '=', 'sale'),
                     ], limit=1).ids)] if line.iva_percent else False,
