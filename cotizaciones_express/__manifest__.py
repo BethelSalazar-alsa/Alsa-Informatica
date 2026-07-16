@@ -11,7 +11,6 @@
         'views/seller_signature_views.xml',
         'views/cotizacion_views.xml',
         'report/cotizacion_preview.xml',
-        'report/cotizacion_preview_html.xml',
         'report/cotizacion_report.xml',
         'data/mail_template.xml',
     ],
