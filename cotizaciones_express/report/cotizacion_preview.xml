@@ -66,7 +66,7 @@
                     <div class="recipient-section">
                         <div class="presente">PRESENTE</div>
                         <div class="date">
-                            <t t-esc="doc.city"/>, <t t-esc="doc.state"/>,
+                            <t t-esc="doc.city"/>, <t t-esc="doc.state_location"/>,
                             <t t-if="doc.date">
                                 <t t-esc="doc.date.strftime('%d')"/> de
                                 <t t-set="months" t-value="['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']"/>
@@ -149,11 +149,7 @@
             </main>
         </div>
         <t t-if="preview_mode">
-            <script>
-<![CDATA[
-(function(){function r(){try{var e=parent.location.hash.replace(/^#/,"").split("&");for(var t=0;t<e.length;t++){var n=e[t].split("=");if(n[0]==="id"&&decodeURIComponent(n[1])>0)return parseInt(decodeURIComponent(n[1]),10)}return null}catch(e){return null}}function u(t){fetch("/cotizacion/preview_html/"+t+"?t="+(new Date).getTime()).then(function(r){return r.text()}).then(function(t){document.open();document.write(t);document.close()}).catch(function(){})}function t(){var e=r();if(e&&e>0){u(e);setTimeout(t,3e3)}else{setTimeout(t,1500)}}t()})();
-]]>
-            </script>
+            <script src="/cotizacion/preview.js"/>
         </t>
     </template>
 </odoo>

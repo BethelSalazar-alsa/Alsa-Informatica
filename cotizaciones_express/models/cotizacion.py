@@ -16,7 +16,7 @@ class CotizacionExpress(models.Model):
 
     date = fields.Date(string='Fecha', default=fields.Date.today, required=True)
     city = fields.Char(string='Ciudad', default='Colima')
-    state = fields.Char(string='Estado', default='Col.')
+    state_location = fields.Char(string='Estado', default='Col.')
 
     user_id = fields.Many2one('res.users', string='Vendedor', default=lambda self: self.env.user, required=True)
     signature_id = fields.Many2one('seller.signature', string='Firma del Vendedor',
@@ -35,6 +35,16 @@ class CotizacionExpress(models.Model):
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string='Moneda')
     crm_lead_id = fields.Many2one('crm.lead', string='Oportunidad CRM')
     notes = fields.Html(string='Notas / Términos')
+    preview_trigger = fields.Char(string='Preview', compute='_compute_preview_trigger')
+
+    @api.depends('partner_id', 'date', 'city', 'state_location', 'user_id', 'signature_id',
+                 'option_ids', 'option_ids.name', 'option_ids.line_ids',
+                 'option_ids.line_ids.name', 'option_ids.line_ids.quantity',
+                 'option_ids.line_ids.price_unit', 'option_ids.line_ids.iva_percent',
+                 'notes')
+    def _compute_preview_trigger(self):
+        for rec in self:
+            rec.preview_trigger = str(fields.Datetime.now())
 
     def action_send_to_client(self):
         self.ensure_one()

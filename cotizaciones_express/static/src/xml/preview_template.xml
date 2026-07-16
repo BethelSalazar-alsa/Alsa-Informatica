@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <templates xml:space="preserve">
-    <t t-name="cotizaciones_express.PreviewIframe" owl="1">
-        <iframe t-att-src="state.src"
-                style="width: 100%; height: calc(100vh - 250px); border: 1px solid #dee2e6; border-radius: 4px; background: white;"/>
+    <t t-name="cotizaciones_express.CotizacionPreview" owl="1">
+        <div class="cotizacion-preview-panel" style="height: 100%;">
+            <div style="padding: 10px 0; border-bottom: 1px solid #dee2e6; margin-bottom: 10px;">
+                <h4 style="margin:0; color: #1a56db; display: flex; justify-content: space-between; align-items: center;">
+                    <span>
+                        <i class="fa fa-file-pdf-o"/> Vista Previa
+                        <a href="#" t-on-click.prevent="onClickRefresh"
+                           style="font-size:9pt; color: #888; margin-left: 10px; text-decoration:none;"
+                           title="Refrescar vista previa">
+                            <i class="fa fa-refresh"/>
+                        </a>
+                    </span>
+                    <a href="#" t-on-click.prevent="onClickDownloadPdf"
+                       style="font-size:9pt; color: #1a56db; text-decoration:none;">
+                        <i class="fa fa-download"/> PDF
+                    </a>
+                </h4>
+            </div>
+            <div t-if="state.isLoading"
+                 style="text-align:center; padding: 20px; color: #888;">
+                <i class="fa fa-spinner fa-spin fa-2x"/>
+                <div style="margin-top:10px; font-size:10pt;">Cargando vista previa...</div>
+            </div>
+            <iframe t-ref="previewIframe"
+                    t-att-src="state.iframeSrc"
+                    t-att-style="'width: 100%; height: calc(100vh - 280px); border: 1px solid #dee2e6; border-radius: 4px; background: white;' + (state.isLoading ? ' visibility: hidden; height: 0;' : '')"/>
+        </div>
     </t>
 </templates>
