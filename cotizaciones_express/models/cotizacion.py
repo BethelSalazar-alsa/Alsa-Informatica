@@ -42,29 +42,29 @@ class CotizacionExpress(models.Model):
     pdf_preview = fields.Binary(string='Vista Previa PDF', attachment=False)
 
     def _generate_pdf_preview(self):
-        self.ensure_one()
-        try:
-            report = self.env.ref('cotizaciones_express.report_cotizacion_express')
-            pdf_content, dummy = report._render_qweb_pdf(self.ids)
-            self.env.cr.execute(
-                "UPDATE cotizacion_express SET pdf_preview = %s WHERE id = %s",
-                (base64.b64encode(pdf_content).decode(), self.id)
-            )
-        except Exception as e:
-            _logger.error("Error generating PDF preview: %s", e)
+        """Método interno para renderizar el PDF y guardarlo en el campo binario"""
+        for record in self:
+            try:
+                report_id = self.env.ref('cotizaciones_express.report_cotizacion_express')
+                pdf_content, dummy = self.env['ir.actions.report']._render_qweb_pdf(report_id, res_ids=record.ids)
+                # Usamos super().write() para evitar recursión infinita y guardar de forma silenciosa
+                super(CotizacionExpress, record).write({'pdf_preview': pdf_content})
+            except Exception as e:
+                _logger.error("Error generating PDF preview: %s", e)
 
     @api.model_create_multi
     def create(self, vals_list):
+        """Se ejecuta la primera vez que el usuario hace clic en Guardar"""
         records = super(CotizacionExpress, self).create(vals_list)
-        for record in records:
-            record._generate_pdf_preview()
+        records._generate_pdf_preview()
         return records
 
     def write(self, vals):
+        """Se ejecuta cada vez que el usuario guarda cambios"""
         res = super(CotizacionExpress, self).write(vals)
+        # Evitamos bucle infinito: solo regeneramos si el cambio NO viene del propio PDF
         if 'pdf_preview' not in vals:
-            for record in self:
-                record._generate_pdf_preview()
+            self._generate_pdf_preview()
         return res
 
     def action_send_to_client(self):
