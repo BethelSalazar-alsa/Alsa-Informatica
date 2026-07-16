@@ -9,7 +9,7 @@ class CotizacionExpressController(http.Controller):
         cotizacion = request.env['cotizacion.express'].browse(cotizacion_id)
         if not cotizacion.exists():
             return request.not_found()
-        return request.render('cotizaciones_express.cotizacion_preview_template', {
+        return request.render('cotizaciones_express.cotizacion_preview_html', {
             'docs': cotizacion,
             'company': request.env.company,
         })
@@ -19,7 +19,7 @@ class CotizacionExpressController(http.Controller):
         cotizacion = request.env['cotizacion.express'].browse(cotizacion_id)
         if not cotizacion.exists():
             return request.not_found()
-        return request.render('cotizaciones_express.cotizacion_preview_template', {
+        return request.render('cotizaciones_express.cotizacion_preview_html', {
             'docs': cotizacion,
             'company': request.env.company,
         })
