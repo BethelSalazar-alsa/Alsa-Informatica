@@ -90,7 +90,12 @@
                                                 <span t-field="line.quantity" t-options="{&quot;widget&quot;: &quot;integer&quot;}" />
                                             </td>
                                             <td style="vertical-align: top; padding: 3px 4px; text-align: left; border: none; line-height: 1.25; font-size: 13px; white-space: normal;">
-                                                <span t-field="line.name" />
+                                                <span t-field="line.name" style="font-weight: bold;"/>
+                                                <t t-if="line.description">
+                                                    <div style="font-size: 11.5px; color: #555; margin-top: 3px; line-height: 1.2;">
+                                                        <t t-out="line.description"/>
+                                                    </div>
+                                                </t>
                                             </td>
                                             <td style="vertical-align: top; padding: 3px 0; text-align: right; border: none; font-size: 13px;">
                                                 <span t-field="line.price_unit" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
