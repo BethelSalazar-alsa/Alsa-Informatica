@@ -182,8 +182,8 @@
 
     <menuitem id="menu_cotizaciones_list" name="Cotizaciones" parent="menu_cotizaciones_root" action="action_cotizacion_express" sequence="10"/>
 
-    <template id="cotizacion_preview_assets" inherit_id="web.assets_backend" name="Cotización Express Preview JS">
-        <xpath expr="." position="inside">
+    <template id="cotizacion_preview_assets" inherit_id="web.html_container" name="Cotización Express Preview JS">
+        <xpath expr="//body" position="inside">
             <script>
                 (function() {
                     function refreshPreview() {
