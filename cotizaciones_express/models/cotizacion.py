@@ -1,3 +1,4 @@
+import base64
 import logging
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
@@ -69,8 +70,9 @@ class CotizacionExpress(models.Model):
         try:
             # Reemplaza por el ID externo de tu reporte
             report = self.env.ref('cotizaciones_express.report_cotizacion_express')
-            pdf_content, dummy = self.env['ir.actions.report']._render_qweb_pdf(report, res_ids=self.ids)
-            super(CotizacionExpress, self).write({'pdf_preview': pdf_content})
+            pdf_content, dummy = report._render_qweb_pdf(self.ids)
+            pdf_base64 = base64.b64encode(pdf_content)
+            super(CotizacionExpress, self).write({'pdf_preview': pdf_base64})
         except Exception as e:
             _logger.error("Error generating PDF preview: %s", e)
 
