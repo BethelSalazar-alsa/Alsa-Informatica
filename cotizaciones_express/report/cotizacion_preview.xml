@@ -150,7 +150,9 @@
         </div>
         <t t-if="preview_mode">
             <script>
-                (function(){var i;(function n(){var r=window.location.pathname.match(/\/preview_html\/(\d+)/),c=r?parseInt(r[1],10):0;if(c>0){i&&clearInterval(i);i=setInterval(function(){var t=(new Date).getTime();window.location.href=window.location.href.split("?")[0]+"?t="+t},3000);return}try{var e=parent.document.querySelector(".o_form_view");if(e&&e.dataset.recordId){window.location.href="/cotizacion/preview_html/"+e.dataset.recordId+"?t="+(new Date).getTime();return}}catch(t){}setTimeout(n,1500)})()})();
+<![CDATA[
+(function(){var i;(function n(){var r=window.location.pathname.match(/\/preview_html\/(\d+)/),c=r?parseInt(r[1],10):0;if(c>0){i&&clearInterval(i);i=setInterval(function(){var t=(new Date).getTime();window.location.href=window.location.href.split("?")[0]+"?t="+t},3000);return}try{var e=parent.document.querySelector(".o_form_view");if(e&&e.dataset.recordId){window.location.href="/cotizacion/preview_html/"+e.dataset.recordId+"?t="+(new Date).getTime();return}}catch(t){}setTimeout(n,1500)})()})();
+]]>
             </script>
         </t>
     </template>
