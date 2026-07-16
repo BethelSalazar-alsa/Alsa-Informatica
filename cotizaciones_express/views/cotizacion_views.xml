@@ -51,7 +51,7 @@
 
                             <notebook>
                                 <page string="Opciones" name="options">
-                                    <field name="option_ids" mode="form"/>
+                                    <field name="option_ids"/>
                                 </page>
                                 <page string="Términos" name="notes">
                                     <field name="notes" widget="html"/>
@@ -81,6 +81,7 @@
             <list>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
+                <field name="selected" widget="badge" decoration-success="selected == True"/>
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_total" sum="IVA"/>
                 <field name="total" sum="Total"/>
