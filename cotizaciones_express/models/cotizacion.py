@@ -39,9 +39,17 @@ class CotizacionExpress(models.Model):
     def action_send_to_client(self):
         self.ensure_one()
         self.state = 'sent'
+        report = self.env.ref('cotizaciones_express.report_cotizacion_express')
+        pdf_content, _ = report._render_qweb_pdf(self.ids)
+        attachment = self.env['ir.attachment'].create({
+            'name': f'Cotizacion_{self.name or "sin_numero"}.pdf',
+            'raw': pdf_content,
+            'mimetype': 'application/pdf',
+        })
         template = self.env.ref('cotizaciones_express.email_template_cotizacion', raise_if_not_found=False)
         if template:
-            self.env['mail.template'].browse(template.id).send_mail(self.id, force_send=True)
+            template.send_mail(self.id, force_send=True,
+                email_values={'attachment_ids': [(4, attachment.id)]})
         return True
 
     def action_confirm(self):
