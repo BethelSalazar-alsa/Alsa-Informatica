@@ -13,6 +13,15 @@
         'report/cotizacion_preview.xml',
         'data/mail_template.xml',
     ],
+    'report': {
+        'cotizaciones_express.report_cotizacion_express': {
+            'report_type': 'qweb-pdf',
+            'model': 'cotizacion.express',
+            'name': 'cotizaciones_express.cotizacion_preview_template',
+            'file': 'cotizaciones_express.cotizacion_preview_template',
+            'print_report_name': "'Cotizacion_' + (object.name or '')",
+        },
+    },
     'assets': {
         'web.assets_backend': [
             'cotizaciones_express/static/src/js/cotizacion_preview.js',
