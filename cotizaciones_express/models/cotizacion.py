@@ -97,6 +97,27 @@ class CotizacionExpress(models.Model):
             'name': _('Órdenes de Venta'),
         }
 
+    def action_mark_crm_opportunity(self):
+        self.ensure_one()
+        if self.crm_lead_id:
+            raise UserError(_('Esta cotización ya tiene una oportunidad CRM asociada.'))
+        lead = self.env['crm.lead'].create({
+            'name': self.name,
+            'partner_id': self.partner_id.id,
+            'expected_revenue': sum(self.option_ids.mapped('total')),
+            'description': self.notes or '',
+            'user_id': self.user_id.id,
+            'team_id': self.env['crm.team'].search([], limit=1).id if self.env['crm.team'].search_count([]) else False,
+        })
+        self.crm_lead_id = lead.id
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'crm.lead',
+            'view_mode': 'form',
+            'res_id': lead.id,
+            'name': _('Oportunidad CRM'),
+        }
+
     def action_cancel(self):
         self.state = 'cancelled'
 

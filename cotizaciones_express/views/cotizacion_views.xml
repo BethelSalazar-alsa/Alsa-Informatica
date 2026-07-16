@@ -21,6 +21,7 @@
             <form>
                 <header>
                     <button name="action_send_to_client" string="Enviar al Cliente" type="object" class="oe_highlight" invisible="state not in ['draft']"/>
+                    <button name="action_mark_crm_opportunity" string="Marcar como Oportunidad CRM" type="object" class="btn-secondary" invisible="state not in ['draft', 'sent']" confirm="¿Crear una oportunidad CRM a partir de esta cotización?"/>
                     <button name="action_confirm_sale_order" string="Crear Orden de Venta" type="object" class="btn-primary" invisible="state not in ['sent','confirmed']"/>
                     <button name="action_confirm" string="Confirmar Cotización" type="object" class="oe_highlight" invisible="state not in ['draft', 'sent']"/>
                     <button name="action_draft" string="Volver a Borrador" type="object" invisible="state == 'draft'"/>
@@ -121,7 +122,6 @@
             <list editable="bottom">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
-                <field name="description" widget="html"/>
                 <field name="quantity"/>
                 <field name="price_unit"/>
                 <field name="iva_percent"/>
@@ -129,6 +129,31 @@
                 <field name="iva_amount" sum="IVA"/>
                 <field name="total" sum="Total"/>
             </list>
+        </field>
+    </record>
+
+    <record id="view_cotizacion_express_option_line_form" model="ir.ui.view">
+        <field name="name">cotizacion.express.option.line.form</field>
+        <field name="model">cotizacion.express.option.line</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <group>
+                        <field name="name"/>
+                        <field name="quantity"/>
+                        <field name="price_unit"/>
+                    </group>
+                    <group>
+                        <field name="iva_percent"/>
+                        <field name="subtotal"/>
+                        <field name="iva_amount"/>
+                        <field name="total"/>
+                    </group>
+                </group>
+                <group string="Descripción">
+                    <field name="description" widget="html" nolabel="1" options="{'default_height': '300px'}"/>
+                </group>
+            </form>
         </field>
     </record>
 

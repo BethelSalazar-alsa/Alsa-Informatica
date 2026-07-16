@@ -10,7 +10,7 @@ class CotizacionExpressController(http.Controller):
         if not cotizacion.exists():
             return request.not_found()
         return request.render('cotizaciones_express.cotizacion_preview_template', {
-            'doc': cotizacion,
+            'docs': cotizacion,
             'company': request.env.company,
         })
 
@@ -20,6 +20,6 @@ class CotizacionExpressController(http.Controller):
         if not cotizacion.exists():
             return request.not_found()
         return request.render('cotizaciones_express.cotizacion_preview_template', {
-            'doc': cotizacion,
+            'docs': cotizacion,
             'company': request.env.company,
         })
