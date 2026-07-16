@@ -2,7 +2,8 @@
 <odoo>
     <template id="cotizacion_preview_template">
         <div id="wrapwrap">
-            <t t-foreach="docs" t-as="doc">
+            <main>
+                <t t-foreach="docs" t-as="doc">
                 <div class="page">
                     <style>
                         .header {
@@ -145,6 +146,7 @@
                     </div>
                 </div>
             </t>
+            </main>
         </div>
     </template>
 </odoo>
