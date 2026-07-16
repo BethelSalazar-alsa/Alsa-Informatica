@@ -69,6 +69,7 @@
                                 </h4>
                             </div>
                             <iframe id="cotizacion_preview_iframe"
+                                    src="/cotizacion/preview_html/0"
                                     style="width: 100%; height: calc(100vh - 250px); border: 1px solid #dee2e6; border-radius: 4px; background: white;"/>
                         </div>
                     </div>

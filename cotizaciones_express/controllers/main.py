@@ -6,9 +6,9 @@ class CotizacionExpressController(http.Controller):
 
     @http.route('/cotizacion/preview_html/<int:cotizacion_id>', type='http', auth='user', website=False)
     def preview_cotizacion_html(self, cotizacion_id):
-        cotizacion = request.env['cotizacion.express'].browse(cotizacion_id)
-        if not cotizacion.exists():
-            return '<html><body style="font-family:sans-serif;color:#999;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><p>Cotización no encontrada</p></body></html>'
+        cotizacion = request.env['cotizacion.express']
+        if cotizacion_id > 0:
+            cotizacion = cotizacion.browse(cotizacion_id)
         return request.render('cotizaciones_express.cotizacion_preview_template', {
             'docs': cotizacion,
             'preview_mode': True,
