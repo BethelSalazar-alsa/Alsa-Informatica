@@ -29,6 +29,17 @@ class CotizacionExpressController(http.Controller):
         var parentDoc = parent.document;
         if (!parentDoc) return;
 
+        var lastInputTime = 0;
+        parentDoc.addEventListener('input', function() {
+            lastInputTime = Date.now();
+        }, true);
+        
+        parentDoc.addEventListener('change', function() {
+            // Force a reload soon after a change event (e.g. selecting a dropdown)
+            lastInputTime = 0; 
+            triggerReload(500);
+        }, true);
+
         function getRecordId() {
             var formEl = parentDoc.querySelector('.o_form_view');
             if (formEl && formEl.dataset.recordId) {
@@ -70,7 +81,7 @@ class CotizacionExpressController(http.Controller):
         }
 
         var reloadTimeout = null;
-        function triggerReload() {
+        function triggerReload(delay) {
             if (reloadTimeout) clearTimeout(reloadTimeout);
             reloadTimeout = setTimeout(function() {
                 var activeId = getRecordId();
@@ -81,18 +92,20 @@ class CotizacionExpressController(http.Controller):
                 } else if (currentId > 0) {
                     window.location.href = "/cotizacion/preview_html/0?t=" + Date.now();
                 }
-            }, 1000);
+            }, delay || 1000);
         }
 
-        parentDoc.addEventListener('change', triggerReload, true);
-
-        var checkInterval = setInterval(function() {
+        // Periodic check and reload (every 2.5s) if user is not typing
+        setInterval(function() {
             var activeId = getRecordId();
             if (activeId !== currentId) {
-                clearInterval(checkInterval);
-                triggerReload();
+                // ID changed (e.g. saved new record), reload immediately
+                triggerReload(100);
+            } else if (activeId > 0 && (Date.now() - lastInputTime > 2000)) {
+                // Normal refresh to get saved database changes
+                window.location.reload();
             }
-        }, 1500);
+        }, 2500);
 
     } catch (e) {
         console.error("Preview iframe error:", e);
