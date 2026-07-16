@@ -61,8 +61,11 @@
 
                         <div class="col-lg-5" style="flex: 4; padding-left: 15px; background: #f8f9fa; min-height: 600px; position: sticky; top: 0;">
                             <div style="padding: 10px 0; border-bottom: 1px solid #dee2e6; margin-bottom: 10px;">
-                                <h4 style="margin:0; color: #1a56db;">
-                                    <i class="fa fa-file-pdf-o"/> Vista Previa
+                                <h4 style="margin:0; color: #1a56db; display: flex; justify-content: space-between; align-items: center;">
+                                    <span><i class="fa fa-file-pdf-o"/> Vista Previa</span>
+                                    <a id="cotizacion_pdf_link" href="#" target="_blank" style="font-size:9pt; color: #1a56db; text-decoration:none;">
+                                        <i class="fa fa-download"/> PDF
+                                    </a>
                                 </h4>
                             </div>
                             <iframe id="cotizacion_preview_iframe"
