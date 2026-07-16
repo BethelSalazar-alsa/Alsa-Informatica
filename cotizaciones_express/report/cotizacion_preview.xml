@@ -50,7 +50,7 @@
 
                     <div class="header">
                         <div>
-                            <img t-if="doc.company_id.logo" t-att-src="image_data_uri(doc.company_id.logo)" class="logo" alt="Logo"/>
+                            <img t-if="doc.company_id.logo" t-attf-src="/cotizacion/image/res.company/{{ doc.company_id.id }}/logo" class="logo" alt="Logo"/>
                             <h1 t-if="not doc.company_id.logo" style="color:#1a56db;" t-esc="doc.company_id.name"/>
                         </div>
                         <div class="company-info">
@@ -132,7 +132,7 @@
                     <div class="signature-section">
                         <p>Atentamente,</p>
                         <div t-if="doc.signature_id and doc.signature_id.signature_image">
-                            <img t-att-src="image_data_uri(doc.signature_id.signature_image)" class="signature-img"/>
+                            <img t-attf-src="/cotizacion/image/seller.signature/{{ doc.signature_id.id }}/signature_image" class="signature-img"/>
                         </div>
                         <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height:60px;"></div>
                         <div class="seller-name"><t t-esc="doc.user_id.name"/></div>
