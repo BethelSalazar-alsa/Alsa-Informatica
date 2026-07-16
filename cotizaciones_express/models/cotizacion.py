@@ -1,5 +1,8 @@
+import logging
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 class CotizacionExpress(models.Model):
     _name = 'cotizacion.express'
@@ -36,6 +39,7 @@ class CotizacionExpress(models.Model):
     crm_lead_id = fields.Many2one('crm.lead', string='Oportunidad CRM')
     notes = fields.Html(string='Notas / Términos')
     preview_trigger = fields.Char(string='Preview', compute='_compute_preview_trigger')
+    pdf_preview = fields.Binary(string='Vista Previa PDF', readonly=True)
 
     @api.depends('partner_id', 'date', 'city', 'state_location', 'user_id', 'signature_id',
                  'option_ids', 'option_ids.name', 'option_ids.line_ids',
@@ -45,6 +49,30 @@ class CotizacionExpress(models.Model):
     def _compute_preview_trigger(self):
         for rec in self:
             rec.preview_trigger = str(fields.Datetime.now())
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super(CotizacionExpress, self).create(vals_list)
+        for record in records:
+            record._generate_pdf_preview()
+        return records
+
+    def write(self, vals):
+        res = super(CotizacionExpress, self).write(vals)
+        if 'pdf_preview' not in vals:
+            for record in self:
+                record._generate_pdf_preview()
+        return res
+
+    def _generate_pdf_preview(self):
+        self.ensure_one()
+        try:
+            # Reemplaza por el ID externo de tu reporte
+            report = self.env.ref('cotizaciones_express.report_cotizacion_express')
+            pdf_content, dummy = self.env['ir.actions.report']._render_qweb_pdf(report, res_ids=self.ids)
+            super(CotizacionExpress, self).write({'pdf_preview': pdf_content})
+        except Exception as e:
+            _logger.error("Error generating PDF preview: %s", e)
 
     def action_send_to_client(self):
         self.ensure_one()
