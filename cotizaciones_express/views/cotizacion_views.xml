@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_cotizacion_express_tree" model="ir.ui.view">
+        <field name="name">cotizacion.express.tree</field>
+        <field name="model">cotizacion.express</field>
+        <field name="arch" type="xml">
+            <list>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="date"/>
+                <field name="user_id"/>
+                <field name="state" widget="badge" decoration-success="state == 'confirmed'" decoration-info="state == 'sent'" decoration-warning="state == 'draft'" decoration-danger="state == 'cancelled'"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_cotizacion_express_form" model="ir.ui.view">
+        <field name="name">cotizacion.express.form</field>
+        <field name="model">cotizacion.express</field>
+        <field name="arch" type="xml">
+            <form>
+                <header>
+                    <button name="action_send_to_client" string="Enviar al Cliente" type="object" class="oe_highlight" invisible="state not in ['draft']"/>
+                    <button name="action_confirm_sale_order" string="Crear Orden de Venta" type="object" class="btn-primary" invisible="state not in ['sent','confirmed']"/>
+                    <button name="action_confirm" string="Confirmar Cotización" type="object" class="oe_highlight" invisible="state not in ['draft', 'sent']"/>
+                    <button name="action_draft" string="Volver a Borrador" type="object" invisible="state == 'draft'"/>
+                    <button name="action_cancel" string="Cancelar" type="object" invisible="state in ['draft', 'cancelled']"/>
+                    <field name="state" widget="statusbar" statusbar_visible="draft,sent,confirmed"/>
+                </header>
+
+                <sheet>
+                    <div class="row" style="display:flex; gap: 0;">
+                        <div class="col-lg-7" style="flex: 6; padding-right: 15px; border-right: 1px solid #dee2e6;">
+                            <div class="oe_title">
+                                <h1><field name="name" placeholder="Cotización"/></h1>
+                            </div>
+
+                            <group>
+                                <group>
+                                    <field name="partner_id" options="{'no_create': True}" context="{'show_address': True}"/>
+                                    <field name="date"/>
+                                    <field name="city"/>
+                                    <field name="state"/>
+                                </group>
+                                <group>
+                                    <field name="user_id"/>
+                                    <field name="signature_id" options="{'no_create': True}"/>
+                                    <field name="crm_lead_id" options="{'no_create': True}"/>
+                                </group>
+                            </group>
+
+                            <notebook>
+                                <page string="Opciones" name="options">
+                                    <field name="option_ids">
+                                        <tree editable="bottom">
+                                            <field name="sequence" widget="handle"/>
+                                            <field name="name"/>
+                                            <field name="description" widget="html"/>
+                                            <field name="selected"/>
+                                            <field name="subtotal" sum="Subtotal"/>
+                                            <field name="iva_total" sum="IVA"/>
+                                            <field name="total" sum="Total"/>
+                                        </tree>
+                                        <form>
+                                            <sheet>
+                                                <group>
+                                                    <group>
+                                                        <field name="name"/>
+                                                        <field name="selected"/>
+                                                    </group>
+                                                    <group>
+                                                        <field name="subtotal"/>
+                                                        <field name="iva_total"/>
+                                                        <field name="total"/>
+                                                    </group>
+                                                </group>
+                                                <group>
+                                                    <field name="description" widget="html"/>
+                                                </group>
+                                                <field name="line_ids">
+                                                    <tree editable="bottom">
+                                                        <field name="sequence" widget="handle"/>
+                                                        <field name="name"/>
+                                                        <field name="description" widget="html"/>
+                                                        <field name="quantity"/>
+                                                        <field name="price_unit"/>
+                                                        <field name="iva_percent"/>
+                                                        <field name="subtotal" sum="Subtotal"/>
+                                                        <field name="iva_amount" sum="IVA"/>
+                                                        <field name="total" sum="Total"/>
+                                                    </tree>
+                                                </field>
+                                            </sheet>
+                                        </form>
+                                    </field>
+                                </page>
+                                <page string="Términos" name="notes">
+                                    <field name="notes" widget="html"/>
+                                </page>
+                            </notebook>
+                        </div>
+
+                        <div class="col-lg-5" style="flex: 4; padding-left: 15px; background: #f8f9fa; min-height: 600px; position: sticky; top: 0;">
+                            <div style="padding: 10px 0; border-bottom: 1px solid #dee2e6; margin-bottom: 10px;">
+                                <h4 style="margin:0; color: #1a56db;">
+                                    <i class="fa fa-file-pdf-o"/> Vista Previa
+                                </h4>
+                            </div>
+                            <iframe t-att-src="'/cotizacion/preview_html/' + id" id="cotizacion_preview_iframe"
+                                    style="width: 100%; height: calc(100vh - 250px); border: 1px solid #dee2e6; border-radius: 4px; background: white;"
+                                    name="cotizacion_preview"/>
+                        </div>
+                    </div>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_cotizacion_express_search" model="ir.ui.view">
+        <field name="name">cotizacion.express.search</field>
+        <field name="model">cotizacion.express</field>
+        <field name="arch" type="xml">
+            <search>
+                <field name="name" string="Cotización"/>
+                <field name="partner_id" string="Cliente"/>
+                <filter string="Borrador" name="filter_draft" domain="[('state', '=', 'draft')]"/>
+                <filter string="Enviadas" name="filter_sent" domain="[('state', '=', 'sent')]"/>
+                <filter string="Confirmadas" name="filter_confirmed" domain="[('state', '=', 'confirmed')]"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_cotizacion_express" model="ir.actions.act_window">
+        <field name="name">Cotizaciones Express</field>
+        <field name="res_model">cotizacion.express</field>
+        <field name="view_mode">list,form</field>
+    </record>
+
+    <menuitem id="menu_cotizaciones_list" name="Cotizaciones" parent="menu_cotizaciones_root" action="action_cotizacion_express" sequence="10"/>
+</odoo>
