@@ -181,4 +181,43 @@
     </record>
 
     <menuitem id="menu_cotizaciones_list" name="Cotizaciones" parent="menu_cotizaciones_root" action="action_cotizacion_express" sequence="10"/>
+
+    <template id="cotizacion_preview_assets" inherit_id="web.assets_backend" name="Cotización Express Preview JS">
+        <xpath expr="." position="inside">
+            <script>
+                (function() {
+                    function refreshPreview() {
+                        var iframe = document.getElementById("cotizacion_preview_iframe");
+                        if (!iframe) return;
+                        var form = iframe.closest(".o_form_view");
+                        if (!form) return;
+                        var pdfLink = document.getElementById("cotizacion_pdf_link");
+                        if (form.dataset.recordId) {
+                            var id = form.dataset.recordId;
+                            iframe.src = "/cotizacion/preview_html/" + id + "?t=" + Date.now();
+                            if (pdfLink) {
+                                pdfLink.href = "/report/pdf/cotizaciones_express.report_cotizacion_express/" + id;
+                            }
+                        } else {
+                            iframe.src = "data:text/html;charset=utf-8,"
+                                + encodeURIComponent('<html><body style="font-family:sans-serif;color:#999;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><p>Guarde la cotizaci\u00f3n para ver la vista previa</p></body></html>');
+                        }
+                    }
+                    if (document.readyState === "loading") {
+                        document.addEventListener("DOMContentLoaded", function() {
+                            refreshPreview();
+                            setInterval(refreshPreview, 2000);
+                            document.addEventListener("change", refreshPreview, true);
+                            document.addEventListener("input", refreshPreview, true);
+                        });
+                    } else {
+                        refreshPreview();
+                        setInterval(refreshPreview, 2000);
+                        document.addEventListener("change", refreshPreview, true);
+                        document.addEventListener("input", refreshPreview, true);
+                    }
+                })();
+            </script>
+        </xpath>
+    </template>
 </odoo>
