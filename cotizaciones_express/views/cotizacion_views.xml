@@ -62,35 +62,33 @@
                                             <field name="total" sum="Total"/>
                                         </tree>
                                         <form>
-                                            <sheet>
+                                            <group>
                                                 <group>
-                                                    <group>
-                                                        <field name="name"/>
-                                                        <field name="selected"/>
-                                                    </group>
-                                                    <group>
-                                                        <field name="subtotal"/>
-                                                        <field name="iva_total"/>
-                                                        <field name="total"/>
-                                                    </group>
+                                                    <field name="name"/>
+                                                    <field name="selected"/>
                                                 </group>
                                                 <group>
+                                                    <field name="subtotal"/>
+                                                    <field name="iva_total"/>
+                                                    <field name="total"/>
+                                                </group>
+                                            </group>
+                                            <group>
+                                                <field name="description" widget="html"/>
+                                            </group>
+                                            <field name="line_ids">
+                                                <tree editable="bottom">
+                                                    <field name="sequence" widget="handle"/>
+                                                    <field name="name"/>
                                                     <field name="description" widget="html"/>
-                                                </group>
-                                                <field name="line_ids">
-                                                    <tree editable="bottom">
-                                                        <field name="sequence" widget="handle"/>
-                                                        <field name="name"/>
-                                                        <field name="description" widget="html"/>
-                                                        <field name="quantity"/>
-                                                        <field name="price_unit"/>
-                                                        <field name="iva_percent"/>
-                                                        <field name="subtotal" sum="Subtotal"/>
-                                                        <field name="iva_amount" sum="IVA"/>
-                                                        <field name="total" sum="Total"/>
-                                                    </tree>
-                                                </field>
-                                            </sheet>
+                                                    <field name="quantity"/>
+                                                    <field name="price_unit"/>
+                                                    <field name="iva_percent"/>
+                                                    <field name="subtotal" sum="Subtotal"/>
+                                                    <field name="iva_amount" sum="IVA"/>
+                                                    <field name="total" sum="Total"/>
+                                                </tree>
+                                            </field>
                                         </form>
                                     </field>
                                 </page>
