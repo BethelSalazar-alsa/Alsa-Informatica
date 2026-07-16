@@ -31,6 +31,8 @@ class CotizacionExpress(models.Model):
         ('cancelled', 'Cancelado'),
     ], string='Estado', default='draft', tracking=True)
 
+    company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
+    currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string='Moneda')
     crm_lead_id = fields.Many2one('crm.lead', string='Oportunidad CRM')
     notes = fields.Html(string='Notas / Términos')
 
