@@ -47,4 +47,4 @@ class CotizacionPreview extends Component {
     }
 }
 
-registry.category("widgets").add("cotizacion_preview_iframe", CotizacionPreview);
+registry.category("view_widgets").add("cotizacion_preview_iframe", CotizacionPreview);
