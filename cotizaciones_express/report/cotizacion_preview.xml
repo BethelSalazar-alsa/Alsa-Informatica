@@ -3,96 +3,79 @@
     <template id="cotizacion_preview_template">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="doc">
-                <div class="page" style="font-family: 'Arial', sans-serif; color: #000; font-size: 13px; padding: 20px;">
-                    
-                    <!-- PIE DE PÁGINA (Estilo ALSA) -->
-                    <style>
-                        .alsa-footer {
-                            font-family: 'Arial', sans-serif; 
-                            color: #1C355E; 
-                            font-size: 11px; 
-                            width: 100%; 
-                            border-top: 1px solid #1C355E; 
-                            padding-top: 8px;
-                            margin-top: 50px;
-                        }
-                        .alsa-footer table {
-                            width: 100%; 
-                            border-collapse: collapse; 
-                            border: none; 
-                            background: transparent;
-                        }
-                        .alsa-footer td {
-                            border: none;
-                        }
-                        .header-logo {
-                            max-height: 80px;
-                            max-width: 220px;
-                            object-fit: contain;
-                        }
-                    </style>
+                <t t-call="web.external_layout">
 
-                    <!-- 0. ENCABEZADO CON LOGO DE LA EMPRESA (Si existe) -->
-                    <div class="row" style="margin-bottom: 25px; border-bottom: 1px solid #ddd; padding-bottom: 15px; align-items: center; display: flex; justify-content: space-between;">
-                        <div class="col-6">
-                            <t t-if="doc.company_id.logo">
-                                <img t-attf-src="/cotizacion/image/res.company/{{ doc.company_id.id }}/logo" class="header-logo"/>
-                            </t>
-                            <t t-else="">
-                                <h2 style="color: #1C355E; margin: 0;" t-field="doc.company_id.name"/>
-                            </t>
-                        </div>
-                        <div class="col-6 text-right" style="text-align: right; font-size: 11px; color: #555;">
-                            <strong t-field="doc.company_id.name"/><br/>
-                            <span t-if="doc.company_id.street"><span t-field="doc.company_id.street"/><br/></span>
-                            <span t-if="doc.company_id.phone">Tel: <span t-field="doc.company_id.phone"/><br/></span>
-                            <span t-if="doc.company_id.email"><span t-field="doc.company_id.email"/></span>
-                        </div>
+                    <!-- PIE DE PÁGINA FIJO AL FINAL -->
+                    <div class="footer"
+                        style="font-family: 'Arial', sans-serif; color: #1C355E; font-size: 11px; width: 100%; border-top: 1px solid #1C355E; padding-top: 8px;">
+                        <table style="width: 100%; border-collapse: collapse; border: none; background: transparent;">
+                            <tr style="border: none;">
+                                <td style="width: 50%; text-align: left; padding: 2px 0; border: none; font-weight: bold; color: #1C355E;">
+                                    www.alsainformatica.com.mx
+                                </td>
+                                <td style="width: 50%; text-align: right; padding: 2px 0; border: none; font-weight: bold; color: #1C355E;">
+                                    contacto@alsainformatica.com.mx
+                                </td>
+                            </tr>
+                            <tr style="border: none;">
+                                <td colspan="2"
+                                    style="width: 100%; text-align: left; padding: 5px 0 0 0; border: none; color: #444; font-size: 11px;">
+                                    Av. Manuel J. Clouthier 182-C Col. El Ángel, C.P. 28979. Villa de Álvarez, Colima
+                                </td>
+                            </tr>
+                        </table>
                     </div>
 
-                    <!-- 1. FECHA (Estilo ALSA) -->
-                    <div class="row justify-content-end" style="margin-bottom: 25px; margin-top: -10px; page-break-inside: avoid; text-align: right;">
-                        <div class="col-auto text-right" style="text-align: right; width: 100%; font-size: 13px;">
-                            <t t-esc="doc.city"/>, <t t-esc="doc.state_location"/>., 
-                            <span t-if="doc.date">
-                                <t t-esc="doc.date.strftime('%d')"/> de
-                                <t t-set="months" t-value="['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']"/>
-                                <t t-esc="months[int(doc.date.strftime('%m'))-1]"/> de
-                                <t t-esc="doc.date.strftime('%Y')"/>
-                            </span>
+                    <!-- CUERPO PRINCIPAL DEL DOCUMENTO -->
+                    <div class="page" style="font-family: 'Arial', sans-serif; color: #000; font-size: 13px;">
+
+                        <!-- 1. FECHA -->
+                        <div class="row justify-content-end"
+                            style="margin-bottom: 25px; margin-top: -10px; page-break-inside: avoid; text-align: right;">
+                            <div class="col-auto text-right" style="text-align: right; width: 100%; font-size: 13px;">
+                                Colima, Col., <span t-if="doc.date">
+                                    <t t-esc="doc.date.strftime('%d')"/> de 
+                                    <t t-set="months" t-value="['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']"/>
+                                    <t t-esc="months[int(doc.date.strftime('%m'))-1]"/> de 
+                                    <t t-esc="doc.date.strftime('%Y')"/>
+                                </span>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- 2. DATOS DEL CLIENTE (Estilo ALSA) -->
-                    <div class="row" style="margin-bottom: 25px; page-break-inside: avoid;">
-                        <div class="col-12" style="text-transform: uppercase; font-weight: bold; line-height: 1.3; text-align: left; font-size: 14px;">
-                            <span t-field="doc.partner_id.name" style="font-size: 15px; display: block; margin-bottom: 2px;" /><br />
+                        <!-- 2. DATOS DEL CLIENTE -->
+                        <div class="row" style="margin-bottom: 25px; page-break-inside: avoid;">
+                            <div class="col-12"
+                                style="text-transform: uppercase; font-weight: bold; line-height: 1.3; text-align: left; font-size: 14px;">
+                                <span t-field="doc.partner_id.name"
+                                    style="font-size: 15px; display: block; margin-bottom: 2px;" /><br />
 
-                            <span t-if="doc.partner_address" style="font-weight: normal; font-size: 12px; color: #222; display: block; text-transform: uppercase; margin-bottom: 2px; margin-top: -10px;">
-                                <span t-field="doc.partner_address" />
-                            </span>
+                                <span t-if="doc.partner_id.street"
+                                    style="font-weight: normal; font-size: 12px; color: #222; display: block; text-transform: uppercase; margin-bottom: 2px; margin-top: -10px;">
+                                    <span t-field="doc.partner_id.street" />
+                                    <span t-if="doc.partner_id.street2">, <span t-field="doc.partner_id.street2" /></span>
+                                    <span t-if="doc.partner_id.zip">, C.P. <span t-field="doc.partner_id.zip" /></span>
+                                </span>
 
-                            <span style="display: block; font-size: 13px; margin-top: 2px;">
-                                AT'N: <t t-if="doc.partner_id.child_ids"><span t-field="doc.partner_id.child_ids[0].name" /></t>
-                                <t t-else=""><span t-field="doc.partner_id.name" /></t>
-                            </span>
+                                <span style="display: block; font-size: 13px; margin-top: 2px;">
+                                    AT'N: <t t-if="doc.partner_id.child_ids"><span
+                                            t-field="doc.partner_id.child_ids.name" /></t>
+                                    <t t-else=""><span t-field="doc.partner_id.name" /></t>
+                                </span>
 
-                            <span style="letter-spacing: 2px; display: block; margin-top: 3px; font-size: 13px;">P R E S E N T E</span>
+                                <span style="letter-spacing: 2px; display: block; margin-top: 3px; font-size: 13px;">P R E S E N T E</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- 3. TABLA DE PRODUCTOS AGRUPADA POR OPCIONES (Estilo ALSA) -->
-                    <t t-foreach="doc.option_ids" t-as="option">
-                        <div style="margin-top: 25px; margin-bottom: 25px; page-break-inside: avoid;">
-                            <h4 style="text-transform: uppercase; font-weight: bold; font-size: 13px; border-bottom: 2px solid #1C355E; padding-bottom: 3px; color: #1C355E; margin-bottom: 10px;">
-                                <span t-field="option.name"/>
-                                <t t-if="option.selected"> (SELECCIONADA POR EL CLIENTE)</t>
-                            </h4>
-                            <div t-if="option.description" style="margin-bottom: 12px; font-size: 12px; color: #333;">
+                        <!-- 3. TABLA DE PRODUCTOS AGRUPADA POR OPCIONES -->
+                        <t t-foreach="doc.option_ids" t-as="option">
+                            <div style="font-weight: bold; text-transform: uppercase; font-size: 12px; text-align: left; margin-top: 15px; margin-bottom: 5px; color: #1C355E; page-break-inside: avoid;">
+                                <span t-field="option.name" /> <t t-if="option.selected">(SELECCIONADA)</t>
+                            </div>
+                            <div t-if="option.description" style="font-size: 11px; margin-bottom: 5px; color: #555; page-break-inside: avoid;">
                                 <t t-raw="option.description"/>
                             </div>
-                            
-                            <table class="table table-sm" style="width: 100%; border-collapse: collapse; margin-bottom: 15px;">
+
+                            <table class="table table-sm" style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
                                 <thead>
                                     <tr style="border-top: 1px solid #000; border-bottom: 1px solid #000; text-transform: uppercase; font-weight: bold; font-size: 12px;">
                                         <th style="width: 10%; border: none; padding: 6px 0; text-align: center;">CANT.</th>
@@ -103,102 +86,171 @@
                                 <tbody>
                                     <t t-foreach="option.line_ids" t-as="line">
                                         <tr style="border: none;">
-                                            <td style="vertical-align: top; padding: 6px 0; font-weight: bold; text-align: center; border: none; font-size: 12px;">
-                                                <span t-field="line.quantity" t-options='{"widget": "integer"}'/>
+                                            <td style="vertical-align: top; padding: 4px 0; font-weight: bold; text-align: center; border: none; font-size: 12px;">
+                                                <span t-field="line.quantity" t-options="{&quot;widget&quot;: &quot;integer&quot;}" />
                                             </td>
-                                            <td style="vertical-align: top; padding: 6px 5px; text-align: left; border: none; line-height: 1.35; font-size: 12px; white-space: normal;">
-                                                <span t-field="line.name"/>
+                                            <td style="vertical-align: top; padding: 4px 5px; text-align: left; border: none; line-height: 1.35; font-size: 12px; white-space: normal;">
+                                                <span t-field="line.name" />
                                                 <t t-if="line.description"><br/><span t-raw="line.description" style="font-size: 11px; color: #555;"/></t>
                                             </td>
-                                            <td style="vertical-align: top; padding: 6px 0; font-weight: bold; text-align: right; border: none; font-size: 12px;">
-                                                <span t-field="line.total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                            <td style="vertical-align: top; padding: 4px 0; font-weight: bold; text-align: right; border: none; font-size: 12px;">
+                                                <span t-field="line.total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
                                             </td>
                                         </tr>
                                     </t>
-                                    <tr style="border-top: 1px solid #000; font-weight: bold; font-size: 12px;">
-                                        <td colspan="2" style="text-align: right; padding: 6px 5px; border: none;">Subtotal:</td>
-                                        <td style="text-align: right; padding: 6px 0; border: none;">
-                                            <span t-field="option.subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                        </td>
-                                    </tr>
-                                    <tr style="font-weight: bold; font-size: 12px;">
-                                        <td colspan="2" style="text-align: right; padding: 2px 5px; border: none;">IVA (16%):</td>
-                                        <td style="text-align: right; padding: 2px 0; border: none;">
-                                            <span t-field="option.iva_total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
-                                        </td>
-                                    </tr>
-                                    <tr style="border-top: 1.5px solid #1C355E; border-bottom: 1.5px solid #1C355E; font-weight: bold; font-size: 13px; color: #1C355E;">
-                                        <td colspan="2" style="text-align: right; padding: 6px 5px; border: none; text-transform: uppercase;">Total:</td>
-                                        <td style="text-align: right; padding: 6px 0; border: none;">
-                                            <span t-field="option.total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                    <tr style="border-top: 1px solid #000; border-bottom: 1px solid #000; font-weight: bold; font-size: 12px;">
+                                        <td colspan="2" style="text-align: right; padding: 4px 5px; border: none; text-transform: uppercase;">TOTAL <span t-field="option.name"/>:</td>
+                                        <td style="text-align: right; padding: 4px 0; border: none;">
+                                            <span t-field="option.total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}"/>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
-                        </div>
-                    </t>
-
-                    <!-- 4. CONDICIONES COMERCIALES (Estilo ALSA) -->
-                    <div style="font-size: 11px; line-height: 1.4; text-align: left; margin-top: 20px; margin-bottom: 20px; page-break-inside: avoid;">
-                        <t t-if="doc.notes">
-                            <strong>Condiciones Comerciales:</strong><br/>
-                            <t t-raw="doc.notes"/>
                         </t>
-                        <t t-else="">
-                            <div>1.- Los precios incluyen IVA y son válidos por 10 días y/o agotar existencias.</div>
-                            <div>2.- Tiempo de entrega: 2 - 3 días contra confirmación del pedido.</div>
-                            <div>3.- Forma de pago: Contado anticipado para ordenar.</div>
-                        </t>
-                    </div>
 
-                    <!-- 5. MENSAJE DE DESPEDIDA (Estilo ALSA) -->
-                    <div style="text-align: left; margin-bottom: 30px; font-size: 12px; page-break-inside: avoid;">
-                        Sin más por el momento y a sus órdenes para cualquier duda ó aclaración, se despide de usted su S.S.
-                    </div>
+                        <!-- 4. CONDICIONES COMERCIALES -->
+                        <div style="font-size: 11px; line-height: 1.4; text-align: left; margin-top: 10px; margin-bottom: 15px; page-break-inside: avoid;">
+                            <t t-if="doc.notes">
+                                <t t-raw="doc.notes"/>
+                            </t>
+                            <t t-else="">
+                                <div>1.- Los precios incluyen IVA y son válidos por 10 días y/o agotar existencias.</div>
+                                <div>2.- Tiempo de entrega: 2 - 3 días contra confirmación del pedido.</div>
+                                <div>3.- Forma de pago: Contado anticipado para ordenar.</div>
+                            </t>
+                        </div>
 
-                    <!-- 6. BLOQUE DE FIRMA (Estilo ALSA) -->
-                    <div style="margin-top: 35px; text-align: center; width: 100%; page-break-inside: avoid; margin-bottom: 20px;">
-                        <div style="margin: 0 auto; text-align: center; max-width: 440px;">
-                            <span style="font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 3px; font-size: 12px; letter-spacing: 1px;">ATENTAMENTE</span>
+                        <!-- 5. MENSAJE DE DESPEDIDA -->
+                        <div style="text-align: left; margin-bottom: 30px; font-size: 12px; page-break-inside: avoid;">
+                            Sin más por el momento y a sus órdenes para cualquier duda ó aclaración, se despide de usted su S.S.
+                        </div>
 
-                            <div style="height: 80px; position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: 3px;">
-                                <t t-if="doc.signature_id and doc.signature_id.signature_image">
-                                    <img t-attf-src="/cotizacion/image/seller.signature/{{ doc.signature_id.id }}/signature_image"
-                                         style="max-height: 80px; max-width: 220px; object-fit: contain;" />
-                                </t>
-                            </div>
+                        <!-- 6. BLOQUE DE FIRMA -->
+                        <div style="margin-top: 35px; text-align: center; width: 100%; page-break-inside: avoid; margin-bottom: 20px;">
+                            <div style="margin: 0 auto; text-align: center; max-width: 440px;">
+                                <span style="font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 3px; font-size: 12px; letter-spacing: 1px;">ATENTAMENTE</span>
 
-                            <div style="border-top: 1.5px solid #000; padding-top: 5px;">
-                                <span t-field="doc.user_id.name" style="font-weight: bold; text-transform: uppercase; display: block; font-size: 12px; color: #000;" />
-                                <span style="font-weight: bold; text-transform: uppercase; font-size: 11px; display: block; color: #000; margin-top: 1px;">CONSULTORÍA EN INFORMÁTICA ALSA S.A. DE C.V.</span>
+                                <div style="height: 80px; position: relative; display: flex; align-items: center; justify-content: center; margin-bottom: 3px;">
+                                    <t t-if="doc.signature_id and doc.signature_id.signature_image">
+                                        <img t-attf-src="/cotizacion/image/seller.signature/{{ doc.signature_id.id }}/signature_image"
+                                             style="max-height: 80px; max-width: 220px; object-fit: contain;" />
+                                    </t>
+                                </div>
+
+                                <div style="border-top: 1.5px solid #000; padding-top: 5px;">
+                                    <span t-field="doc.user_id.name" style="font-weight: bold; text-transform: uppercase; display: block; font-size: 12px; color: #000;" />
+                                    <span style="font-weight: bold; text-transform: uppercase; font-size: 11px; display: block; color: #000; margin-top: 1px;">CONSULTORÍA EN INFORMÁTICA ALSA S.A. DE C.V.</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- 7. PIE DE PÁGINA ALSA -->
-                    <div class="alsa-footer">
-                        <table>
-                            <tr>
-                                <td style="width: 50%; text-align: left; padding: 2px 0; font-weight: bold; color: #1C355E;">
-                                    www.alsainformatica.com.mx
-                                </td>
-                                <td style="width: 50%; text-align: right; padding: 2px 0; font-weight: bold; color: #1C355E;">
-                                    contacto@alsainformatica.com.mx
-                                </td>
-                            </tr>
-                            <tr>
-                                <td colspan="2" style="width: 100%; text-align: left; padding: 5px 0 0 0; color: #444; font-size: 11px;">
-                                    Av. Manuel J. Clouthier 182-C Col. El Ángel, C.P. 28979. Villa de Álvarez, Colima
-                                </td>
-                            </tr>
-                        </table>
                     </div>
-
-                </div>
+                </t>
             </t>
         </t>
         <t t-if="preview_mode">
-            <script src="/cotizacion/preview.js"></script>
+            <script>
+                <![CDATA[
+                (function() {
+                    try {
+                        var parentDoc = parent.document;
+                        if (!parentDoc) return;
+
+                        function getRecordId() {
+                            var formEl = parentDoc.querySelector('.o_form_view');
+                            if (formEl && formEl.dataset.recordId) {
+                                var id = parseInt(formEl.dataset.recordId, 10);
+                                if (id > 0) return id;
+                            }
+                            var pathname = parent.window.location.pathname;
+                            var match = pathname.match(/\/cotizacion\.express\/(\d+)/);
+                            if (match) return parseInt(match[1], 10);
+                            return 0;
+                        }
+
+                        var parentId = getRecordId();
+                        var currentId = 0;
+                        var currentUrlMatch = window.location.pathname.match(/\/preview_html\/(\d+)/);
+                        if (currentUrlMatch) {
+                            currentId = parseInt(currentUrlMatch[1], 10);
+                        }
+
+                        // Redirigir si el padre tiene ID y nosotros estamos en 0
+                        if (currentId === 0 && parentId > 0) {
+                            window.location.href = "/cotizacion/preview_html/" + parentId + "?t=" + Date.now();
+                            return;
+                        }
+
+                        // Actualizar enlace de descarga de PDF en el padre
+                        var pdfLink = parentDoc.getElementById('cotizacion_pdf_link');
+                        if (pdfLink && parentId > 0) {
+                            pdfLink.href = "/report/pdf/cotizaciones_express.cotizacion_preview_template/" + parentId;
+                        }
+
+                        // Monitorear actividad para autoguardar y actualizar
+                        var lastActive = Date.now();
+                        parentDoc.addEventListener('input', function() { lastActive = Date.now(); }, true);
+                        parentDoc.addEventListener('click', function() { lastActive = Date.now(); }, true);
+
+                        // Función para forzar el guardado de Odoo mediante el atajo Ctrl+S / Cmd+S
+                        function forceOdooSave() {
+                            var isMac = /Mac|iPad|iPhone|iPod/.test(parent.navigator.platform);
+                            var event = new KeyboardEvent('keydown', {
+                                bubbles: true,
+                                cancelable: true,
+                                key: 's',
+                                code: 'KeyS',
+                                keyCode: 83,
+                                which: 83,
+                                ctrlKey: !isMac,
+                                metaKey: isMac
+                            });
+                            parentDoc.dispatchEvent(event);
+                        }
+
+                        setInterval(function() {
+                            var activeId = getRecordId();
+                            if (activeId !== currentId) {
+                                // Cambió de ID (guardó por primera vez), redirigir
+                                window.location.href = "/cotizacion/preview_html/" + activeId + "?t=" + Date.now();
+                                return;
+                            }
+                            
+                            var formEl = parentDoc.querySelector('.o_form_view');
+                            var isDirty = formEl && formEl.classList.contains('o_form_dirty');
+                            
+                            // Si el usuario modificó datos y ha estado inactivo por más de 2 segundos,
+                            // forzamos el guardado del formulario en Odoo para refrescar la BD
+                            if (isDirty && (Date.now() - lastActive > 2000)) {
+                                lastActive = Date.now(); // reset timer
+                                forceOdooSave();
+                            }
+                        }, 1000);
+
+                        // Recarga automática cuando el formulario de Odoo se guarda
+                        if (parentDoc.querySelector('.o_form_view')) {
+                            var observer = new MutationObserver(function(mutations) {
+                                mutations.forEach(function(mutation) {
+                                    if (mutation.attributeName === 'class') {
+                                        var isDirtyNow = mutation.target.classList.contains('o_form_dirty');
+                                        if (!isDirtyNow) {
+                                            // El formulario se guardó en la DB, recargar vista previa tras 500ms
+                                            setTimeout(function() {
+                                                window.location.reload();
+                                            }, 500);
+                                        }
+                                    }
+                                });
+                            });
+                            observer.observe(parentDoc.querySelector('.o_form_view'), { attributes: true });
+                        }
+
+                    } catch (e) {
+                        console.error(e);
+                    }
+                })();
+                ]]>
+            </script>
         </t>
     </template>
 </odoo>
