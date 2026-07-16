@@ -1,30 +1,24 @@
-odoo.define('cotizaciones_express.cotizacion_preview', function (require) {
-    "use strict";
+/** @odoo-module **/
+import { registry } from "@web/core/registry";
+import { Component, onWillUpdateProps, useState } from "@odoo/owl";
 
-    var iframe = document.getElementById('cotizacion_preview_iframe');
-    if (!iframe) return;
+class CotizacionPreview extends Component {
+    static template = "cotizaciones_express.PreviewIframe";
 
-    function updateSrc() {
-        var form = iframe.closest('.o_form_view');
-        if (form && form.dataset.recordId) {
-            iframe.src = '/cotizacion/preview_html/' + form.dataset.recordId;
-        }
-    }
-
-    var form = iframe.closest('.o_form_view');
-    if (form) {
-        var observer = new MutationObserver(updateSrc);
-        observer.observe(form, {
-            attributes: true,
-            attributeFilter: ['data-record-id'],
-            childList: false,
-            subtree: false,
+    setup() {
+        this.state = useState({ src: this._getSrc(this.props) });
+        onWillUpdateProps((nextProps) => {
+            this.state.src = this._getSrc(nextProps);
         });
     }
 
-    document.addEventListener('change', function () {
-        if (iframe.src) {
-            iframe.src = iframe.src;
+    _getSrc(props) {
+        const resId = props.record?.resId;
+        if (resId) {
+            return "/cotizacion/preview_html/" + resId;
         }
-    });
-});
+        return "";
+    }
+}
+
+registry.category("widgets").add("cotizacion_preview_iframe", CotizacionPreview);

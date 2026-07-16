@@ -65,9 +65,7 @@
                                     <i class="fa fa-file-pdf-o"/> Vista Previa
                                 </h4>
                             </div>
-                            <iframe id="cotizacion_preview_iframe"
-                                    style="width: 100%; height: calc(100vh - 250px); border: 1px solid #dee2e6; border-radius: 4px; background: white;"
-                                    name="cotizacion_preview"/>
+                            <widget name="cotizacion_preview_iframe"/>
                         </div>
                     </div>
                 </sheet>

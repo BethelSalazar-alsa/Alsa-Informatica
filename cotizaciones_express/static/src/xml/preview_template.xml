@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates xml:space="preserve">
+    <t t-name="cotizaciones_express.PreviewIframe" owl="1">
+        <iframe t-att-src="state.src"
+                style="width: 100%; height: calc(100vh - 250px); border: 1px solid #dee2e6; border-radius: 4px; background: white;"/>
+    </t>
+</templates>
