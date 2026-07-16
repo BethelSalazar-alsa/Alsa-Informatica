@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="cotizacion_preview_template">
+        <div id="wrapwrap">
+            <main>
+                <t t-foreach="docs" t-as="doc">
+                <div class="page">
+                    <style>
+                        .header {
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-start;
+                            margin-bottom: 30px;
+                            border-bottom: 2px solid #1a56db;
+                            padding-bottom: 20px;
+                        }
+                        .header .logo { max-height: 80px; max-width: 200px; }
+                        .header .company-info { text-align: right; font-size: 9pt; color: #555; }
+                        .header .company-info strong { color: #333; font-size: 11pt; }
+                        .recipient-section { margin-bottom: 25px; }
+                        .recipient-section .presente { font-size: 12pt; font-weight: bold; color: #1a56db; margin-bottom: 5px; }
+                        .recipient-section .date { font-size: 10pt; color: #666; margin-bottom: 15px; }
+                        .recipient-section .client-name { font-size: 13pt; font-weight: bold; color: #333; }
+                        .option-block {
+                            margin: 20px 0;
+                            border: 1px solid #dee2e6;
+                            border-radius: 5px;
+                            overflow: hidden;
+                        }
+                        .option-header {
+                            background: #1a56db;
+                            color: white;
+                            padding: 8px 12px;
+                            font-weight: bold;
+                            font-size: 11pt;
+                        }
+                        .option-header .check-mark { float: right; }
+                        .option-body { padding: 10px; }
+                        table.items { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 10pt; }
+                        table.items th { background-color: #1a56db; color: white; padding: 6px 8px; text-align: left; font-weight: bold; font-size: 9pt; }
+                        table.items td { padding: 6px 8px; border-bottom: 1px solid #ddd; vertical-align: top; }
+                        table.items tr:nth-child(even) td { background-color: #f9f9f9; }
+                        .option-totals { text-align: right; font-size: 10pt; margin: 5px 0 15px 0; padding: 5px 10px; background: #f0f4ff; border-radius: 3px; }
+                        .option-totals .total-final { font-size: 12pt; font-weight: bold; color: #1a56db; }
+                        .signature-section { margin-top: 40px; text-align: center; }
+                        .signature-section .signature-img { max-height: 80px; max-width: 200px; }
+                        .signature-section .seller-name { font-weight: bold; margin-top: 5px; }
+                        .signature-section .seller-title { color: #666; font-size: 9pt; }
+                        .footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #ddd; font-size: 8pt; color: #999; text-align: center; }
+                    </style>
+
+                    <div class="header">
+                        <div>
+                            <img t-if="doc.company_id.logo" t-attf-src="/cotizacion/image/res.company/{{ doc.company_id.id }}/logo" class="logo" alt="Logo"/>
+                            <h1 t-if="not doc.company_id.logo" style="color:#1a56db;" t-esc="doc.company_id.name"/>
+                        </div>
+                        <div class="company-info">
+                            <strong t-esc="doc.company_id.name"/><br/>
+                            <span t-if="doc.company_id.street"><t t-esc="doc.company_id.street"/><br/></span>
+                            <span t-if="doc.company_id.city"><t t-esc="doc.company_id.city"/></span><t t-if="doc.company_id.state_id"><span>, <t t-esc="doc.company_id.state_id.name"/></span></t><br/>
+                            <span t-if="doc.company_id.phone">Tel: <t t-esc="doc.company_id.phone"/><br/></span>
+                            <span t-if="doc.company_id.email"><t t-esc="doc.company_id.email"/></span>
+                        </div>
+                    </div>
+
+                    <div class="recipient-section">
+                        <div class="presente">PRESENTE</div>
+                        <div class="date">
+                            <t t-esc="doc.city"/>, <t t-esc="doc.state_location"/>,
+                            <t t-if="doc.date">
+                                <t t-esc="doc.date.strftime('%d')"/> de
+                                <t t-set="months" t-value="['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']"/>
+                                <t t-esc="months[int(doc.date.strftime('%m'))-1]"/> de
+                                <t t-esc="doc.date.strftime('%Y')"/>
+                            </t>
+                        </div>
+                        <div class="client-name">
+                            <t t-esc="doc.partner_id.name"/>
+                        </div>
+                        <div t-if="doc.partner_address" style="font-size:10pt;color:#666;">
+                            <t t-esc="doc.partner_address"/>
+                        </div>
+                    </div>
+
+                    <t t-foreach="doc.option_ids" t-as="option">
+                        <div class="option-block">
+                            <div class="option-header">
+                                <t t-esc="option.name"/>
+                                <span t-if="option.selected" class="check-mark">&#10003; SELECCIONADA</span>
+                            </div>
+                            <div class="option-body">
+                                <div t-if="option.description" style="margin-bottom:10px;font-size:10pt;color:#555;">
+                                    <t t-raw="option.description"/>
+                                </div>
+                                <table class="items" t-if="option.line_ids">
+                                    <thead>
+                                        <tr>
+                                            <th>Cant.</th>
+                                            <th>Producto</th>
+                                            <th>Descripción</th>
+                                            <th>P. Unit.</th>
+                                            <th>Subtotal</th>
+                                            <th>IVA</th>
+                                            <th>Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr t-foreach="option.line_ids" t-as="line">
+                                            <td><t t-esc="line.quantity"/></td>
+                                            <td><strong><t t-esc="line.name"/></strong></td>
+                                            <td style="font-size:9pt;color:#555;"><t t-raw="line.description"/></td>
+                                            <td><t t-esc="'${:,.2f}'.format(line.price_unit)"/></td>
+                                            <td><t t-esc="'${:,.2f}'.format(line.subtotal)"/></td>
+                                            <td><t t-esc="'${:,.2f}'.format(line.iva_amount)"/></td>
+                                            <td><t t-esc="'${:,.2f}'.format(line.total)"/></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="option-totals">
+                                    Subtotal: <strong><t t-esc="'${:,.2f}'.format(option.subtotal)"/></strong> |
+                                    IVA: <strong><t t-esc="'${:,.2f}'.format(option.iva_total)"/></strong> |
+                                    <span class="total-final">Total: <t t-esc="'${:,.2f}'.format(option.total)"/></span>
+                                </div>
+                            </div>
+                        </div>
+                    </t>
+
+                    <div t-if="doc.notes" style="margin:20px 0;padding:15px;background:#f8f9fa;border-left:3px solid #1a56db;">
+                        <strong>Términos y Condiciones:</strong><br/>
+                        <t t-raw="doc.notes"/>
+                    </div>
+
+                    <div class="signature-section">
+                        <p>Atentamente,</p>
+                        <div t-if="doc.signature_id and doc.signature_id.signature_image">
+                            <img t-attf-src="/cotizacion/image/seller.signature/{{ doc.signature_id.id }}/signature_image" class="signature-img"/>
+                        </div>
+                        <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height:60px;"></div>
+                        <div class="seller-name"><t t-esc="doc.user_id.name"/></div>
+                        <div class="seller-title"><t t-esc="doc.user_id.function or 'Vendedor'"/></div>
+                    </div>
+
+                    <div class="footer">
+                        <t t-esc="doc.company_id.name"/> - <t t-esc="doc.company_id.phone or ''"/> - <t t-esc="doc.company_id.email or ''"/><br/>
+                        Cotización generada el <t t-if="doc.date"><t t-esc="doc.date.strftime('%d/%m/%Y')"/></t>
+                    </div>
+                </div>
+            </t>
+            </main>
+        </div>
+        <t t-if="preview_mode">
+            <script src="/cotizacion/preview.js"/>
+        </t>
+    </template>
+</odoo>
