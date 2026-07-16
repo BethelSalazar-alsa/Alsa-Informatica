@@ -18,7 +18,7 @@
                     <p><strong t-esc="object.user_id.name"/></p>
                 </div>
             </field>
-            <field name="report_template" ref="report_cotizacion_preview_template"/>
+            <field name="report_template" ref="report_cotizacion_express"/>
             <field name="report_name">Cotizacion_{{ object.name or 'sin_numero' }}</field>
         </record>
     </data>

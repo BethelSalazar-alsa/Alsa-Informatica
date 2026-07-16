@@ -8,10 +8,10 @@
     'data': [
         'security/ir.model.access.csv',
         'data/ir_sequence.xml',
-        'data/mail_template.xml',
         'views/seller_signature_views.xml',
         'views/cotizacion_views.xml',
         'report/cotizacion_preview.xml',
+        'data/mail_template.xml',
     ],
     'assets': {
         'web.assets_backend': [
