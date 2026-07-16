@@ -76,19 +76,7 @@
                                             <group>
                                                 <field name="description" widget="html"/>
                                             </group>
-                                            <field name="line_ids">
-                                                <tree editable="bottom">
-                                                    <field name="sequence" widget="handle"/>
-                                                    <field name="name"/>
-                                                    <field name="description" widget="html"/>
-                                                    <field name="quantity"/>
-                                                    <field name="price_unit"/>
-                                                    <field name="iva_percent"/>
-                                                    <field name="subtotal" sum="Subtotal"/>
-                                                    <field name="iva_amount" sum="IVA"/>
-                                                    <field name="total" sum="Total"/>
-                                                </tree>
-                                            </field>
+                                            <field name="line_ids"/>
                                         </form>
                                     </field>
                                 </page>
@@ -111,6 +99,24 @@
                     </div>
                 </sheet>
             </form>
+        </field>
+    </record>
+
+    <record id="view_cotizacion_express_option_line_tree" model="ir.ui.view">
+        <field name="name">cotizacion.express.option.line.tree</field>
+        <field name="model">cotizacion.express.option.line</field>
+        <field name="arch" type="xml">
+            <tree editable="bottom">
+                <field name="sequence" widget="handle"/>
+                <field name="name"/>
+                <field name="description" widget="html"/>
+                <field name="quantity"/>
+                <field name="price_unit"/>
+                <field name="iva_percent"/>
+                <field name="subtotal" sum="Subtotal"/>
+                <field name="iva_amount" sum="IVA"/>
+                <field name="total" sum="Total"/>
+            </tree>
         </field>
     </record>
 
