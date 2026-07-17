@@ -118,14 +118,14 @@
             <list editable="bottom">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
-                <field name="description" widget="textarea" optional="show" style="white-space: pre-wrap; min-width: 250px;"/>
+                <field name="description" optional="show"/>
                 <field name="quantity"/>
                 <field name="price_unit"/>
                 <field name="iva_percent"/>
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_amount" sum="IVA"/>
                 <field name="total" sum="Total"/>
-                <button name="action_open_line_form" type="object" icon="fa-edit" title="Editar detalles y descripción"/>
+                <button name="action_open_line_form" type="object" icon="fa-pencil" title="Editar descripción"/>
             </list>
         </field>
     </record>
