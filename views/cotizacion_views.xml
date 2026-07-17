@@ -118,14 +118,14 @@
             <list editable="bottom">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
-                <field name="description" widget="textarea" optional="show" style="white-space: pre-wrap; min-width: 250px;"/>
+                <field name="description" optional="show"/>
                 <field name="quantity"/>
                 <field name="price_unit"/>
                 <field name="iva_percent"/>
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_amount" sum="IVA"/>
                 <field name="total" sum="Total"/>
-                <button name="action_open_line_form" type="object" icon="fa-edit" title="Editar detalles y descripción"/>
+                <button name="action_open_line_form" type="object" icon="fa-pencil" title="Editar descripción"/>
             </list>
         </field>
     </record>
@@ -159,7 +159,7 @@
         <field name="name">cotizacion.express.kanban</field>
         <field name="model">cotizacion.express</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="state" quick_create="false" class="o_kanban_small_column">
+            <kanban default_group_by="state" quick_create="false">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="date"/>
@@ -168,30 +168,22 @@
                 <field name="currency_id"/>
                 <field name="state"/>
                 <templates>
-                    <t t-name="kanban-box">
-                        <div class="oe_kanban_global_click o_kanban_record_has_image_fill">
-                            <div class="oe_kanban_details d-flex flex-column justify-content-between">
-                                <div>
-                                    <strong class="o_kanban_record_title" style="font-size: 15px; color: #1C355E;">
-                                        <field name="name"/>
-                                    </strong>
-                                    <div style="font-weight: bold; margin-top: 4px;">
-                                        <field name="partner_id"/>
-                                    </div>
-                                    <div class="text-muted" style="font-size: 12px; margin-top: 2px;">
-                                        <field name="date"/>
-                                    </div>
-                                </div>
-                                <div class="o_kanban_record_bottom d-flex justify-content-between align-items-center mt-2">
-                                    <div class="oe_kanban_bottom_left">
-                                        <field name="user_id" widget="many2one_avatar_user"/>
-                                    </div>
-                                    <div class="oe_kanban_bottom_right">
-                                        <strong style="color: #28a745; font-size: 14px;">
-                                            <field name="amount_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
-                                        </strong>
-                                    </div>
-                                </div>
+                    <t t-name="card">
+                        <div class="oe_kanban_global_click">
+                            <strong style="font-size: 14px; color: #1C355E;">
+                                <field name="name"/>
+                            </strong>
+                            <div class="text-muted" style="font-size: 12px; margin-top: 2px;">
+                                <field name="partner_id"/>
+                            </div>
+                            <div class="text-muted" style="font-size: 11px; margin-top: 2px;">
+                                <field name="date"/>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <field name="user_id" widget="many2one_avatar_user"/>
+                                <strong style="color: #28a745; font-size: 14px;">
+                                    <field name="amount_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+                                </strong>
                             </div>
                         </div>
                     </t>
