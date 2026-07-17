@@ -8,6 +8,7 @@
     'data': [
         'security/ir.model.access.csv',
         'data/ir_sequence.xml',
+        'data/stages.xml',
         'views/seller_signature_views.xml',
         'views/cotizacion_views.xml',
         'report/cotizacion_preview.xml',

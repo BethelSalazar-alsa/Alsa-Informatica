@@ -75,9 +75,17 @@
                                 <t t-foreach="doc.option_ids" t-as="option">
                                     <!-- Nombre de la Opción como sección -->
                                     <tr style="border: none;">
+                                    <!-- Nombre de la Opción como sección -->
+                                    <tr style="border: none;">
                                         <td colspan="5"
                                             style="padding: 8px 0 3px 0; font-weight: bold; text-transform: uppercase; font-size: 12px; text-align: left; border: none; color: #1C355E; border-bottom: 1px solid #dee2e6;">
                                             <span t-field="option.name" />
+                                        </td>
+                                    </tr>
+                                    <!-- Descripción General de la Opción (Vendedor) -->
+                                    <tr t-if="option.description" style="border: none;">
+                                        <td colspan="5" style="border: none; padding: 4px 6px; font-size: 12px; color: #444; line-height: 1.35;">
+                                            <span t-field="option.description"/>
                                         </td>
                                     </tr>
                                     <!-- Filas de Productos -->
@@ -120,7 +128,7 @@
                         </table>
 
                         <!-- 4. CONDICIONES Y FIRMA -->
-                        <div style="page-break-inside: avoid; margin-top: 35px;">
+                        <div style="page-break-inside: avoid; margin-top: 80px;">
 
                             <!-- CONDICIONES COMERCIALES -->
                             <div style="font-size: 11px; line-height: 1.6; text-align: left; margin-bottom: 16px; color: #333;">
@@ -140,17 +148,17 @@
                             </div>
 
                             <!-- BLOQUE DE FIRMA -->
-                            <div style="margin-top: 50px; text-align: center; width: 100%; page-break-inside: avoid;">
-                                <div style="display: inline-block; text-align: center; min-width: 280px; max-width: 420px;">
+                            <div style="margin-top: 90px; text-align: center; width: 100%; page-break-inside: avoid;">
+                                <div style="display: inline-block; text-align: center; min-width: 280px; max-width: 440px;">
                                     <span style="font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 10px; font-size: 12px; letter-spacing: 1.5px; color: #000;">ATENTAMENTE</span>
 
                                     <!-- Imagen de firma grande -->
-                                    <div style="height: 110px; text-align: center; margin-bottom: 6px;">
+                                    <div style="height: 150px; text-align: center; margin-bottom: 6px;">
                                         <t t-if="doc.signature_id and doc.signature_id.signature_image">
                                             <img t-attf-src="/web/image/seller.signature/{{ doc.signature_id.id }}/signature_image"
-                                                style="max-height: 105px; max-width: 300px; display: inline-block;" />
+                                                style="max-height: 140px; max-width: 340px; display: inline-block;" />
                                         </t>
-                                        <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height: 105px;" />
+                                        <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height: 140px;" />
                                     </div>
 
                                     <!-- Línea y nombre del vendedor -->
