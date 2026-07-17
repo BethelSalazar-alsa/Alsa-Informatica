@@ -161,7 +161,7 @@ class CotizacionExpress(models.Model):
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'sale.order',
-            'view_mode': 'tree,form',
+            'view_mode': 'list,form',
             'domain': [('origin', '=', self.name)],
             'name': _('Órdenes de Venta'),
         }
