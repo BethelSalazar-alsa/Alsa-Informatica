@@ -155,7 +155,7 @@ class CotizacionExpress(models.Model):
                     ], limit=1).ids)] if line.iva_percent else False,
                 }
                 self.env['sale.order.line'].create(order_line_vals)
-            if self.crm_lead_id:
+            if self.crm_lead_id and 'sale_order_id' in self.crm_lead_id._fields:
                 self.crm_lead_id.write({'sale_order_id': order.id})
         self.state = 'confirmed'
         return {
