@@ -1,155 +1,179 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <template id="cotizacion_preview_template">
-        <div id="wrapwrap">
-            <main>
-                <t t-foreach="docs" t-as="doc">
-                <div class="page">
-                    <style>
-                        .header {
-                            display: flex;
-                            justify-content: space-between;
-                            align-items: flex-start;
-                            margin-bottom: 30px;
-                            border-bottom: 2px solid #1a56db;
-                            padding-bottom: 20px;
-                        }
-                        .header .logo { max-height: 80px; max-width: 200px; }
-                        .header .company-info { text-align: right; font-size: 9pt; color: #555; }
-                        .header .company-info strong { color: #333; font-size: 11pt; }
-                        .recipient-section { margin-bottom: 25px; }
-                        .recipient-section .presente { font-size: 12pt; font-weight: bold; color: #1a56db; margin-bottom: 5px; }
-                        .recipient-section .date { font-size: 10pt; color: #666; margin-bottom: 15px; }
-                        .recipient-section .client-name { font-size: 13pt; font-weight: bold; color: #333; }
-                        .option-block {
-                            margin: 20px 0;
-                            border: 1px solid #dee2e6;
-                            border-radius: 5px;
-                            overflow: hidden;
-                        }
-                        .option-header {
-                            background: #1a56db;
-                            color: white;
-                            padding: 8px 12px;
-                            font-weight: bold;
-                            font-size: 11pt;
-                        }
-                        .option-header .check-mark { float: right; }
-                        .option-body { padding: 10px; }
-                        table.items { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 10pt; }
-                        table.items th { background-color: #1a56db; color: white; padding: 6px 8px; text-align: left; font-weight: bold; font-size: 9pt; }
-                        table.items td { padding: 6px 8px; border-bottom: 1px solid #ddd; vertical-align: top; }
-                        table.items tr:nth-child(even) td { background-color: #f9f9f9; }
-                        .option-totals { text-align: right; font-size: 10pt; margin: 5px 0 15px 0; padding: 5px 10px; background: #f0f4ff; border-radius: 3px; }
-                        .option-totals .total-final { font-size: 12pt; font-weight: bold; color: #1a56db; }
-                        .signature-section { margin-top: 40px; text-align: center; }
-                        .signature-section .signature-img { max-height: 80px; max-width: 200px; }
-                        .signature-section .seller-name { font-weight: bold; margin-top: 5px; }
-                        .signature-section .seller-title { color: #666; font-size: 9pt; }
-                        .footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #ddd; font-size: 8pt; color: #999; text-align: center; }
-                    </style>
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.basic_layout">
 
-                    <div class="header">
-                        <div>
-                            <img t-if="doc.company_id.logo" t-attf-src="/cotizacion/image/res.company/{{ doc.company_id.id }}/logo" class="logo" alt="Logo"/>
-                            <h1 t-if="not doc.company_id.logo" style="color:#1a56db;" t-esc="doc.company_id.name"/>
-                        </div>
-                        <div class="company-info">
-                            <strong t-esc="doc.company_id.name"/><br/>
-                            <span t-if="doc.company_id.street"><t t-esc="doc.company_id.street"/><br/></span>
-                            <span t-if="doc.company_id.city"><t t-esc="doc.company_id.city"/></span><t t-if="doc.company_id.state_id"><span>, <t t-esc="doc.company_id.state_id.name"/></span></t><br/>
-                            <span t-if="doc.company_id.phone">Tel: <t t-esc="doc.company_id.phone"/><br/></span>
-                            <span t-if="doc.company_id.email"><t t-esc="doc.company_id.email"/></span>
-                        </div>
+                    <!-- ENCABEZADO COMPACTO -->
+                    <div class="header"
+                        style="font-family: 'Arial', sans-serif; color: #1C355E; font-size: 11px; width: 100%; border-bottom: 1px solid #1C355E; padding-bottom: 2px; margin-bottom: 0px;">
+                        <table style="width: 100%; border-collapse: collapse; border: none; background: transparent;">
+                            <tr style="border: none;">
+                                <td style="width: 40%; border: none; text-align: left; vertical-align: middle;">
+                                    <img t-if="doc.company_id.logo" t-att-src="image_data_uri(doc.company_id.logo)"
+                                        style="max-height: 38px; max-width: 100%;" alt="Logo ALSA" />
+                                    <t t-if="not doc.company_id.logo">
+                                        <strong style="font-size: 13px; color: #1C355E; letter-spacing: 1px;">ALSA</strong><br />
+                                        <span style="font-size: 9px; color: #555; text-transform: uppercase;">Informática</span>
+                                    </t>
+                                </td>
+                                <td style="width: 60%; border: none; text-align: right; line-height: 1.1; font-size: 10px;">
+                                    <strong style="font-size: 11px; color: #1C355E;">Alsa Informática</strong><br />
+                                    <span>Conmutador: 312 311 23 25</span><br />
+                                    <span>WhatsApp Ventas: 312 120 26 45</span>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
 
-                    <div class="recipient-section">
-                        <div class="presente">PRESENTE</div>
-                        <div class="date">
-                            <t t-esc="doc.city"/>, <t t-esc="doc.state_location"/>,
-                            <t t-if="doc.date">
-                                <t t-esc="doc.date.strftime('%d')"/> de
-                                <t t-set="months" t-value="['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']"/>
-                                <t t-esc="months[int(doc.date.strftime('%m'))-1]"/> de
-                                <t t-esc="doc.date.strftime('%Y')"/>
-                            </t>
-                        </div>
-                        <div class="client-name">
-                            <t t-esc="doc.partner_id.name"/>
-                        </div>
-                        <div t-if="doc.partner_address" style="font-size:10pt;color:#666;">
-                            <t t-esc="doc.partner_address"/>
-                        </div>
-                    </div>
+                    <!-- CUERPO PRINCIPAL DEL DOCUMENTO -->
+                    <div class="page"
+                        style="font-family: 'Arial', sans-serif; color: #000; font-size: 13px; padding: 0px !important;">
 
-                    <t t-foreach="doc.option_ids" t-as="option">
-                        <div class="option-block">
-                            <div class="option-header">
-                                <t t-esc="option.name"/>
-                                <span t-if="option.selected" class="check-mark">&#10003; SELECCIONADA</span>
-                            </div>
-                            <div class="option-body">
-                                <div t-if="option.description" style="margin-bottom:10px;font-size:10pt;color:#555;">
-                                    <t t-raw="option.description"/>
-                                </div>
-                                <table class="items" t-if="option.line_ids">
-                                    <thead>
-                                        <tr>
-                                            <th>Cant.</th>
-                                            <th>Producto</th>
-                                            <th>Descripción</th>
-                                            <th>P. Unit.</th>
-                                            <th>Subtotal</th>
-                                            <th>IVA</th>
-                                            <th>Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr t-foreach="option.line_ids" t-as="line">
-                                            <td><t t-esc="line.quantity"/></td>
-                                            <td><strong><t t-esc="line.name"/></strong></td>
-                                            <td style="font-size:9pt;color:#555;"><t t-raw="line.description"/></td>
-                                            <td><t t-esc="'${:,.2f}'.format(line.price_unit)"/></td>
-                                            <td><t t-esc="'${:,.2f}'.format(line.subtotal)"/></td>
-                                            <td><t t-esc="'${:,.2f}'.format(line.iva_amount)"/></td>
-                                            <td><t t-esc="'${:,.2f}'.format(line.total)"/></td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                                <div class="option-totals">
-                                    Subtotal: <strong><t t-esc="'${:,.2f}'.format(option.subtotal)"/></strong> |
-                                    IVA: <strong><t t-esc="'${:,.2f}'.format(option.iva_total)"/></strong> |
-                                    <span class="total-final">Total: <t t-esc="'${:,.2f}'.format(option.total)"/></span>
-                                </div>
+                        <!-- 1. FECHA -->
+                        <div class="row justify-content-end" style="margin-bottom: 25px; margin-top: -10px; page-break-inside: avoid;">
+                            <div class="col-auto text-right" style="text-align: right; width: 100%; font-size: 13px;">
+                                Colima, Col., <t t-if="doc.date">
+                                    <t t-esc="doc.date.strftime('%d')"/> de
+                                    <t t-set="months" t-value="['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']"/>
+                                    <t t-esc="months[int(doc.date.strftime('%m'))-1]"/> de
+                                    <t t-esc="doc.date.strftime('%Y')"/>
+                                </t>
                             </div>
                         </div>
-                    </t>
 
-                    <div t-if="doc.notes" style="margin:20px 0;padding:15px;background:#f8f9fa;border-left:3px solid #1a56db;">
-                        <strong>Términos y Condiciones:</strong><br/>
-                        <t t-raw="doc.notes"/>
-                    </div>
-
-                    <div class="signature-section">
-                        <p>Atentamente,</p>
-                        <div t-if="doc.signature_id and doc.signature_id.signature_image">
-                            <img t-attf-src="/cotizacion/image/seller.signature/{{ doc.signature_id.id }}/signature_image" class="signature-img"/>
+                        <!-- 2. DATOS DEL CLIENTE -->
+                        <div class="row" style="margin-bottom: 8px;">
+                            <div class="col-12"
+                                style="text-transform: uppercase; font-weight: bold; line-height: 1.2; text-align: left;">
+                                <span t-field="doc.partner_id.name"
+                                    style="font-size: 15px; display: block; margin-bottom: 2px;" />
+                                <span t-if="doc.partner_id.street"
+                                    style="font-weight: normal; font-size: 13px; color: #222; display: block; margin-top: 0;">
+                                    <span t-field="doc.partner_id.street" />
+                                    <span t-if="doc.partner_id.street2">, <span t-field="doc.partner_id.street2" /></span>
+                                    <span t-if="doc.partner_id.zip">, C.P. <span t-field="doc.partner_id.zip" /></span>
+                                </span>
+                                <span style="display: block; font-size: 13px; font-weight: normal; margin-top: 2px;">
+                                    AT'N: <t t-if="doc.partner_id.child_ids"><span t-field="doc.partner_id.child_ids[0].name" /></t>
+                                    <t t-else=""><span t-field="doc.partner_id.name" /></t>
+                                </span>
+                                <span style="letter-spacing: 1.5px; display: block; margin-top: 2px; font-size: 13px;">P R E S E N T E</span>
+                            </div>
                         </div>
-                        <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height:60px;"></div>
-                        <div class="seller-name"><t t-esc="doc.user_id.name"/></div>
-                        <div class="seller-title"><t t-esc="doc.user_id.function or 'Vendedor'"/></div>
+
+                        <!-- 3. TABLA ÚNICA DE PRODUCTOS (opciones como secciones) -->
+                        <table class="table table-sm" style="width: 100%; border-collapse: collapse; margin-bottom: 6px;">
+                            <thead>
+                                <tr style="border-top: 1px solid #000; border-bottom: 1px solid #000; text-transform: uppercase; font-weight: bold; font-size: 12px;">
+                                    <th style="width: 8%; border: none; padding: 3px 0; text-align: center;">CANT.</th>
+                                    <th style="width: 47%; border: none; padding: 3px 4px; text-align: left;">DESCRIPCIÓN</th>
+                                    <th style="width: 15%; border: none; padding: 3px 0; text-align: right;">P. UNITARIO</th>
+                                    <th style="width: 12%; border: none; padding: 3px 0; text-align: right;">IVA (16%)</th>
+                                    <th style="width: 18%; border: none; padding: 3px 0; text-align: right;">TOTAL C/IVA</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="doc.option_ids" t-as="option">
+                                    <!-- Fila de Sección: Nombre de la Opción -->
+                                    <tr style="border: none;">
+                                        <td colspan="5"
+                                            style="padding: 6px 0 2px 0; font-weight: bold; text-transform: uppercase; font-size: 12px; text-align: left; border: none; color: #000;">
+                                            <span t-field="option.name" />
+                                        </td>
+                                    </tr>
+                                    <!-- Filas de Productos dentro de la Opción -->
+                                    <t t-foreach="option.line_ids" t-as="line">
+                                        <tr style="border: none;">
+                                            <td style="vertical-align: top; padding: 3px 0; font-weight: bold; text-align: center; border: none; font-size: 13px;">
+                                                <span t-field="line.quantity" t-options="{&quot;widget&quot;: &quot;integer&quot;}" />
+                                            </td>
+                                            <td style="vertical-align: top; padding: 3px 4px; text-align: left; border: none; line-height: 1.25; font-size: 13px; white-space: normal;">
+                                                <span t-field="line.name" style="font-weight: bold;"/>
+                                                <t t-if="line.description">
+                                                    <div style="font-size: 11.5px; color: #555; margin-top: 3px; line-height: 1.2; white-space: pre-wrap;">
+                                                        <t t-out="line.description"/>
+                                                    </div>
+                                                </t>
+                                            </td>
+                                            <td style="vertical-align: top; padding: 3px 0; text-align: right; border: none; font-size: 13px;">
+                                                <span t-field="line.price_unit" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                                            </td>
+                                            <td style="vertical-align: top; padding: 3px 0; text-align: right; border: none; font-size: 13px; color: #444;">
+                                                <span t-out="line.price_unit * line.quantity * (line.iva_percent / 100.0)"
+                                                    t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                                            </td>
+                                            <td style="vertical-align: top; padding: 3px 0; font-weight: bold; text-align: right; border: none; font-size: 13px;">
+                                                <span t-out="line.price_unit * line.quantity * (1 + line.iva_percent / 100.0)"
+                                                    t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: doc.currency_id}" />
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- 4. CONDICIONES Y FIRMAS -->
+                        <div style="page-break-inside: avoid;">
+                            <!-- CONDICIONES COMERCIALES -->
+                            <div style="font-size: 11px; line-height: 1.15; text-align: left; margin-bottom: 4px;">
+                                <t t-if="doc.notes">
+                                    <t t-raw="doc.notes"/>
+                                </t>
+                                <t t-else="">
+                                    <div>1.- Los precios incluyen IVA y son válidos por 10 días y/o agotar existencias.</div>
+                                    <div>2.- Tiempo de entrega: 2 - 3 días contra confirmación del pedido.</div>
+                                    <div>3.- Forma de pago: Contado anticipado para ordenar.</div>
+                                </t>
+                            </div>
+
+                            <!-- DESPEDIDA -->
+                            <div style="text-align: left; margin-bottom: 5px; font-size: 11px; line-height: 1.15;">
+                                Sin más por el momento y a sus órdenes para cualquier duda ó aclaración, se despide de usted su S.S.
+                            </div>
+
+                            <!-- BLOQUE DE FIRMA -->
+                            <div style="margin-top: 5px; text-align: center; width: 100%; margin-bottom: 2px; page-break-inside: avoid;">
+                                <div style="margin: 0 auto; text-align: center; max-width: 440px;">
+                                    <span style="font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; font-size: 12px; letter-spacing: 1px;">ATENTAMENTE</span>
+                                    <div style="height: 32px; text-align: center; margin-bottom: 1px; display: block;">
+                                        <t t-if="doc.signature_id and doc.signature_id.signature_image">
+                                            <img t-attf-src="/web/image/seller.signature/{{ doc.signature_id.id }}/signature_image"
+                                                style="max-height: 30px; max-width: 200px; display: inline-block; vertical-align: middle;" />
+                                        </t>
+                                        <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height: 30px;" />
+                                    </div>
+                                    <div style="border-top: 1.5px solid #000; padding-top: 3px;">
+                                        <span t-field="doc.user_id.name"
+                                            style="font-weight: bold; text-transform: uppercase; display: block; font-size: 12px; color: #000;" />
+                                        <span style="font-weight: bold; text-transform: uppercase; font-size: 11px; display: block; color: #000; margin-top: 1px;">CONSULTORÍA EN INFORMÁTICA ALSA S.A. DE C.V.</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
 
-                    <div class="footer">
-                        <t t-esc="doc.company_id.name"/> - <t t-esc="doc.company_id.phone or ''"/> - <t t-esc="doc.company_id.email or ''"/><br/>
-                        Cotización generada el <t t-if="doc.date"><t t-esc="doc.date.strftime('%d/%m/%Y')"/></t>
+                    <!-- PIE DE PÁGINA -->
+                    <div class="footer"
+                        style="font-family: 'Arial', sans-serif; color: #1C355E; font-size: 10px; width: 100%; border-top: 1px solid #1C355E; padding-top: 2px;">
+                        <table style="width: 100%; border-collapse: collapse; border: none; background: transparent;">
+                            <tr style="border: none;">
+                                <td style="width: 50%; text-align: left; padding: 1px 0; border: none; font-weight: bold; color: #1C355E;">alsainformatica.com.mx</td>
+                                <td style="width: 50%; text-align: right; padding: 1px 0; border: none; font-weight: bold; color: #1C355E;">contacto@alsainformatica.com.mx</td>
+                            </tr>
+                            <tr style="border: none;">
+                                <td colspan="2"
+                                    style="width: 100%; text-align: left; padding: 1px 0 0 0; border: none; color: #444; font-size: 9px; font-weight: normal;">
+                                    Av. Manuel J. Clouthier 182-C Col. El Ángel, C.P. 28979. Villa de Álvarez, Colima
+                                </td>
+                            </tr>
+                        </table>
                     </div>
-                </div>
+
+                </t>
             </t>
-            </main>
-        </div>
-        <t t-if="preview_mode">
-            <script src="/cotizacion/preview.js"/>
         </t>
     </template>
 </odoo>

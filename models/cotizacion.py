@@ -1,5 +1,9 @@
+import base64
+import logging
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
+
+_logger = logging.getLogger(__name__)
 
 class CotizacionExpress(models.Model):
     _name = 'cotizacion.express'
@@ -35,22 +39,39 @@ class CotizacionExpress(models.Model):
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string='Moneda')
     crm_lead_id = fields.Many2one('crm.lead', string='Oportunidad CRM')
     notes = fields.Html(string='Notas / Términos')
-    preview_trigger = fields.Char(string='Preview', compute='_compute_preview_trigger')
+    pdf_preview = fields.Binary(string='Vista Previa PDF', attachment=False)
 
-    @api.depends('partner_id', 'date', 'city', 'state_location', 'user_id', 'signature_id',
-                 'option_ids', 'option_ids.name', 'option_ids.line_ids',
-                 'option_ids.line_ids.name', 'option_ids.line_ids.quantity',
-                 'option_ids.line_ids.price_unit', 'option_ids.line_ids.iva_percent',
-                 'notes')
-    def _compute_preview_trigger(self):
-        for rec in self:
-            rec.preview_trigger = str(fields.Datetime.now())
+    def _generate_pdf_preview(self):
+        """Método interno para renderizar el PDF y guardarlo en el campo binario"""
+        for record in self:
+            try:
+                report_id = self.env.ref('cotizaciones_express.report_cotizacion_express')
+                pdf_content, dummy = self.env['ir.actions.report']._render_qweb_pdf(report_id, res_ids=record.ids)
+                # Usamos super().write() para evitar recursión infinita y guardar de forma silenciosa
+                super(CotizacionExpress, record).write({'pdf_preview': pdf_content})
+            except Exception as e:
+                _logger.error("Error generating PDF preview: %s", e)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        """Se ejecuta la primera vez que el usuario hace clic en Guardar"""
+        records = super(CotizacionExpress, self).create(vals_list)
+        records._generate_pdf_preview()
+        return records
+
+    def write(self, vals):
+        """Se ejecuta cada vez que el usuario guarda cambios"""
+        res = super(CotizacionExpress, self).write(vals)
+        # Evitamos bucle infinito: solo regeneramos si el cambio NO viene del propio PDF
+        if 'pdf_preview' not in vals:
+            self._generate_pdf_preview()
+        return res
 
     def action_send_to_client(self):
         self.ensure_one()
         self.state = 'sent'
         report = self.env.ref('cotizaciones_express.report_cotizacion_express')
-        pdf_content, _ = report._render_qweb_pdf(self.ids)
+        pdf_content, _ = report._render_qweb_pdf(report.id, res_ids=self.ids)
         attachment = self.env['ir.attachment'].create({
             'name': f'Cotizacion_{self.name or "sin_numero"}.pdf',
             'raw': pdf_content,
@@ -100,7 +121,7 @@ class CotizacionExpress(models.Model):
                     'name': line.name + ('\n' + line.description if line.description else ''),
                     'product_uom_qty': line.quantity,
                     'price_unit': line.price_unit,
-                    'tax_id': [(6, 0, self.env['account.tax'].search([
+                    'tax_ids': [(6, 0, self.env['account.tax'].search([
                         ('amount', '=', line.iva_percent),
                         ('type_tax_use', '=', 'sale'),
                     ], limit=1).ids)] if line.iva_percent else False,
@@ -156,7 +177,7 @@ class CotizacionExpressOptionLine(models.Model):
 
     option_id = fields.Many2one('cotizacion.express.option', string='Opción', ondelete='cascade')
     name = fields.Char(string='Producto', required=True)
-    description = fields.Html(string='Descripción')
+    description = fields.Text(string='Descripción')
     quantity = fields.Float(string='Cantidad', default=1.0, required=True)
     price_unit = fields.Monetary(string='Precio Unitario', required=True)
     currency_id = fields.Many2one('res.currency', related='option_id.currency_id')

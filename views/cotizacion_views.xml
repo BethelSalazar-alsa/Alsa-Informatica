@@ -18,7 +18,7 @@
         <field name="name">cotizacion.express.form</field>
         <field name="model">cotizacion.express</field>
         <field name="arch" type="xml">
-            <form>
+            <form autosave="1">
                 <header>
                     <button name="action_send_to_client" string="Enviar al Cliente" type="object" class="oe_highlight" invisible="state not in ['draft']"/>
                     <button name="action_confirm_sale_order" string="Crear Orden de Venta" type="object" class="btn-primary" invisible="state not in ['sent','confirmed']"/>
@@ -60,7 +60,9 @@
                         </div>
 
                         <div class="col-lg-5" style="flex: 4; padding-left: 15px; background: #f8f9fa; min-height: 600px; position: sticky; top: 0;">
-                            <field name="preview_trigger" widget="cotizacion_preview" nolabel="1"/>
+                            <div style="width: 100%; height: 680px; border: 1px solid #dee2e6; border-radius: 4px; overflow: hidden; background: #fff;">
+                                <field name="pdf_preview" widget="pdf_viewer" nolabel="1" readonly="1" style="width: 100%; height: 680px;"/>
+                            </div>
                         </div>
                     </div>
                 </sheet>
@@ -116,6 +118,7 @@
             <list editable="bottom">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
+                <field name="description" optional="show"/>
                 <field name="quantity"/>
                 <field name="price_unit"/>
                 <field name="iva_percent"/>
@@ -145,7 +148,7 @@
                     </group>
                 </group>
                 <group string="Descripción">
-                    <field name="description" widget="html" nolabel="1" options="{'default_height': '300px'}"/>
+                    <field name="description" nolabel="1" placeholder="Descripción detallada del producto..."/>
                 </group>
             </form>
         </field>

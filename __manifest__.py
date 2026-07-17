@@ -14,9 +14,7 @@
         'report/cotizacion_report.xml',
         'data/mail_template.xml',
     ],
-    'assets': {
-        'web.assets_backend': [],
-    },
+
     'installable': True,
     'application': True,
     'license': 'LGPL-3',
