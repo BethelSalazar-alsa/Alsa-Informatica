@@ -75,8 +75,6 @@
                                 <t t-foreach="doc.option_ids" t-as="option">
                                     <!-- Nombre de la Opción como sección -->
                                     <tr style="border: none;">
-                                    <!-- Nombre de la Opción como sección -->
-                                    <tr style="border: none;">
                                         <td colspan="5"
                                             style="padding: 8px 0 3px 0; font-weight: bold; text-transform: uppercase; font-size: 12px; text-align: left; border: none; color: #1C355E; border-bottom: 1px solid #dee2e6;">
                                             <span t-field="option.name" />
