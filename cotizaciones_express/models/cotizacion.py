@@ -205,7 +205,7 @@ class CotizacionExpressOptionLine(models.Model):
 
     option_id = fields.Many2one('cotizacion.express.option', string='Opción', ondelete='cascade')
     name = fields.Char(string='Producto', required=True)
-    description = fields.Text(string='Descripción')
+    description = fields.Html(string='Descripción', sanitize=False)
     quantity = fields.Float(string='Cantidad', default=1.0, required=True)
     price_unit = fields.Monetary(string='Precio Unitario', required=True)
     currency_id = fields.Many2one('res.currency', related='option_id.currency_id')

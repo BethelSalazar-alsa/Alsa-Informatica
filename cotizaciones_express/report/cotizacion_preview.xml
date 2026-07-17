@@ -92,7 +92,7 @@
                                             <td style="vertical-align: top; padding: 3px 4px; text-align: left; border: none; line-height: 1.25; font-size: 13px; white-space: normal;">
                                                 <span t-field="line.name" style="font-weight: bold;"/>
                                                 <t t-if="line.description">
-                                                    <div style="font-size: 11.5px; color: #555; margin-top: 3px; line-height: 1.2; white-space: pre-wrap;">
+                                                    <div style="font-size: 11.5px; color: #555; margin-top: 3px; line-height: 1.2;">
                                                         <t t-out="line.description"/>
                                                     </div>
                                                 </t>
