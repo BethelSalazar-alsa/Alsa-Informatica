@@ -5,6 +5,22 @@ from odoo.exceptions import UserError
 
 _logger = logging.getLogger(__name__)
 
+class CotizacionExpressStage(models.Model):
+    _name = 'cotizacion.express.stage'
+    _description = 'Etapa de Cotización Express'
+    _order = 'sequence, id'
+
+    name = fields.Char(string='Nombre de Etapa', required=True, translate=True)
+    sequence = fields.Integer(string='Secuencia', default=10)
+    fold = fields.Boolean(string='Plegado en Kanban', default=False)
+    state_type = fields.Selection([
+        ('draft', 'Borrador'),
+        ('sent', 'Enviado al Cliente'),
+        ('confirmed', 'Confirmado'),
+        ('cancelled', 'Cancelado'),
+    ], string='Tipo de Estado', default='draft', required=True, help="Define el comportamiento de negocio/botones para esta etapa.")
+
+
 class CotizacionExpress(models.Model):
     _name = 'cotizacion.express'
     _description = 'Cotización Express'
@@ -35,12 +51,33 @@ class CotizacionExpress(models.Model):
         ('cancelled', 'Cancelado'),
     ], string='Estado', default='draft', tracking=True)
 
+    stage_id = fields.Many2one(
+        'cotizacion.express.stage', 
+        string='Etapa', 
+        ondelete='restrict', 
+        tracking=True,
+        default=lambda self: self._default_stage_id(),
+        group_expand='_read_group_stage_ids'
+    )
+
     company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string='Moneda')
     crm_lead_id = fields.Many2one('crm.lead', string='Oportunidad CRM')
     notes = fields.Html(string='Notas / Términos')
     pdf_preview = fields.Binary(string='Vista Previa PDF', attachment=False)
     amount_total = fields.Monetary(string='Total', compute='_compute_amount_total', store=True)
+
+    @api.model
+    def _read_group_stage_ids(self, stages, domain, order):
+        return self.env['cotizacion.express.stage'].search([], order=order)
+
+    def _default_stage_id(self):
+        return self.env['cotizacion.express.stage'].search([('state_type', '=', 'draft')], limit=1).id
+
+    @api.onchange('stage_id')
+    def _onchange_stage_id(self):
+        if self.stage_id:
+            self.state = self.stage_id.state_type
 
     @api.depends('option_ids.total', 'option_ids.selected')
     def _compute_amount_total(self):
@@ -67,12 +104,30 @@ class CotizacionExpress(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         """Se ejecuta la primera vez que el usuario hace clic en Guardar"""
+        for vals in vals_list:
+            if 'state' in vals and 'stage_id' not in vals:
+                stage = self.env['cotizacion.express.stage'].search([('state_type', '=', vals['state'])], limit=1)
+                if stage:
+                    vals['stage_id'] = stage.id
+            elif 'stage_id' in vals and 'state' not in vals:
+                stage = self.env['cotizacion.express.stage'].browse(vals['stage_id'])
+                if stage:
+                    vals['state'] = stage.state_type
         records = super(CotizacionExpress, self).create(vals_list)
         records._generate_pdf_preview()
         return records
 
     def write(self, vals):
         """Se ejecuta cada vez que el usuario guarda cambios"""
+        if 'stage_id' in vals:
+            stage = self.env['cotizacion.express.stage'].browse(vals['stage_id'])
+            if stage:
+                vals['state'] = stage.state_type
+        if 'state' in vals and 'stage_id' not in vals:
+            stage = self.env['cotizacion.express.stage'].search([('state_type', '=', vals['state'])], limit=1)
+            if stage:
+                vals['stage_id'] = stage.id
+                
         res = super(CotizacionExpress, self).write(vals)
         # Evitamos bucle infinito: solo regeneramos si el cambio NO viene del propio PDF
         if 'pdf_preview' not in vals:
@@ -110,60 +165,64 @@ class CotizacionExpress(models.Model):
         selected = self.option_ids.filtered('selected')
         if not selected:
             raise UserError(_('Debe seleccionar al menos una opción como "Seleccionada por el Cliente"'))
+        option = selected[0]
         if not self.crm_lead_id:
             lead = self.env['crm.lead'].create({
                 'name': self.name,
                 'partner_id': self.partner_id.id,
-                'expected_revenue': sum(self.option_ids.mapped('total')),
+                'expected_revenue': option.total,
                 'description': self.notes or '',
                 'user_id': self.user_id.id,
                 'team_id': self.env['crm.team'].search([], limit=1).id if self.env['crm.team'].search_count([]) else False,
             })
             self.crm_lead_id = lead.id
-        for option in selected:
-            vals = {
-                'partner_id': self.partner_id.id,
-                'origin': self.name,
-                'user_id': self.user_id.id,
-                'team_id': self.crm_lead_id.team_id.id if self.crm_lead_id else False,
-                'campaign_id': self.crm_lead_id.campaign_id.id if self.crm_lead_id else False,
-                'medium_id': self.crm_lead_id.medium_id.id if self.crm_lead_id else False,
-                'note': option.description or '',
-                'order_line': [],
+            
+        vals = {
+            'partner_id': self.partner_id.id,
+            'origin': self.name,
+            'user_id': self.user_id.id,
+            'team_id': self.crm_lead_id.team_id.id if self.crm_lead_id else False,
+            'campaign_id': self.crm_lead_id.campaign_id.id if self.crm_lead_id else False,
+            'medium_id': self.crm_lead_id.medium_id.id if self.crm_lead_id else False,
+            'note': option.description or '',
+            'order_line': [],
+            'is_express': True,
+        }
+        order = self.env['sale.order'].create(vals)
+        for line in option.line_ids:
+            product = self.env['product.product'].search([('name', '=', line.name)], limit=1)
+            if not product:
+                product = self.env['product.product'].search([('name', '=', 'Concepto Cotización')], limit=1)
+            if not product:
+                product = self.env['product.product'].create({
+                    'name': 'Concepto Cotización',
+                    'type': 'service',
+                    'sale_ok': True,
+                    'purchase_ok': False,
+                })
+            order_line_vals = {
+                'order_id': order.id,
+                'product_id': product.id,
+                'name': line.name + ('\n' + line.description if line.description else ''),
+                'product_uom_qty': line.quantity,
+                'price_unit': line.price_unit,
+                'tax_ids': [(6, 0, self.env['account.tax'].search([
+                    ('amount', '=', line.iva_percent),
+                    ('type_tax_use', '=', 'sale'),
+                ], limit=1).ids)] if line.iva_percent else False,
             }
-            order = self.env['sale.order'].create(vals)
-            for line in option.line_ids:
-                product = self.env['product.product'].search([('name', '=', line.name)], limit=1)
-                if not product:
-                    product = self.env['product.product'].search([('name', '=', 'Concepto Cotización')], limit=1)
-                if not product:
-                    product = self.env['product.product'].create({
-                        'name': 'Concepto Cotización',
-                        'type': 'service',
-                        'sale_ok': True,
-                        'purchase_ok': False,
-                    })
-                order_line_vals = {
-                    'order_id': order.id,
-                    'product_id': product.id,
-                    'name': line.name + ('\n' + line.description if line.description else ''),
-                    'product_uom_qty': line.quantity,
-                    'price_unit': line.price_unit,
-                    'tax_ids': [(6, 0, self.env['account.tax'].search([
-                        ('amount', '=', line.iva_percent),
-                        ('type_tax_use', '=', 'sale'),
-                    ], limit=1).ids)] if line.iva_percent else False,
-                }
-                self.env['sale.order.line'].create(order_line_vals)
-            if self.crm_lead_id and 'sale_order_id' in self.crm_lead_id._fields:
-                self.crm_lead_id.write({'sale_order_id': order.id})
+            self.env['sale.order.line'].create(order_line_vals)
+            
+        if self.crm_lead_id and 'sale_order_id' in self.crm_lead_id._fields:
+            self.crm_lead_id.write({'sale_order_id': order.id})
         self.state = 'confirmed'
         return {
             'type': 'ir.actions.act_window',
             'res_model': 'sale.order',
-            'view_mode': 'list,form',
-            'domain': [('origin', '=', self.name)],
-            'name': _('Órdenes de Venta'),
+            'view_mode': 'form',
+            'res_id': order.id,
+            'name': _('Orden de Venta'),
+            'context': {'show_express_orders': True},
         }
 
     def action_cancel(self):
@@ -196,6 +255,24 @@ class CotizacionExpressOption(models.Model):
             rec.subtotal = sum(rec.line_ids.mapped('subtotal'))
             rec.iva_total = sum(rec.line_ids.mapped('iva_amount'))
             rec.total = rec.subtotal + rec.iva_total
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        for vals in vals_list:
+            if vals.get('selected') and vals.get('cotizacion_id'):
+                self.env['cotizacion.express.option'].search([
+                    ('cotizacion_id', '=', vals['cotizacion_id']),
+                    ('selected', '=', True)
+                ]).write({'selected': False})
+        return super(CotizacionExpressOption, self).create(vals_list)
+
+    def write(self, vals):
+        if vals.get('selected'):
+            for rec in self:
+                if rec.cotizacion_id:
+                    other_options = rec.cotizacion_id.option_ids - rec
+                    other_options.write({'selected': False})
+        return super(CotizacionExpressOption, self).write(vals)
 
 
 class CotizacionExpressOptionLine(models.Model):
@@ -232,3 +309,15 @@ class CotizacionExpressOptionLine(models.Model):
             'res_id': self.id,
             'target': 'new',
         }
+
+
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    is_express = fields.Boolean(string='Es Cotización Express', default=False)
+
+    @api.model
+    def _search(self, domain, offset=0, limit=None, order=None):
+        if not self.env.context.get('show_express_orders'):
+            domain = [('is_express', '=', False)] + list(domain)
+        return super(SaleOrder, self)._search(domain, offset, limit, order)
