@@ -40,6 +40,18 @@ class CotizacionExpress(models.Model):
     crm_lead_id = fields.Many2one('crm.lead', string='Oportunidad CRM')
     notes = fields.Html(string='Notas / Términos')
     pdf_preview = fields.Binary(string='Vista Previa PDF', attachment=False)
+    amount_total = fields.Monetary(string='Total', compute='_compute_amount_total', store=True)
+
+    @api.depends('option_ids.total', 'option_ids.selected')
+    def _compute_amount_total(self):
+        for rec in self:
+            selected_options = rec.option_ids.filtered('selected')
+            if selected_options:
+                rec.amount_total = sum(selected_options.mapped('total'))
+            elif rec.option_ids:
+                rec.amount_total = rec.option_ids[0].total
+            else:
+                rec.amount_total = 0.0
 
     def _generate_pdf_preview(self):
         """Método interno para renderizar el PDF y guardarlo en el campo binario"""
@@ -70,18 +82,25 @@ class CotizacionExpress(models.Model):
     def action_send_to_client(self):
         self.ensure_one()
         self.state = 'sent'
-        report = self.env.ref('cotizaciones_express.report_cotizacion_express')
-        pdf_content, _ = report._render_qweb_pdf(report.id, res_ids=self.ids)
-        attachment = self.env['ir.attachment'].create({
-            'name': f'Cotizacion_{self.name or "sin_numero"}.pdf',
-            'raw': pdf_content,
-            'mimetype': 'application/pdf',
-        })
         template = self.env.ref('cotizaciones_express.email_template_cotizacion', raise_if_not_found=False)
-        if template:
-            template.send_mail(self.id, force_send=True,
-                email_values={'attachment_ids': [(4, attachment.id)]})
-        return True
+        compose_form = self.env.ref('mail.email_compose_message_wizard_form')
+        ctx = {
+            'default_model': 'cotizacion.express',
+            'default_res_ids': self.ids,
+            'default_template_id': template.id if template else False,
+            'default_composition_mode': 'comment',
+            'force_email': True,
+        }
+        return {
+            'name': _('Enviar Correo Electrónico'),
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'mail.compose.message',
+            'views': [(compose_form.id, 'form')],
+            'view_id': compose_form.id,
+            'target': 'new',
+            'context': ctx,
+        }
 
     def action_confirm(self):
         self.state = 'confirmed'
@@ -115,9 +134,18 @@ class CotizacionExpress(models.Model):
             order = self.env['sale.order'].create(vals)
             for line in option.line_ids:
                 product = self.env['product.product'].search([('name', '=', line.name)], limit=1)
+                if not product:
+                    product = self.env['product.product'].search([('name', '=', 'Concepto Cotización')], limit=1)
+                if not product:
+                    product = self.env['product.product'].create({
+                        'name': 'Concepto Cotización',
+                        'type': 'service',
+                        'sale_ok': True,
+                        'purchase_ok': False,
+                    })
                 order_line_vals = {
                     'order_id': order.id,
-                    'product_id': product.id if product else False,
+                    'product_id': product.id,
                     'name': line.name + ('\n' + line.description if line.description else ''),
                     'product_uom_qty': line.quantity,
                     'price_unit': line.price_unit,
@@ -193,3 +221,14 @@ class CotizacionExpressOptionLine(models.Model):
             rec.subtotal = rec.price_unit * rec.quantity
             rec.iva_amount = rec.subtotal * (rec.iva_percent / 100.0)
             rec.total = rec.subtotal + rec.iva_amount
+
+    def action_open_line_form(self):
+        self.ensure_one()
+        return {
+            'name': _('Editar Producto'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'cotizacion.express.option.line',
+            'view_mode': 'form',
+            'res_id': self.id,
+            'target': 'new',
+        }
