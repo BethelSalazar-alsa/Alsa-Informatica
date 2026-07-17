@@ -68,7 +68,7 @@ class CotizacionExpress(models.Model):
     amount_total = fields.Monetary(string='Total', compute='_compute_amount_total', store=True)
 
     @api.model
-    def _read_group_stage_ids(self, stages, domain, order=None, *args, **kwargs):
+    def _read_group_stage_ids(self, stages, domain, order=None):
         return self.env['cotizacion.express.stage'].search([], order=order)
 
     def _default_stage_id(self):
