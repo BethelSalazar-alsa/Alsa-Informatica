@@ -115,17 +115,15 @@
         <field name="name">cotizacion.express.option.line.tree</field>
         <field name="model">cotizacion.express.option.line</field>
         <field name="arch" type="xml">
-            <list editable="bottom">
+            <list>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
-                <field name="description" optional="show"/>
                 <field name="quantity"/>
                 <field name="price_unit"/>
                 <field name="iva_percent"/>
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_amount" sum="IVA"/>
                 <field name="total" sum="Total"/>
-                <button name="action_open_line_form" type="object" icon="fa-pencil" title="Editar descripción"/>
             </list>
         </field>
     </record>
@@ -143,14 +141,15 @@
                     </group>
                     <group>
                         <field name="iva_percent"/>
-                        <field name="subtotal"/>
-                        <field name="iva_amount"/>
-                        <field name="total"/>
+                        <field name="subtotal" readonly="1"/>
+                        <field name="iva_amount" readonly="1"/>
+                        <field name="total" readonly="1"/>
                     </group>
                 </group>
-                <group string="Descripción">
-                    <field name="description" nolabel="1" placeholder="Descripción detallada del producto..."/>
-                </group>
+                <separator string="Descripción"/>
+                <field name="description" widget="html" nolabel="1"
+                       options="{&apos;height&apos;: 300, &apos;toolbar&apos;: true}"
+                       style="min-height: 250px; width: 100%;"/>
             </form>
         </field>
     </record>
