@@ -254,6 +254,10 @@ class CotizacionExpressOption(models.Model):
             rec.iva_total = sum(rec.line_ids.mapped('iva_amount'))
             rec.total = rec.subtotal + rec.iva_total
 
+    def action_duplicate(self):
+        self.ensure_one()
+        self.copy({'selected': False, 'name': self.name + ' (copia)'})
+
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
@@ -296,6 +300,10 @@ class CotizacionExpressOptionLine(models.Model):
     user_id = fields.Many2one('res.users', related='option_id.cotizacion_id.user_id', store=True, string='Vendedor')
     partner_id = fields.Many2one('res.partner', related='option_id.cotizacion_id.partner_id', store=True, string='Cliente')
     date = fields.Date(related='option_id.cotizacion_id.date', store=True, string='Fecha')
+
+    def action_duplicate_line(self):
+        self.ensure_one()
+        self.copy({'name': self.name + ' (copia)'})
 
     @api.depends('price_unit', 'quantity', 'iva_percent')
     def _compute_line_totals(self):

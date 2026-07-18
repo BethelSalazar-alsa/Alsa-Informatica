@@ -81,6 +81,7 @@
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_total" sum="IVA"/>
                 <field name="total" sum="Total"/>
+                <button name="action_duplicate" type="object" icon="fa-copy" title="Duplicar"/>
             </list>
         </field>
     </record>
@@ -124,6 +125,7 @@
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_amount" sum="IVA"/>
                 <field name="total" sum="Total"/>
+                <button name="action_duplicate_line" type="object" icon="fa-copy" title="Duplicar"/>
             </list>
         </field>
     </record>
