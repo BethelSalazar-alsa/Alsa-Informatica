@@ -62,7 +62,6 @@ class CotizacionExpress(models.Model):
 
     company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string='Moneda')
-    crm_lead_id = fields.Many2one('crm.lead', string='Oportunidad CRM')
     notes = fields.Html(string='Notas / Términos')
     pdf_preview = fields.Binary(string='Vista Previa PDF', attachment=False)
     amount_total = fields.Monetary(string='Total', compute='_compute_amount_total', store=True)
@@ -175,24 +174,10 @@ class CotizacionExpress(models.Model):
         if not selected:
             raise UserError(_('Debe seleccionar al menos una opción como "Seleccionada por el Cliente"'))
         option = selected[0]
-        if not self.crm_lead_id:
-            lead = self.env['crm.lead'].create({
-                'name': self.name,
-                'partner_id': self.partner_id.id,
-                'expected_revenue': option.total,
-                'description': self.notes or '',
-                'user_id': self.user_id.id,
-                'team_id': self.env['crm.team'].search([], limit=1).id if self.env['crm.team'].search_count([]) else False,
-            })
-            self.crm_lead_id = lead.id
-            
         vals = {
             'partner_id': self.partner_id.id,
             'origin': self.name,
             'user_id': self.user_id.id,
-            'team_id': self.crm_lead_id.team_id.id if self.crm_lead_id else False,
-            'campaign_id': self.crm_lead_id.campaign_id.id if self.crm_lead_id else False,
-            'medium_id': self.crm_lead_id.medium_id.id if self.crm_lead_id else False,
             'note': option.description or '',
             'order_line': [],
             'is_express': True,
