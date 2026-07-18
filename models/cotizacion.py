@@ -66,6 +66,15 @@ class CotizacionExpress(models.Model):
     notes = fields.Html(string='Notas / Términos')
     pdf_preview = fields.Binary(string='Vista Previa PDF', attachment=False)
     amount_total = fields.Monetary(string='Total', compute='_compute_amount_total', store=True)
+    amount_confirmed = fields.Monetary(string='Monto Confirmado', compute='_compute_amount_confirmed', store=True, currency_field='currency_id')
+
+    @api.depends('amount_total', 'state')
+    def _compute_amount_confirmed(self):
+        for rec in self:
+            if rec.state == 'confirmed':
+                rec.amount_confirmed = rec.amount_total
+            else:
+                rec.amount_confirmed = 0.0
 
     @api.model
     def _read_group_stage_ids(self, stages, domain, order=None):
@@ -158,6 +167,10 @@ class CotizacionExpress(models.Model):
         }
 
     def action_confirm(self):
+        self.ensure_one()
+        selected = self.option_ids.filtered('selected')
+        if not selected:
+            raise UserError(_('Debe seleccionar al menos una opción como "Seleccionada por el Cliente" para poder confirmar la venta.'))
         self.state = 'confirmed'
 
     def action_confirm_sale_order(self):
@@ -292,6 +305,13 @@ class CotizacionExpressOptionLine(models.Model):
     total = fields.Monetary(string='Total', compute='_compute_line_totals', store=True)
     sequence = fields.Integer(string='Secuencia', default=10)
 
+    cotizacion_id = fields.Many2one('cotizacion.express', related='option_id.cotizacion_id', store=True, string='Cotización')
+    cotizacion_state = fields.Selection(related='option_id.cotizacion_id.state', store=True, string='Estado de Cotización')
+    option_selected = fields.Boolean(related='option_id.selected', store=True, string='Opción Seleccionada')
+    user_id = fields.Many2one('res.users', related='option_id.cotizacion_id.user_id', store=True, string='Vendedor')
+    partner_id = fields.Many2one('res.partner', related='option_id.cotizacion_id.partner_id', store=True, string='Cliente')
+    date = fields.Date(related='option_id.cotizacion_id.date', store=True, string='Fecha')
+
     @api.depends('price_unit', 'quantity', 'iva_percent')
     def _compute_line_totals(self):
         for rec in self:
@@ -317,7 +337,7 @@ class SaleOrder(models.Model):
     is_express = fields.Boolean(string='Es Cotización Express', default=False)
 
     @api.model
-    def _search(self, domain, offset=0, limit=None, order=None):
+    def _search(self, domain, *args, **kwargs):
         if not self.env.context.get('show_express_orders'):
             domain = [('is_express', '=', False)] + list(domain)
-        return super(SaleOrder, self)._search(domain, offset, limit, order)
+        return super(SaleOrder, self)._search(domain, *args, **kwargs)
