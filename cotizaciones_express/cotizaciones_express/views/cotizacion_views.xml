@@ -159,7 +159,7 @@
         <field name="name">cotizacion.express.kanban</field>
         <field name="model">cotizacion.express</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="stage_id" default_order="date desc" quick_create="false" on_create="quick_create">
+            <kanban default_group_by="stage_id" default_order="sequence" quick_create="false" on_create="quick_create">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="date"/>

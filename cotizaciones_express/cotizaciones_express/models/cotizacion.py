@@ -77,7 +77,7 @@ class CotizacionExpress(models.Model):
                 rec.amount_confirmed = 0.0
 
     @api.model
-    def _read_group_stage_ids(self, stages, domain, order=None):
+    def _read_group_stage_ids(self, stages, domain, order=None, *args, **kwargs):
         return self.env['cotizacion.express.stage'].search([], order=order)
 
     def _default_stage_id(self):
@@ -337,7 +337,7 @@ class SaleOrder(models.Model):
     is_express = fields.Boolean(string='Es Cotización Express', default=False)
 
     @api.model
-    def _search(self, domain, *args, **kwargs):
+    def _search(self, domain, offset=0, limit=None, order=None):
         if not self.env.context.get('show_express_orders'):
             domain = [('is_express', '=', False)] + list(domain)
-        return super(SaleOrder, self)._search(domain, *args, **kwargs)
+        return super(SaleOrder, self)._search(domain, offset, limit, order)

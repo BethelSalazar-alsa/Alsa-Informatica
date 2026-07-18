@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_cotizacion_express,cotizacion.express,model_cotizacion_express,base.group_user,1,1,1,1
+access_cotizacion_express_option,cotizacion.express.option,model_cotizacion_express_option,base.group_user,1,1,1,1
+access_cotizacion_express_option_line,cotizacion.express.option.line,model_cotizacion_express_option_line,base.group_user,1,1,1,1
+access_seller_signature,seller.signature,model_seller_signature,base.group_user,1,1,1,1
+access_cotizacion_express_stage,cotizacion.express.stage,model_cotizacion_express_stage,base.group_user,1,1,1,1
