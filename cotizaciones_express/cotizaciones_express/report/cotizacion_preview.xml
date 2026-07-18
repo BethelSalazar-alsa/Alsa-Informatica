@@ -32,7 +32,7 @@
                         style="font-family: 'Arial', sans-serif; color: #000; font-size: 13px; padding: 0px !important;">
 
                         <!-- 1. FECHA — margen positivo para que no quede tapada -->
-                        <div style="text-align: right; width: 100%; font-size: 13px; margin-top: 10px; margin-bottom: 18px; color: #000;">
+                        <div style="text-align: right; width: 100%; font-size: 13px; margin-top: 25px; margin-bottom: 18px; color: #000;">
                             Colima, Col., <t t-if="doc.date">
                                 <t t-esc="doc.date.strftime('%d')"/> de
                                 <t t-set="months" t-value="['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']"/>
