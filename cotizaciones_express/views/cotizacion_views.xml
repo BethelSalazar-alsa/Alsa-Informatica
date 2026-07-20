@@ -560,10 +560,24 @@
         <field name="name">cotizacion.express.tag.list</field>
         <field name="model">cotizacion.express.tag</field>
         <field name="arch" type="xml">
-            <list editable="bottom">
+            <list>
                 <field name="name"/>
-                <field name="color" widget="color"/>
             </list>
+        </field>
+    </record>
+
+    <record id="view_cotizacion_express_tag_form" model="ir.ui.view">
+        <field name="name">cotizacion.express.tag.form</field>
+        <field name="model">cotizacion.express.tag</field>
+        <field name="arch" type="xml">
+            <form string="Etiqueta de Cotización">
+                <sheet>
+                    <group>
+                        <field name="name" string="Nombre de la Etiqueta"/>
+                        <field name="color" widget="color_picker" string="Color de la Etiqueta"/>
+                    </group>
+                </sheet>
+            </form>
         </field>
     </record>
 </odoo>
