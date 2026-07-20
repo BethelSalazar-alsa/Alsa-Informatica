@@ -152,12 +152,12 @@
                                     <span style="font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 8px; font-size: 12px; letter-spacing: 1.5px; color: #000;">ATENTAMENTE</span>
 
                                     <!-- Imagen de firma grande -->
-                                    <div style="height: 70px; text-align: center; margin-bottom: 6px;">
+                                    <div style="height: 45px; position: relative; text-align: center; margin-bottom: 6px;">
                                         <t t-if="doc.signature_id and doc.signature_id.signature_image">
                                             <img t-attf-src="/web/image/seller.signature/{{ doc.signature_id.id }}/signature_image"
-                                                style="max-height: 60px; max-width: 340px; display: inline-block;" />
+                                                style="position: absolute; top: -35px; left: 50%; transform: translateX(-50%); max-height: 100px; max-width: 340px; z-index: 10; pointer-events: none; opacity: 0.95;" />
                                         </t>
-                                        <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height: 60px;" />
+                                        <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height: 45px;" />
                                     </div>
 
                                     <!-- Línea y nombre del vendedor -->
