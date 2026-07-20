@@ -222,12 +222,15 @@ class CotizacionExpress(models.Model):
                     'sale_ok': True,
                     'purchase_ok': False,
                 })
+            # Calculamos el descuento combinado (descuento por línea + descuento general de la opción)
+            final_discount = 100.0 * (1.0 - (1.0 - line.discount / 100.0) * (1.0 - option.discount_general / 100.0))
             order_line_vals = {
                 'order_id': order.id,
                 'product_id': product.id,
                 'name': line.name + ('\n' + line.description if line.description else ''),
                 'product_uom_qty': line.quantity,
                 'price_unit': line.price_unit,
+                'discount': final_discount,
                 'tax_ids': [(6, 0, self.env['account.tax'].search([
                     ('amount', '=', line.iva_percent),
                     ('type_tax_use', '=', 'sale'),
@@ -266,16 +269,23 @@ class CotizacionExpressOption(models.Model):
     selected = fields.Boolean(string='Seleccionada por el Cliente', default=False)
     sequence = fields.Integer(string='Secuencia', default=10)
 
+    discount_general = fields.Float(string='Descuento General %', default=0.0)
+    amount_lines_subtotal = fields.Monetary(string='Subtotal Líneas', compute='_compute_option_totals', store=True)
+    amount_lines_iva = fields.Monetary(string='IVA Líneas', compute='_compute_option_totals', store=True)
+    discount_general_amount = fields.Monetary(string='Monto Descuento General', compute='_compute_option_totals', store=True)
     subtotal = fields.Monetary(string='Subtotal', compute='_compute_option_totals', store=True)
     iva_total = fields.Monetary(string='IVA Total', compute='_compute_option_totals', store=True)
     total = fields.Monetary(string='Total', compute='_compute_option_totals', store=True)
     currency_id = fields.Many2one('res.currency', related='cotizacion_id.currency_id')
 
-    @api.depends('line_ids.subtotal', 'line_ids.iva_amount')
+    @api.depends('line_ids.subtotal', 'line_ids.iva_amount', 'discount_general')
     def _compute_option_totals(self):
         for rec in self:
-            rec.subtotal = sum(rec.line_ids.mapped('subtotal'))
-            rec.iva_total = sum(rec.line_ids.mapped('iva_amount'))
+            rec.amount_lines_subtotal = sum(rec.line_ids.mapped('subtotal'))
+            rec.amount_lines_iva = sum(rec.line_ids.mapped('iva_amount'))
+            rec.discount_general_amount = rec.amount_lines_subtotal * (rec.discount_general / 100.0)
+            rec.subtotal = rec.amount_lines_subtotal - rec.discount_general_amount
+            rec.iva_total = rec.amount_lines_iva * (1.0 - rec.discount_general / 100.0)
             rec.total = rec.subtotal + rec.iva_total
 
     def action_duplicate(self):
@@ -321,6 +331,7 @@ class CotizacionExpressOptionLine(models.Model):
     price_unit = fields.Monetary(string='Precio Unitario', required=True)
     currency_id = fields.Many2one('res.currency', related='option_id.currency_id')
     iva_percent = fields.Float(string='IVA %', default=16.0)
+    discount = fields.Float(string='Descuento %', default=0.0)
     subtotal = fields.Monetary(string='Subtotal', compute='_compute_line_totals', store=True)
     iva_amount = fields.Monetary(string='IVA', compute='_compute_line_totals', store=True)
     total = fields.Monetary(string='Total', compute='_compute_line_totals', store=True)
@@ -337,10 +348,11 @@ class CotizacionExpressOptionLine(models.Model):
         self.ensure_one()
         self.copy({'name': self.name + ' (copia)'})
 
-    @api.depends('price_unit', 'quantity', 'iva_percent')
+    @api.depends('price_unit', 'quantity', 'iva_percent', 'discount')
     def _compute_line_totals(self):
         for rec in self:
-            rec.subtotal = rec.price_unit * rec.quantity
+            subtotal_before_discount = rec.price_unit * rec.quantity
+            rec.subtotal = subtotal_before_discount * (1.0 - rec.discount / 100.0)
             rec.iva_amount = rec.subtotal * (rec.iva_percent / 100.0)
             rec.total = rec.subtotal + rec.iva_amount
 

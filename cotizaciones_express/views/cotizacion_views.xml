@@ -78,7 +78,7 @@
             <list>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
-                <field name="selected" widget="badge" decoration-success="selected == True"/>
+                <field name="selected"/>
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_total" sum="IVA"/>
                 <field name="total" sum="Total"/>
@@ -95,12 +95,15 @@
                 <group>
                     <group>
                         <field name="name"/>
+                        <field name="discount_general"/>
                     </group>
                     <group>
                         <field name="selected"/>
-                        <field name="subtotal"/>
-                        <field name="iva_total"/>
-                        <field name="total"/>
+                        <field name="amount_lines_subtotal" string="Subtotal Líneas" readonly="1"/>
+                        <field name="discount_general_amount" string="Monto Desc. General" readonly="1"/>
+                        <field name="subtotal" string="Subtotal Neto" readonly="1"/>
+                        <field name="iva_total" string="IVA Total" readonly="1"/>
+                        <field name="total" string="Total" readonly="1"/>
                     </group>
                 </group>
                 <group string="Descripción">
@@ -122,6 +125,7 @@
                 <field name="name"/>
                 <field name="quantity"/>
                 <field name="price_unit"/>
+                <field name="discount"/>
                 <field name="iva_percent"/>
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_amount" sum="IVA"/>
@@ -141,6 +145,7 @@
                         <field name="name"/>
                         <field name="quantity"/>
                         <field name="price_unit"/>
+                        <field name="discount"/>
                     </group>
                     <group>
                         <field name="iva_percent"/>
