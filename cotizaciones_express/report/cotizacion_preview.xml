@@ -32,7 +32,8 @@
                         style="font-family: 'Arial', sans-serif; color: #000; font-size: 13px; padding: 0px !important;">
 
                         <!-- 1. FECHA -->
-                        <div style="text-align: right; width: 100%; font-size: 13px; margin-top: 3cm; margin-bottom: 18px; color: #000;">
+                        <div style="height: 3cm; width: 100%; clear: both;"/>
+                        <div style="text-align: right; width: 100%; font-size: 13px; margin-top: 0px; margin-bottom: 18px; color: #000;">
                             <span t-esc="doc.city or 'Colima'"/>, <span t-esc="doc.state_location or 'Col.'"/>, <t t-if="doc.date">
                                 <t t-esc="doc.date.strftime('%d')"/> de
                                 <t t-set="months" t-value="['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']"/>
