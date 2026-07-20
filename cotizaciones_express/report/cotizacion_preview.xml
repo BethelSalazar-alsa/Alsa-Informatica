@@ -45,7 +45,9 @@
                         <!-- 2. DATOS DEL CLIENTE -->
                         <div style="margin-bottom: 14px;">
                             <div style="text-transform: uppercase; font-weight: bold; line-height: 1.4; text-align: left;">
-                                <span t-field="doc.partner_id.name"
+                                <span t-if="doc.partner_id.parent_id" t-field="doc.partner_id.parent_id.name"
+                                    style="font-size: 15px; display: block; margin-bottom: 2px;" />
+                                <span t-else="" t-field="doc.partner_id.name"
                                     style="font-size: 15px; display: block; margin-bottom: 2px;" />
                                 <span t-if="doc.partner_id.street"
                                     style="font-weight: normal; font-size: 12px; color: #222; display: block; margin-top: 0; text-transform: none;">
@@ -53,9 +55,15 @@
                                     <span t-if="doc.partner_id.street2">, <span t-field="doc.partner_id.street2" /></span>
                                     <span t-if="doc.partner_id.zip">, C.P. <span t-field="doc.partner_id.zip" /></span>
                                 </span>
-                                <span style="display: block; font-size: 13px; font-weight: normal; margin-top: 3px; text-transform: none;">
-                                    AT'N: <t t-if="doc.partner_id.child_ids"><span t-field="doc.partner_id.child_ids[0].name" /></t>
-                                    <t t-else=""><span t-field="doc.partner_id.name" /></t>
+                                <span t-if="doc.partner_id.parent_id or (doc.partner_id.is_company and doc.partner_id.child_ids)"
+                                      style="display: block; font-size: 13px; font-weight: normal; margin-top: 3px; text-transform: none;">
+                                    AT'N: 
+                                    <t t-if="doc.partner_id.parent_id">
+                                        <span t-field="doc.partner_id.name" />
+                                    </t>
+                                    <t t-else="">
+                                        <span t-field="doc.partner_id.child_ids[0].name" />
+                                    </t>
                                 </span>
                                 <span style="letter-spacing: 2px; display: block; margin-top: 4px; font-size: 13px;">P R E S E N T E</span>
                             </div>

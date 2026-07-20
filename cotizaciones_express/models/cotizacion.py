@@ -66,6 +66,8 @@ class CotizacionExpress(models.Model):
     pdf_preview = fields.Binary(string='Vista Previa PDF', attachment=False)
     pdf_filename = fields.Char(string='Nombre PDF', default='cotizacion.pdf')
     pdf_toggle = fields.Boolean(string='PDF Toggle', default=False)
+    template_id = fields.Many2one('cotizacion.express.template', string='Cargar Plantilla')
+    option_template_id = fields.Many2one('cotizacion.express.template.option', string='Cargar Paquete')
     amount_total = fields.Monetary(string='Total', compute='_compute_amount_total', store=True)
     amount_confirmed = fields.Monetary(string='Monto Confirmado', compute='_compute_amount_confirmed', store=True, currency_field='currency_id')
 
@@ -117,6 +119,64 @@ class CotizacionExpress(models.Model):
                 })
             except Exception as e:
                 _logger.error("Error generating PDF preview: %s", e)
+
+    def action_load_template(self):
+        self.ensure_one()
+        if not self.template_id:
+            return
+        self.notes = self.template_id.notes
+        
+        # Limpiar opciones actuales
+        self.option_ids.unlink()
+        
+        # Crear nuevas opciones a partir de la plantilla
+        for t_option in self.template_id.option_ids:
+            option = self.env['cotizacion.express.option'].create({
+                'cotizacion_id': self.id,
+                'name': t_option.name,
+                'discount_general': t_option.discount_general,
+            })
+            for t_line in t_option.line_ids:
+                self.env['cotizacion.express.option.line'].create({
+                    'option_id': option.id,
+                    'name': t_line.name,
+                    'description': t_line.description,
+                    'quantity': t_line.quantity,
+                    'price_unit': t_line.price_unit,
+                    'discount': t_line.discount,
+                    'iva_percent': t_line.iva_percent,
+                })
+        
+        # Forzar recarga del PDF
+        self._generate_pdf_preview()
+
+    def action_load_option_template(self):
+        self.ensure_one()
+        if not self.option_template_id:
+            return
+        t_option = self.option_template_id
+        
+        # Crear nueva opción
+        option = self.env['cotizacion.express.option'].create({
+            'cotizacion_id': self.id,
+            'name': t_option.name,
+            'discount_general': t_option.discount_general,
+        })
+        for t_line in t_option.line_ids:
+            self.env['cotizacion.express.option.line'].create({
+                'option_id': option.id,
+                'name': t_line.name,
+                'description': t_line.description,
+                'quantity': t_line.quantity,
+                'price_unit': t_line.price_unit,
+                'discount': t_line.discount,
+                'iva_percent': t_line.iva_percent,
+            })
+            
+        # Limpiar el campo
+        self.option_template_id = False
+        # Forzar recarga del PDF
+        self._generate_pdf_preview()
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -418,4 +478,36 @@ class CotizacionConfirmWizardLine(models.TransientModel):
     total = fields.Monetary(related='option_id.total', string='Total', currency_field='currency_id', readonly=True)
     currency_id = fields.Many2one('res.currency', related='option_id.currency_id')
     selected = fields.Boolean(string='Seleccionada')
+
+
+class CotizacionExpressTemplate(models.Model):
+    _name = 'cotizacion.express.template'
+    _description = 'Plantilla de Cotización Express'
+
+    name = fields.Char(string='Nombre de la Plantilla', required=True)
+    option_ids = fields.One2many('cotizacion.express.template.option', 'template_id', string='Opciones / Paquetes')
+    notes = fields.Html(string='Notas / Términos')
+
+
+class CotizacionExpressTemplateOption(models.Model):
+    _name = 'cotizacion.express.template.option'
+    _description = 'Plantilla de Opción / Paquete'
+
+    template_id = fields.Many2one('cotizacion.express.template', string='Plantilla de Cotización', ondelete='cascade')
+    name = fields.Char(string='Nombre de la Opción', required=True)
+    discount_general = fields.Float(string='Descuento General %', default=0.0)
+    line_ids = fields.One2many('cotizacion.express.template.option.line', 'option_id', string='Líneas de Producto')
+
+
+class CotizacionExpressTemplateOptionLine(models.Model):
+    _name = 'cotizacion.express.template.option.line'
+    _description = 'Plantilla de Línea de Opción'
+
+    option_id = fields.Many2one('cotizacion.express.template.option', string='Opción', ondelete='cascade')
+    name = fields.Char(string='Producto/Concepto', required=True)
+    description = fields.Text(string='Descripción')
+    quantity = fields.Float(string='Cantidad', default=1.0)
+    price_unit = fields.Float(string='Precio Unitario', default=0.0)
+    discount = fields.Float(string='Descuento %', default=0.0)
+    iva_percent = fields.Selection([('0', '0%'), ('8', '8%'), ('16', '16%')], string='IVA %', default='16')
 
