@@ -167,10 +167,27 @@ class CotizacionExpress(models.Model):
 
     def action_confirm(self):
         self.ensure_one()
-        selected = self.option_ids.filtered('selected')
-        if not selected:
-            raise UserError(_('Debe seleccionar al menos una opción como "Seleccionada por el Cliente" para poder confirmar la venta.'))
-        self.state = 'confirmed'
+        wizard_lines = []
+        for option in self.option_ids:
+            wizard_lines.append((0, 0, {
+                'option_id': option.id,
+                'selected': option.selected,
+            }))
+        
+        wizard = self.env['cotizacion.confirm.wizard'].create({
+            'cotizacion_id': self.id,
+            'line_ids': wizard_lines,
+        })
+        
+        return {
+            'name': _('Confirmar Venta - Seleccionar Opciones'),
+            'type': 'ir.actions.act_window',
+            'res_model': 'cotizacion.confirm.wizard',
+            'view_mode': 'form',
+            'res_id': wizard.id,
+            'target': 'new',
+            'context': self.env.context,
+        }
 
     def action_confirm_sale_order(self):
         self.ensure_one()
@@ -334,3 +351,42 @@ class SaleOrder(models.Model):
         if not self.env.context.get('show_express_orders'):
             domain = [('is_express', '=', False)] + list(domain)
         return super(SaleOrder, self)._search(domain, offset, limit, order)
+
+
+class CotizacionConfirmWizard(models.TransientModel):
+    _name = 'cotizacion.confirm.wizard'
+    _description = 'Confirmar Opciones de Cotización'
+
+    cotizacion_id = fields.Many2one('cotizacion.express', string='Cotización', required=True)
+    line_ids = fields.One2many('cotizacion.confirm.wizard.line', 'wizard_id', string='Opciones')
+
+    def action_confirm(self):
+        self.ensure_one()
+        # Actualizar opciones seleccionadas en la cotización
+        for line in self.line_ids:
+            line.option_id.selected = line.selected
+        
+        # Actualizar estado de la cotización a confirmado
+        self.cotizacion_id.state = 'confirmed'
+        
+        # Buscar e indicar la etapa correspondiente a "confirmed"
+        stage = self.env['cotizacion.express.stage'].search([('state_type', '=', 'confirmed')], limit=1)
+        if stage:
+            self.cotizacion_id.stage_id = stage.id
+            
+        # Regenerar la vista previa del PDF
+        self.cotizacion_id._generate_pdf_preview()
+        return {'type': 'ir.actions.act_window_close'}
+
+
+class CotizacionConfirmWizardLine(models.TransientModel):
+    _name = 'cotizacion.confirm.wizard.line'
+    _description = 'Línea de Confirmación de Opción'
+
+    wizard_id = fields.Many2one('cotizacion.confirm.wizard', required=True, ondelete='cascade')
+    option_id = fields.Many2one('cotizacion.express.option', string='Opción', required=True, readonly=True)
+    name = fields.Char(related='option_id.name', string='Nombre de la Opción', readonly=True)
+    total = fields.Monetary(related='option_id.total', string='Total', currency_field='currency_id', readonly=True)
+    currency_id = fields.Many2one('res.currency', related='option_id.currency_id')
+    selected = fields.Boolean(string='Seleccionada')
+

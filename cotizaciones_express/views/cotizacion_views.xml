@@ -334,4 +334,27 @@
     <menuitem id="menu_cotizaciones_list" name="Cotizaciones" parent="menu_cotizaciones_root" action="action_cotizacion_express" sequence="10"/>
     <menuitem id="menu_cotizacion_express_report" name="Resultados de Ventas" parent="menu_cotizaciones_root" action="action_cotizacion_express_report" sequence="20"/>
     <menuitem id="menu_cotizacion_express_stage" name="Etapas" parent="menu_cotizaciones_root" action="action_cotizacion_express_stage" sequence="40"/>
+    <record id="view_cotizacion_confirm_wizard_form" model="ir.ui.view">
+        <field name="name">cotizacion.confirm.wizard.form</field>
+        <field name="model">cotizacion.confirm.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Confirmar Venta - Seleccionar Opciones">
+                <field name="cotizacion_id" invisible="1"/>
+                <p class="oe_grey">
+                    Seleccione las opciones que el cliente decidió confirmar para esta cotización. Puede elegir varias:
+                </p>
+                <field name="line_ids" nolabel="1">
+                    <list editable="bottom" create="false" delete="false">
+                        <field name="selected" widget="boolean_toggle"/>
+                        <field name="name" string="Opción"/>
+                        <field name="total" string="Monto"/>
+                    </list>
+                </field>
+                <footer>
+                    <button name="action_confirm" string="Confirmar Venta" type="object" class="oe_highlight"/>
+                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
 </odoo>
