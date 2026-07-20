@@ -29,7 +29,7 @@
                     <field name="stage_id" widget="statusbar" options="{'clickable': '1'}"/>
                 </header>
 
-                <sheet>
+                <sheet class="o_cotizacion_express_sheet">
                     <div style="display: flex; width: 100%; gap: 16px;">
                         <div style="flex: 1; min-width: 0; border-right: 1px solid #dee2e6; padding-right: 16px;">
                             <div class="oe_title">
