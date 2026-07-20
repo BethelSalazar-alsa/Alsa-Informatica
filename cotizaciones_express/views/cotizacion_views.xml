@@ -234,9 +234,6 @@
                 <filter string="Borrador" name="filter_draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Enviadas" name="filter_sent" domain="[('state', '=', 'sent')]"/>
                 <filter string="Confirmadas" name="filter_confirmed" domain="[('state', '=', 'confirmed')]"/>
-                <group expand="0" string="Agrupar por">
-                    <filter string="Etiquetas" name="group_tags" context="{'group_by': 'tag_ids'}"/>
-                </group>
             </search>
         </field>
     </record>
