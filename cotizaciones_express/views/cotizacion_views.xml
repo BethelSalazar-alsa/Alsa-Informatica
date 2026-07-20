@@ -417,7 +417,7 @@
                                             <field name="line_ids">
                                                 <list editable="bottom">
                                                     <field name="name"/>
-                                                    <field name="description"/>
+                                                    <field name="description" widget="html" options="{'style-inline': true}"/>
                                                     <field name="quantity"/>
                                                     <field name="price_unit"/>
                                                     <field name="discount"/>
@@ -479,7 +479,7 @@
                             <field name="line_ids">
                                 <list editable="bottom">
                                     <field name="name"/>
-                                    <field name="description"/>
+                                    <field name="description" widget="html" options="{'style-inline': true}"/>
                                     <field name="quantity"/>
                                     <field name="price_unit"/>
                                     <field name="discount"/>
