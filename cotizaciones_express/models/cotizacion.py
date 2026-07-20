@@ -505,7 +505,7 @@ class CotizacionExpressTemplateOptionLine(models.Model):
 
     option_id = fields.Many2one('cotizacion.express.template.option', string='Opción', ondelete='cascade')
     name = fields.Char(string='Producto/Concepto', required=True)
-    description = fields.Text(string='Descripción')
+    description = fields.Html(string='Descripción', sanitize=False)
     quantity = fields.Float(string='Cantidad', default=1.0)
     price_unit = fields.Float(string='Precio Unitario', default=0.0)
     discount = fields.Float(string='Descuento %', default=0.0)
