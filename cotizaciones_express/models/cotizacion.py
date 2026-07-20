@@ -256,7 +256,15 @@ class CotizacionExpressOption(models.Model):
 
     def action_duplicate(self):
         self.ensure_one()
-        self.copy({'selected': False, 'name': self.name + ' (copia)'})
+        lines = [(0, 0, {
+            'name': line.name,
+            'description': line.description,
+            'quantity': line.quantity,
+            'price_unit': line.price_unit,
+            'iva_percent': line.iva_percent,
+            'sequence': line.sequence,
+        }) for line in self.line_ids]
+        self.copy({'selected': False, 'name': self.name + ' (copia)', 'line_ids': lines})
 
     @api.model_create_multi
     def create(self, vals_list):
