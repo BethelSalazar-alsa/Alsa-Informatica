@@ -68,6 +68,7 @@ class CotizacionExpress(models.Model):
     pdf_toggle = fields.Boolean(string='PDF Toggle', default=False)
     template_id = fields.Many2one('cotizacion.express.template', string='Cargar Plantilla')
     option_template_id = fields.Many2one('cotizacion.express.template.option', string='Cargar Paquete')
+    tag_ids = fields.Many2many('cotizacion.express.tag', string='Etiquetas')
     amount_total = fields.Monetary(string='Total', compute='_compute_amount_total', store=True)
     amount_confirmed = fields.Monetary(string='Monto Confirmado', compute='_compute_amount_confirmed', store=True, currency_field='currency_id')
 
@@ -510,4 +511,12 @@ class CotizacionExpressTemplateOptionLine(models.Model):
     price_unit = fields.Float(string='Precio Unitario', default=0.0)
     discount = fields.Float(string='Descuento %', default=0.0)
     iva_percent = fields.Selection([('0', '0%'), ('8', '8%'), ('16', '16%')], string='IVA %', default='16')
+
+
+class CotizacionExpressTag(models.Model):
+    _name = 'cotizacion.express.tag'
+    _description = 'Etiqueta de Cotización Express'
+
+    name = fields.Char(string='Nombre', required=True)
+    color = fields.Integer(string='Color')
 

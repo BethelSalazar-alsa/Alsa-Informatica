@@ -9,4 +9,5 @@ access_cotizacion_confirm_wizard_line,cotizacion.confirm.wizard.line,model_cotiz
 access_cotizacion_express_template,cotizacion.express.template,model_cotizacion_express_template,base.group_user,1,1,1,1
 access_cotizacion_express_template_option,cotizacion.express.template.option,model_cotizacion_express_template_option,base.group_user,1,1,1,1
 access_cotizacion_express_template_option_line,cotizacion.express.template.option.line,model_cotizacion_express_template_option_line,base.group_user,1,1,1,1
+access_cotizacion_express_tag,cotizacion.express.tag,model_cotizacion_express_tag,base.group_user,1,1,1,1
 
