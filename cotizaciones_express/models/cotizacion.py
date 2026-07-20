@@ -65,6 +65,7 @@ class CotizacionExpress(models.Model):
     notes = fields.Html(string='Notas / Términos')
     pdf_preview = fields.Binary(string='Vista Previa PDF', attachment=False)
     pdf_filename = fields.Char(string='Nombre PDF', default='cotizacion.pdf')
+    pdf_toggle = fields.Boolean(string='PDF Toggle', default=False)
     amount_total = fields.Monetary(string='Total', compute='_compute_amount_total', store=True)
     amount_confirmed = fields.Monetary(string='Monto Confirmado', compute='_compute_amount_confirmed', store=True, currency_field='currency_id')
 
@@ -112,6 +113,7 @@ class CotizacionExpress(models.Model):
                 super(CotizacionExpress, record).write({
                     'pdf_preview': pdf_content,
                     'pdf_filename': filename,
+                    'pdf_toggle': not record.pdf_toggle,
                 })
             except Exception as e:
                 _logger.error("Error generating PDF preview: %s", e)
