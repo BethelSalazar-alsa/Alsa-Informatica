@@ -562,7 +562,7 @@
         <field name="arch" type="xml">
             <list editable="bottom">
                 <field name="name"/>
-                <field name="color" widget="color_picker"/>
+                <field name="color" widget="color"/>
             </list>
         </field>
     </record>
