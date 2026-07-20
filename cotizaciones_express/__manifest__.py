@@ -16,6 +16,11 @@
         'data/mail_template.xml',
     ],
 
+    'assets': {
+        'web.assets_backend': [
+            'cotizaciones_express/static/src/css/cotizacion_form.css',
+        ],
+    },
     'installable': True,
     'application': True,
     'license': 'LGPL-3',
