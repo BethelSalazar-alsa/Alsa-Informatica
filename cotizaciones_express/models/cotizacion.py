@@ -62,13 +62,9 @@ class CotizacionExpress(models.Model):
 
     company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string='Moneda')
+    crm_lead_id = fields.Many2one('crm.lead', string='Oportunidad CRM')
     notes = fields.Html(string='Notas / Términos')
     pdf_preview = fields.Binary(string='Vista Previa PDF', attachment=False)
-    pdf_filename = fields.Char(string='Nombre PDF', default='cotizacion.pdf')
-    pdf_toggle = fields.Boolean(string='PDF Toggle', default=False)
-    template_id = fields.Many2one('cotizacion.express.template', string='Cargar Plantilla')
-    option_template_id = fields.Many2one('cotizacion.express.template.option', string='Cargar Paquete')
-    tag_ids = fields.Many2many('cotizacion.express.tag', string='Etiquetas')
     amount_total = fields.Monetary(string='Total', compute='_compute_amount_total', store=True)
     amount_confirmed = fields.Monetary(string='Monto Confirmado', compute='_compute_amount_confirmed', store=True, currency_field='currency_id')
 
@@ -81,7 +77,7 @@ class CotizacionExpress(models.Model):
                 rec.amount_confirmed = 0.0
 
     @api.model
-    def _read_group_stage_ids(self, stages, domain, order=None):
+    def _read_group_stage_ids(self, stages, domain, order=None, *args, **kwargs):
         return self.env['cotizacion.express.stage'].search([], order=order)
 
     def _default_stage_id(self):
@@ -104,84 +100,16 @@ class CotizacionExpress(models.Model):
                 rec.amount_total = 0.0
 
     def _generate_pdf_preview(self):
-        """Método interno para renderizar el PDF y guardarlo en el campo binario"""
         for record in self:
             try:
                 report_id = self.env.ref('cotizaciones_express.report_cotizacion_express')
                 pdf_content, dummy = self.env['ir.actions.report']._render_qweb_pdf(report_id, res_ids=record.ids)
-                # Generamos un nombre de archivo único con un timestamp para evitar el cacheo del navegador
-                import time
-                filename = f"cotizacion_{record.name or 'nueva'}_{int(time.time())}.pdf"
-                # Usamos super().write() para evitar recursión infinita y guardar de forma silenciosa
-                super(CotizacionExpress, record).write({
-                    'pdf_preview': pdf_content,
-                    'pdf_filename': filename,
-                    'pdf_toggle': not record.pdf_toggle,
-                })
+                super(CotizacionExpress, record).write({'pdf_preview': pdf_content})
             except Exception as e:
                 _logger.error("Error generating PDF preview: %s", e)
 
-    def action_load_template(self):
-        self.ensure_one()
-        if not self.template_id:
-            return
-        self.notes = self.template_id.notes
-        
-        # Limpiar opciones actuales
-        self.option_ids.unlink()
-        
-        # Crear nuevas opciones a partir de la plantilla
-        for t_option in self.template_id.option_ids:
-            option = self.env['cotizacion.express.option'].create({
-                'cotizacion_id': self.id,
-                'name': t_option.name,
-                'discount_general': t_option.discount_general,
-            })
-            for t_line in t_option.line_ids:
-                self.env['cotizacion.express.option.line'].create({
-                    'option_id': option.id,
-                    'name': t_line.name,
-                    'description': t_line.description,
-                    'quantity': t_line.quantity,
-                    'price_unit': t_line.price_unit,
-                    'discount': t_line.discount,
-                    'iva_percent': t_line.iva_percent,
-                })
-        
-        # Forzar recarga del PDF
-        self._generate_pdf_preview()
-
-    def action_load_option_template(self):
-        self.ensure_one()
-        if not self.option_template_id:
-            return
-        t_option = self.option_template_id
-        
-        # Crear nueva opción
-        option = self.env['cotizacion.express.option'].create({
-            'cotizacion_id': self.id,
-            'name': t_option.name,
-            'discount_general': t_option.discount_general,
-        })
-        for t_line in t_option.line_ids:
-            self.env['cotizacion.express.option.line'].create({
-                'option_id': option.id,
-                'name': t_line.name,
-                'description': t_line.description,
-                'quantity': t_line.quantity,
-                'price_unit': t_line.price_unit,
-                'discount': t_line.discount,
-                'iva_percent': t_line.iva_percent,
-            })
-            
-        # Limpiar el campo
-        self.option_template_id = False
-        # Forzar recarga del PDF
-        self._generate_pdf_preview()
-
     @api.model_create_multi
     def create(self, vals_list):
-        """Se ejecuta la primera vez que el usuario hace clic en Guardar"""
         for vals in vals_list:
             if 'state' in vals and 'stage_id' not in vals:
                 stage = self.env['cotizacion.express.stage'].search([('state_type', '=', vals['state'])], limit=1)
@@ -196,7 +124,6 @@ class CotizacionExpress(models.Model):
         return records
 
     def write(self, vals):
-        """Se ejecuta cada vez que el usuario guarda cambios"""
         if 'stage_id' in vals:
             stage = self.env['cotizacion.express.stage'].browse(vals['stage_id'])
             if stage:
@@ -207,7 +134,6 @@ class CotizacionExpress(models.Model):
                 vals['stage_id'] = stage.id
                 
         res = super(CotizacionExpress, self).write(vals)
-        # Evitamos bucle infinito: solo regeneramos si el cambio NO viene del propio PDF
         if 'pdf_preview' not in vals:
             self._generate_pdf_preview()
         return res
@@ -237,27 +163,10 @@ class CotizacionExpress(models.Model):
 
     def action_confirm(self):
         self.ensure_one()
-        wizard_lines = []
-        for option in self.option_ids:
-            wizard_lines.append((0, 0, {
-                'option_id': option.id,
-                'selected': option.selected,
-            }))
-        
-        wizard = self.env['cotizacion.confirm.wizard'].create({
-            'cotizacion_id': self.id,
-            'line_ids': wizard_lines,
-        })
-        
-        return {
-            'name': _('Confirmar Venta - Seleccionar Opciones'),
-            'type': 'ir.actions.act_window',
-            'res_model': 'cotizacion.confirm.wizard',
-            'view_mode': 'form',
-            'res_id': wizard.id,
-            'target': 'new',
-            'context': self.env.context,
-        }
+        selected = self.option_ids.filtered('selected')
+        if not selected:
+            raise UserError(_('Debe seleccionar al menos una opción como "Seleccionada por el Cliente" para poder confirmar la venta.'))
+        self.state = 'confirmed'
 
     def action_confirm_sale_order(self):
         self.ensure_one()
@@ -265,10 +174,24 @@ class CotizacionExpress(models.Model):
         if not selected:
             raise UserError(_('Debe seleccionar al menos una opción como "Seleccionada por el Cliente"'))
         option = selected[0]
+        if not self.crm_lead_id:
+            lead = self.env['crm.lead'].create({
+                'name': self.name,
+                'partner_id': self.partner_id.id,
+                'expected_revenue': option.total,
+                'description': self.notes or '',
+                'user_id': self.user_id.id,
+                'team_id': self.env['crm.team'].search([], limit=1).id if self.env['crm.team'].search_count([]) else False,
+            })
+            self.crm_lead_id = lead.id
+            
         vals = {
             'partner_id': self.partner_id.id,
             'origin': self.name,
             'user_id': self.user_id.id,
+            'team_id': self.crm_lead_id.team_id.id if self.crm_lead_id else False,
+            'campaign_id': self.crm_lead_id.campaign_id.id if self.crm_lead_id else False,
+            'medium_id': self.crm_lead_id.medium_id.id if self.crm_lead_id else False,
             'note': option.description or '',
             'order_line': [],
             'is_express': True,
@@ -285,15 +208,12 @@ class CotizacionExpress(models.Model):
                     'sale_ok': True,
                     'purchase_ok': False,
                 })
-            # Calculamos el descuento combinado (descuento por línea + descuento general de la opción)
-            final_discount = 100.0 * (1.0 - (1.0 - line.discount / 100.0) * (1.0 - option.discount_general / 100.0))
             order_line_vals = {
                 'order_id': order.id,
                 'product_id': product.id,
                 'name': line.name + ('\n' + line.description if line.description else ''),
                 'product_uom_qty': line.quantity,
                 'price_unit': line.price_unit,
-                'discount': final_discount,
                 'tax_ids': [(6, 0, self.env['account.tax'].search([
                     ('amount', '=', line.iva_percent),
                     ('type_tax_use', '=', 'sale'),
@@ -332,36 +252,17 @@ class CotizacionExpressOption(models.Model):
     selected = fields.Boolean(string='Seleccionada por el Cliente', default=False)
     sequence = fields.Integer(string='Secuencia', default=10)
 
-    discount_general = fields.Float(string='Descuento General %', default=0.0)
-    amount_lines_subtotal = fields.Monetary(string='Subtotal Líneas', compute='_compute_option_totals', store=True)
-    amount_lines_iva = fields.Monetary(string='IVA Líneas', compute='_compute_option_totals', store=True)
-    discount_general_amount = fields.Monetary(string='Monto Descuento General', compute='_compute_option_totals', store=True)
     subtotal = fields.Monetary(string='Subtotal', compute='_compute_option_totals', store=True)
     iva_total = fields.Monetary(string='IVA Total', compute='_compute_option_totals', store=True)
     total = fields.Monetary(string='Total', compute='_compute_option_totals', store=True)
     currency_id = fields.Many2one('res.currency', related='cotizacion_id.currency_id')
 
-    @api.depends('line_ids.subtotal', 'line_ids.iva_amount', 'discount_general')
+    @api.depends('line_ids.subtotal', 'line_ids.iva_amount')
     def _compute_option_totals(self):
         for rec in self:
-            rec.amount_lines_subtotal = sum(rec.line_ids.mapped('subtotal'))
-            rec.amount_lines_iva = sum(rec.line_ids.mapped('iva_amount'))
-            rec.discount_general_amount = rec.amount_lines_subtotal * (rec.discount_general / 100.0)
-            rec.subtotal = rec.amount_lines_subtotal - rec.discount_general_amount
-            rec.iva_total = rec.amount_lines_iva * (1.0 - rec.discount_general / 100.0)
+            rec.subtotal = sum(rec.line_ids.mapped('subtotal'))
+            rec.iva_total = sum(rec.line_ids.mapped('iva_amount'))
             rec.total = rec.subtotal + rec.iva_total
-
-    def action_duplicate(self):
-        self.ensure_one()
-        lines = [(0, 0, {
-            'name': line.name,
-            'description': line.description,
-            'quantity': line.quantity,
-            'price_unit': line.price_unit,
-            'iva_percent': line.iva_percent,
-            'sequence': line.sequence,
-        }) for line in self.line_ids]
-        self.copy({'selected': False, 'name': self.name + ' (copia)', 'line_ids': lines})
 
     @api.model_create_multi
     def create(self, vals_list):
@@ -394,7 +295,6 @@ class CotizacionExpressOptionLine(models.Model):
     price_unit = fields.Monetary(string='Precio Unitario', required=True)
     currency_id = fields.Many2one('res.currency', related='option_id.currency_id')
     iva_percent = fields.Float(string='IVA %', default=16.0)
-    discount = fields.Float(string='Descuento %', default=0.0)
     subtotal = fields.Monetary(string='Subtotal', compute='_compute_line_totals', store=True)
     iva_amount = fields.Monetary(string='IVA', compute='_compute_line_totals', store=True)
     total = fields.Monetary(string='Total', compute='_compute_line_totals', store=True)
@@ -407,15 +307,10 @@ class CotizacionExpressOptionLine(models.Model):
     partner_id = fields.Many2one('res.partner', related='option_id.cotizacion_id.partner_id', store=True, string='Cliente')
     date = fields.Date(related='option_id.cotizacion_id.date', store=True, string='Fecha')
 
-    def action_duplicate_line(self):
-        self.ensure_one()
-        self.copy({'name': self.name + ' (copia)'})
-
-    @api.depends('price_unit', 'quantity', 'iva_percent', 'discount')
+    @api.depends('price_unit', 'quantity', 'iva_percent')
     def _compute_line_totals(self):
         for rec in self:
-            subtotal_before_discount = rec.price_unit * rec.quantity
-            rec.subtotal = subtotal_before_discount * (1.0 - rec.discount / 100.0)
+            rec.subtotal = rec.price_unit * rec.quantity
             rec.iva_amount = rec.subtotal * (rec.iva_percent / 100.0)
             rec.total = rec.subtotal + rec.iva_amount
 
@@ -437,86 +332,7 @@ class SaleOrder(models.Model):
     is_express = fields.Boolean(string='Es Cotización Express', default=False)
 
     @api.model
-    def _search(self, domain, *args, **kwargs):
+    def _search(self, domain, offset=0, limit=None, order=None):
         if not self.env.context.get('show_express_orders'):
             domain = [('is_express', '=', False)] + list(domain)
-        return super(SaleOrder, self)._search(domain, *args, **kwargs)
-
-
-class CotizacionConfirmWizard(models.TransientModel):
-    _name = 'cotizacion.confirm.wizard'
-    _description = 'Confirmar Opciones de Cotización'
-
-    cotizacion_id = fields.Many2one('cotizacion.express', string='Cotización', required=True)
-    line_ids = fields.One2many('cotizacion.confirm.wizard.line', 'wizard_id', string='Opciones')
-
-    def action_confirm(self):
-        self.ensure_one()
-        # Actualizar opciones seleccionadas en la cotización
-        for line in self.line_ids:
-            line.option_id.selected = line.selected
-        
-        # Actualizar estado de la cotización a confirmado
-        self.cotizacion_id.state = 'confirmed'
-        
-        # Buscar e indicar la etapa correspondiente a "confirmed"
-        stage = self.env['cotizacion.express.stage'].search([('state_type', '=', 'confirmed')], limit=1)
-        if stage:
-            self.cotizacion_id.stage_id = stage.id
-            
-        # Regenerar la vista previa del PDF
-        self.cotizacion_id._generate_pdf_preview()
-        return {'type': 'ir.actions.act_window_close'}
-
-
-class CotizacionConfirmWizardLine(models.TransientModel):
-    _name = 'cotizacion.confirm.wizard.line'
-    _description = 'Línea de Confirmación de Opción'
-
-    wizard_id = fields.Many2one('cotizacion.confirm.wizard', required=True, ondelete='cascade')
-    option_id = fields.Many2one('cotizacion.express.option', string='Opción', required=True, readonly=True)
-    name = fields.Char(related='option_id.name', string='Nombre de la Opción', readonly=True)
-    total = fields.Monetary(related='option_id.total', string='Total', currency_field='currency_id', readonly=True)
-    currency_id = fields.Many2one('res.currency', related='option_id.currency_id')
-    selected = fields.Boolean(string='Seleccionada')
-
-
-class CotizacionExpressTemplate(models.Model):
-    _name = 'cotizacion.express.template'
-    _description = 'Plantilla de Cotización Express'
-
-    name = fields.Char(string='Nombre de la Plantilla', required=True)
-    option_ids = fields.One2many('cotizacion.express.template.option', 'template_id', string='Opciones / Paquetes')
-    notes = fields.Html(string='Notas / Términos')
-
-
-class CotizacionExpressTemplateOption(models.Model):
-    _name = 'cotizacion.express.template.option'
-    _description = 'Plantilla de Opción / Paquete'
-
-    template_id = fields.Many2one('cotizacion.express.template', string='Plantilla de Cotización', ondelete='cascade')
-    name = fields.Char(string='Nombre de la Opción', required=True)
-    discount_general = fields.Float(string='Descuento General %', default=0.0)
-    line_ids = fields.One2many('cotizacion.express.template.option.line', 'option_id', string='Líneas de Producto')
-
-
-class CotizacionExpressTemplateOptionLine(models.Model):
-    _name = 'cotizacion.express.template.option.line'
-    _description = 'Plantilla de Línea de Opción'
-
-    option_id = fields.Many2one('cotizacion.express.template.option', string='Opción', ondelete='cascade')
-    name = fields.Char(string='Producto/Concepto', required=True)
-    description = fields.Html(string='Descripción', sanitize=False)
-    quantity = fields.Float(string='Cantidad', default=1.0)
-    price_unit = fields.Float(string='Precio Unitario', default=0.0)
-    discount = fields.Float(string='Descuento %', default=0.0)
-    iva_percent = fields.Selection([('0', '0%'), ('8', '8%'), ('16', '16%')], string='IVA %', default='16')
-
-
-class CotizacionExpressTag(models.Model):
-    _name = 'cotizacion.express.tag'
-    _description = 'Etiqueta de Cotización Express'
-
-    name = fields.Char(string='Nombre', required=True)
-    color = fields.Integer(string='Color')
-
+        return super(SaleOrder, self)._search(domain, offset, limit, order)

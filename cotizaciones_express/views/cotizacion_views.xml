@@ -8,7 +8,6 @@
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="date"/>
-                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                 <field name="user_id"/>
                 <field name="amount_total" sum="Total de Cotizaciones"/>
                 <field name="amount_confirmed" sum="Total Vendido (Confirmado)"/>
@@ -21,7 +20,7 @@
         <field name="name">cotizacion.express.form</field>
         <field name="model">cotizacion.express</field>
         <field name="arch" type="xml">
-            <form class="o_cotizacion_express_form" autosave="1">
+            <form autosave="1">
                 <header>
                     <button name="action_send_to_client" string="Enviar al Cliente" type="object" class="oe_highlight" invisible="state not in ['draft']"/>
                     <button name="action_confirm" string="Confirmar Venta" type="object" class="oe_highlight" invisible="state not in ['draft', 'sent']"/>
@@ -30,16 +29,16 @@
                     <field name="stage_id" widget="statusbar" options="{'clickable': '1'}"/>
                 </header>
 
-                <sheet class="o_cotizacion_express_sheet">
-                    <div style="display: flex; width: 100%; gap: 16px;">
-                        <div style="flex: 1.4; min-width: 0; border-right: 1px solid #dee2e6; padding-right: 16px;">
+                <sheet>
+                    <div class="row" style="display:flex; gap: 0;">
+                        <div class="col-lg-7" style="flex: 6; padding-right: 15px; border-right: 1px solid #dee2e6;">
                             <div class="oe_title">
                                 <h1><field name="name" placeholder="Cotización"/></h1>
                             </div>
 
                             <group>
                                 <group>
-                                    <field name="partner_id" context="{'show_address': True}"/>
+                                    <field name="partner_id" options="{'no_create': True}" context="{'show_address': True}"/>
                                     <field name="date"/>
                                     <field name="city"/>
                                     <field name="state_location"/>
@@ -47,24 +46,7 @@
                                 <group>
                                     <field name="user_id"/>
                                     <field name="signature_id" options="{'no_create': True}"/>
-                                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
-                                </group>
-                            </group>
-
-                            <group string="Plantillas y Paquetes">
-                                <group>
-                                    <label for="template_id"/>
-                                    <div class="o_row">
-                                        <field name="template_id" options="{'no_create': True}" placeholder="Seleccionar Plantilla..."/>
-                                        <button name="action_load_template" type="object" string="Aplicar Plantilla" class="btn-primary" invisible="not template_id" confirm="¿Está seguro de aplicar esta plantilla? Se borrarán todas las opciones de la cotización actual."/>
-                                    </div>
-                                </group>
-                                <group>
-                                    <label for="option_template_id"/>
-                                    <div class="o_row">
-                                        <field name="option_template_id" options="{'no_create': True}" placeholder="Seleccionar Paquete..."/>
-                                        <button name="action_load_option_template" type="object" string="Agregar Paquete" class="btn-secondary" invisible="not option_template_id"/>
-                                    </div>
+                                    <field name="crm_lead_id" options="{'no_create': True}"/>
                                 </group>
                             </group>
 
@@ -78,12 +60,9 @@
                             </notebook>
                         </div>
 
-                        <div style="flex: 1; background: #f8f9fa; min-height: 600px; position: sticky; top: 0; border-radius: 6px; padding: 16px;">
-                            <div style="width: 100%; height: 100%; min-height: 650px; background: #fff; border-radius: 4px;">
-                                <field name="pdf_filename" invisible="1"/>
-                                <field name="pdf_toggle" invisible="1"/>
-                                <field name="pdf_preview" widget="pdf_viewer" filename="pdf_filename" nolabel="1" readonly="1" style="width: 100%; height: 650px;" invisible="pdf_toggle"/>
-                                <field name="pdf_preview" widget="pdf_viewer" filename="pdf_filename" nolabel="1" readonly="1" style="width: 100%; height: 650px;" invisible="not pdf_toggle"/>
+                        <div class="col-lg-5" style="flex: 4; padding-left: 15px; background: #f8f9fa; min-height: 600px; position: sticky; top: 0;">
+                            <div style="width: 100%; height: 680px; border: 1px solid #dee2e6; border-radius: 4px; overflow: hidden; background: #fff;">
+                                <field name="pdf_preview" widget="pdf_viewer" nolabel="1" readonly="1" style="width: 100%; height: 680px;"/>
                             </div>
                         </div>
                     </div>
@@ -99,11 +78,10 @@
             <list>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
-                <field name="selected"/>
+                <field name="selected" widget="badge" decoration-success="selected == True"/>
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_total" sum="IVA"/>
                 <field name="total" sum="Total"/>
-                <button name="action_duplicate" type="object" icon="fa-copy" title="Duplicar"/>
             </list>
         </field>
     </record>
@@ -116,15 +94,12 @@
                 <group>
                     <group>
                         <field name="name"/>
-                        <field name="discount_general"/>
                     </group>
                     <group>
                         <field name="selected"/>
-                        <field name="amount_lines_subtotal" string="Subtotal Líneas" readonly="1"/>
-                        <field name="discount_general_amount" string="Monto Desc. General" readonly="1"/>
-                        <field name="subtotal" string="Subtotal Neto" readonly="1"/>
-                        <field name="iva_total" string="IVA Total" readonly="1"/>
-                        <field name="total" string="Total" readonly="1"/>
+                        <field name="subtotal"/>
+                        <field name="iva_total"/>
+                        <field name="total"/>
                     </group>
                 </group>
                 <group string="Descripción">
@@ -146,12 +121,10 @@
                 <field name="name"/>
                 <field name="quantity"/>
                 <field name="price_unit"/>
-                <field name="discount"/>
                 <field name="iva_percent"/>
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_amount" sum="IVA"/>
                 <field name="total" sum="Total"/>
-                <button name="action_duplicate_line" type="object" icon="fa-copy" title="Duplicar"/>
             </list>
         </field>
     </record>
@@ -166,7 +139,6 @@
                         <field name="name"/>
                         <field name="quantity"/>
                         <field name="price_unit"/>
-                        <field name="discount"/>
                     </group>
                     <group>
                         <field name="iva_percent"/>
@@ -187,7 +159,7 @@
         <field name="name">cotizacion.express.kanban</field>
         <field name="model">cotizacion.express</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="stage_id" default_order="date desc" quick_create="false" on_create="quick_create">
+            <kanban default_group_by="stage_id" default_order="sequence" quick_create="false" on_create="quick_create">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="date"/>
@@ -209,9 +181,8 @@
                             <div class="text-muted" style="font-size: 11px; margin-top: 2px;">
                                 <field name="date"/>
                             </div>
-                             <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div class="d-flex justify-content-between align-items-center mt-2">
                                 <field name="user_id" widget="many2one_avatar_user"/>
-                                <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                                 <strong style="color: #28a745; font-size: 14px;">
                                     <field name="amount_total" widget="monetary" options="{'currency_field': 'currency_id'}"/>
                                 </strong>
@@ -230,7 +201,6 @@
             <search>
                 <field name="name" string="Cotización"/>
                 <field name="partner_id" string="Cliente"/>
-                <field name="tag_ids" string="Etiqueta"/>
                 <filter string="Borrador" name="filter_draft" domain="[('state', '=', 'draft')]"/>
                 <filter string="Enviadas" name="filter_sent" domain="[('state', '=', 'sent')]"/>
                 <filter string="Confirmadas" name="filter_confirmed" domain="[('state', '=', 'confirmed')]"/>
@@ -325,16 +295,17 @@
         <field name="name">cotizacion.express.option.line.search</field>
         <field name="model">cotizacion.express.option.line</field>
         <field name="arch" type="xml">
-            <search>
+            <search string="Búsqueda de Resultados de Ventas">
                 <field name="name" string="Producto"/>
                 <field name="user_id" string="Vendedor"/>
                 <field name="partner_id" string="Cliente"/>
                 <filter string="Vendido (Confirmado)" name="filter_sold" domain="[('cotizacion_state', '=', 'confirmed'), ('option_selected', '=', True)]"/>
-                <separator/>
-                <filter string="Producto/Concepto" name="group_product" context="{'group_by':'name'}"/>
-                <filter string="Vendedor" name="group_user" context="{'group_by':'user_id'}"/>
-                <filter string="Cliente" name="group_partner" context="{'group_by':'partner_id'}"/>
-                <filter string="Fecha" name="group_date" context="{'group_by':'date:month'}"/>
+                <group expand="1" string="Agrupar por">
+                    <filter string="Producto/Concepto" name="group_product" context="{'group_by':'name'}"/>
+                    <filter string="Vendedor" name="group_user" context="{'group_by':'user_id'}"/>
+                    <filter string="Cliente" name="group_partner" context="{'group_by':'partner_id'}"/>
+                    <filter string="Fecha" name="group_date" context="{'group_by':'date:month'}"/>
+                </group>
             </search>
         </field>
     </record>
@@ -363,221 +334,4 @@
     <menuitem id="menu_cotizaciones_list" name="Cotizaciones" parent="menu_cotizaciones_root" action="action_cotizacion_express" sequence="10"/>
     <menuitem id="menu_cotizacion_express_report" name="Resultados de Ventas" parent="menu_cotizaciones_root" action="action_cotizacion_express_report" sequence="20"/>
     <menuitem id="menu_cotizacion_express_stage" name="Etapas" parent="menu_cotizaciones_root" action="action_cotizacion_express_stage" sequence="40"/>
-
-    <record id="action_cotizacion_express_tag" model="ir.actions.act_window">
-        <field name="name">Etiquetas de Cotización</field>
-        <field name="res_model">cotizacion.express.tag</field>
-        <field name="view_mode">list,form</field>
-    </record>
-
-    <menuitem id="menu_cotizacion_express_tag" name="Etiquetas" parent="menu_cotizaciones_root" action="action_cotizacion_express_tag" sequence="45"/>
-    <record id="view_cotizacion_confirm_wizard_form" model="ir.ui.view">
-        <field name="name">cotizacion.confirm.wizard.form</field>
-        <field name="model">cotizacion.confirm.wizard</field>
-        <field name="arch" type="xml">
-            <form string="Confirmar Venta - Seleccionar Opciones">
-                <field name="cotizacion_id" invisible="1"/>
-                <p class="oe_grey">
-                    Seleccione las opciones que el cliente decidió confirmar para esta cotización. Puede elegir varias:
-                </p>
-                <field name="line_ids" nolabel="1">
-                    <list editable="bottom" create="false" delete="false">
-                        <field name="selected" widget="boolean_toggle"/>
-                        <field name="name" string="Opción"/>
-                        <field name="total" string="Monto"/>
-                    </list>
-                </field>
-                <footer>
-                    <button name="action_confirm" string="Confirmar Venta" type="object" class="oe_highlight"/>
-                    <button string="Cancelar" class="btn-secondary" special="cancel"/>
-                </footer>
-            </form>
-        </field>
-    </record>
-
-    <!-- VIEWS FOR TEMPLATES -->
-    <record id="view_cotizacion_express_template_form" model="ir.ui.view">
-        <field name="name">cotizacion.express.template.form</field>
-        <field name="model">cotizacion.express.template</field>
-        <field name="arch" type="xml">
-            <form string="Plantilla de Cotización Express">
-                <sheet>
-                    <div class="oe_title">
-                        <label for="name" class="oe_edit_only"/>
-                        <h1>
-                            <field name="name" placeholder="Nombre de la Plantilla..."/>
-                        </h1>
-                    </div>
-                    <notebook>
-                        <page string="Opciones / Paquetes" name="options">
-                            <field name="option_ids">
-                                <list>
-                                    <field name="name"/>
-                                    <field name="discount_general"/>
-                                </list>
-                                <form>
-                                    <group>
-                                        <group>
-                                            <field name="name"/>
-                                        </group>
-                                        <group>
-                                            <field name="discount_general"/>
-                                        </group>
-                                    </group>
-                                    <notebook>
-                                        <page string="Productos" name="lines">
-                                            <field name="line_ids">
-                                                <list>
-                                                    <field name="name"/>
-                                                    <field name="description" widget="html" options="{'style-inline': true}"/>
-                                                    <field name="quantity"/>
-                                                    <field name="price_unit"/>
-                                                    <field name="discount"/>
-                                                    <field name="iva_percent"/>
-                                                </list>
-                                            </field>
-                                        </page>
-                                    </notebook>
-                                </form>
-                            </field>
-                        </page>
-                        <page string="Términos y Condiciones" name="notes">
-                            <field name="notes" widget="html"/>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <record id="view_cotizacion_express_template_tree" model="ir.ui.view">
-        <field name="name">cotizacion.express.template.tree</field>
-        <field name="model">cotizacion.express.template</field>
-        <field name="arch" type="xml">
-            <list>
-                <field name="name"/>
-            </list>
-        </field>
-    </record>
-
-    <record id="action_cotizacion_express_template" model="ir.actions.act_window">
-        <field name="name">Plantillas de Cotización</field>
-        <field name="res_model">cotizacion.express.template</field>
-        <field name="view_mode">list,form</field>
-    </record>
-
-    <record id="view_cotizacion_express_template_option_form" model="ir.ui.view">
-        <field name="name">cotizacion.express.template.option.form</field>
-        <field name="model">cotizacion.express.template.option</field>
-        <field name="arch" type="xml">
-            <form string="Plantilla de Opción / Paquete">
-                <sheet>
-                    <div class="oe_title">
-                        <label for="name" class="oe_edit_only"/>
-                        <h1>
-                            <field name="name" placeholder="Nombre de la Opción..."/>
-                        </h1>
-                    </div>
-                    <group>
-                        <group>
-                            <field name="template_id" options="{'no_create': True}"/>
-                        </group>
-                        <group>
-                            <field name="discount_general"/>
-                        </group>
-                    </group>
-                    <notebook>
-                        <page string="Productos" name="lines">
-                            <field name="line_ids">
-                                <list>
-                                    <field name="name"/>
-                                    <field name="description" widget="html" options="{'style-inline': true}"/>
-                                    <field name="quantity"/>
-                                    <field name="price_unit"/>
-                                    <field name="discount"/>
-                                    <field name="iva_percent"/>
-                                </list>
-                            </field>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <record id="view_cotizacion_express_template_option_tree" model="ir.ui.view">
-        <field name="name">cotizacion.express.template.option.tree</field>
-        <field name="model">cotizacion.express.template.option</field>
-        <field name="arch" type="xml">
-            <list>
-                <field name="name"/>
-                <field name="template_id"/>
-                <field name="discount_general"/>
-            </list>
-        </field>
-    </record>
-
-    <record id="action_cotizacion_express_template_option" model="ir.actions.act_window">
-        <field name="name">Plantillas de Paquetes</field>
-        <field name="res_model">cotizacion.express.template.option</field>
-        <field name="view_mode">list,form</field>
-    </record>
-
-    <!-- MENUS FOR TEMPLATES -->
-    <menuitem id="menu_cotizacion_express_template" name="Plantillas de Cotización" parent="menu_cotizaciones_root" action="action_cotizacion_express_template" sequence="25"/>
-    <menuitem id="menu_cotizacion_express_template_option" name="Plantillas de Paquetes" parent="menu_cotizaciones_root" action="action_cotizacion_express_template_option" sequence="30"/>
-
-    <!-- FORM VIEW FOR TEMPLATE LINE POP-UP MODAL -->
-    <record id="view_cotizacion_express_template_option_line_form" model="ir.ui.view">
-        <field name="name">cotizacion.express.template.option.line.form</field>
-        <field name="model">cotizacion.express.template.option.line</field>
-        <field name="arch" type="xml">
-            <form string="Producto / Concepto de Plantilla">
-                <sheet>
-                    <group>
-                        <group>
-                            <field name="name" string="Producto"/>
-                            <field name="quantity" string="Cantidad"/>
-                            <field name="price_unit" string="Precio Unitario"/>
-                        </group>
-                        <group>
-                            <field name="discount" string="Descuento %"/>
-                            <field name="iva_percent" string="IVA %"/>
-                        </group>
-                    </group>
-                    <notebook>
-                        <page string="Descripción" name="description_page">
-                            <field name="description" widget="html" options="{'style-inline': true}" placeholder="Escriba la descripción del producto o servicio..."/>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <!-- VIEWS AND CONFIGURATION FOR TAGS -->
-    <record id="view_cotizacion_express_tag_list" model="ir.ui.view">
-        <field name="name">cotizacion.express.tag.list</field>
-        <field name="model">cotizacion.express.tag</field>
-        <field name="arch" type="xml">
-            <list>
-                <field name="name"/>
-            </list>
-        </field>
-    </record>
-
-    <record id="view_cotizacion_express_tag_form" model="ir.ui.view">
-        <field name="name">cotizacion.express.tag.form</field>
-        <field name="model">cotizacion.express.tag</field>
-        <field name="arch" type="xml">
-            <form string="Etiqueta de Cotización">
-                <sheet>
-                    <group>
-                        <field name="name" string="Nombre de la Etiqueta"/>
-                        <field name="color" widget="color_picker" string="Color de la Etiqueta"/>
-                    </group>
-                </sheet>
-            </form>
-        </field>
-    </record>
 </odoo>
