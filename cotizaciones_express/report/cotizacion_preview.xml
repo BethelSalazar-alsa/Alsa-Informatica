@@ -238,5 +238,8 @@
                 </t>
             </t>
         </t>
+        <t t-if="preview_mode">
+            <script src="/cotizacion/preview.js"></script>
+        </t>
     </template>
 </odoo>
