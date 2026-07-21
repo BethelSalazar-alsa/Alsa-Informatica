@@ -70,7 +70,6 @@
             </form>
         </field>
     </record>
-
     <record id="view_cotizacion_express_option_tree" model="ir.ui.view">
         <field name="name">cotizacion.express.option.tree</field>
         <field name="model">cotizacion.express.option</field>
