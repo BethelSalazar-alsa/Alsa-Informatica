@@ -1,6 +1,6 @@
 {
     'name': 'Cotizaciones Express',
-    'version': '19.0.1.0.7',
+    'version': '19.0.1.0.8',
     'category': 'Sales',
     'summary': 'Cotizaciones con vista dividida y previsualización de PDF en tiempo real',
     'author': 'Alsa Informática',
@@ -15,6 +15,12 @@
         'report/cotizacion_report.xml',
         'data/mail_template.xml',
     ],
+
+    'assets': {
+        'web.assets_backend': [
+            'cotizaciones_express/static/src/css/cotizacion_form.css',
+        ],
+    },
     'installable': True,
     'application': True,
     'license': 'LGPL-3',
