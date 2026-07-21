@@ -299,13 +299,15 @@
                 <field name="name" string="Producto"/>
                 <field name="user_id" string="Vendedor"/>
                 <field name="partner_id" string="Cliente"/>
+                <field name="cotizacion_state" invisible="1"/>
+                <field name="option_selected" invisible="1"/>
+                <field name="date" invisible="1"/>
                 <filter string="Vendido (Confirmado)" name="filter_sold" domain="[('cotizacion_state', '=', 'confirmed'), ('option_selected', '=', True)]"/>
-                <group string="Agrupar por">
-                    <filter string="Producto/Concepto" name="group_product" context="{'group_by':'name'}"/>
-                    <filter string="Vendedor" name="group_user" context="{'group_by':'user_id'}"/>
-                    <filter string="Cliente" name="group_partner" context="{'group_by':'partner_id'}"/>
-                    <filter string="Fecha" name="group_date" context="{'group_by':'date'}"/>
-                </group>
+                <separator/>
+                <filter string="Producto/Concepto" name="group_product" context="{'group_by':'name'}"/>
+                <filter string="Vendedor" name="group_user" context="{'group_by':'user_id'}"/>
+                <filter string="Cliente" name="group_partner" context="{'group_by':'partner_id'}"/>
+                <filter string="Fecha" name="group_date" context="{'group_by':'date'}"/>
             </search>
         </field>
     </record>
