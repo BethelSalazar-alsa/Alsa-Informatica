@@ -66,8 +66,6 @@ class CotizacionExpress(models.Model):
     notes = fields.Html(string='Notas / Términos')
     pdf_preview = fields.Binary(string='Vista Previa PDF', attachment=False)
     pdf_filename = fields.Char(string='Nombre PDF', default='cotizacion.pdf')
-    pdf_toggle = fields.Boolean(string='PDF Toggle', default=False)
-    preview_html = fields.Html(string='Vista Previa HTML', compute='_compute_preview_html', sanitize=False)
     template_id = fields.Many2one('cotizacion.express.template', string='Cargar Plantilla')
     option_template_id = fields.Many2one('cotizacion.express.template.option', string='Cargar Paquete')
     tag_ids = fields.Many2many('cotizacion.express.tag', string='Etiquetas')
