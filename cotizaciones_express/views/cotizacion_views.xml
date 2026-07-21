@@ -159,7 +159,7 @@
         <field name="name">cotizacion.express.kanban</field>
         <field name="model">cotizacion.express</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="stage_id" default_order="sequence" quick_create="false" on_create="quick_create">
+            <kanban default_group_by="stage_id" quick_create="false" on_create="quick_create">
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="date"/>
@@ -323,7 +323,7 @@
     <record id="action_cotizacion_express" model="ir.actions.act_window">
         <field name="name">Cotizaciones Express</field>
         <field name="res_model">cotizacion.express</field>
-        <field name="view_mode">kanban,list,form,graph,pivot</field>
+        <field name="view_mode">list,kanban,form,graph,pivot</field>
     </record>
 
     <record id="action_cotizacion_express_stage" model="ir.actions.act_window">
