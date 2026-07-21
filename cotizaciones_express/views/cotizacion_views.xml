@@ -304,7 +304,7 @@
                     <filter string="Producto/Concepto" name="group_product" context="{'group_by':'name'}"/>
                     <filter string="Vendedor" name="group_user" context="{'group_by':'user_id'}"/>
                     <filter string="Cliente" name="group_partner" context="{'group_by':'partner_id'}"/>
-                    <filter string="Fecha" name="group_date" context="{'group_by':'date:month'}"/>
+                    <filter string="Fecha" name="group_date" context="{'group_by':'date'}"/>
                 </group>
             </search>
         </field>

@@ -27,7 +27,7 @@ class CotizacionExpress(models.Model):
     _rec_name = 'name'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
-    name = fields.Char(string='Cotización', required=True, default=lambda self: self.env['ir.sequence'].next_by_code('cotizacion.express') or 'Nueva')
+    name = fields.Char(string='Cotización', required=True, copy=False, readonly=True, default='Nueva')
     partner_id = fields.Many2one('res.partner', string='Cliente', required=True, tracking=True)
     partner_name = fields.Char(related='partner_id.name', string='Nombre del Cliente')
     partner_email = fields.Char(related='partner_id.email', string='Email')
@@ -111,6 +111,8 @@ class CotizacionExpress(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         for vals in vals_list:
+            if not vals.get('name') or vals.get('name') == 'Nueva':
+                vals['name'] = self.env['ir.sequence'].next_by_code('cotizacion.express') or 'Nueva'
             if 'state' in vals and 'stage_id' not in vals:
                 stage = self.env['cotizacion.express.stage'].search([('state_type', '=', vals['state'])], limit=1)
                 if stage:
