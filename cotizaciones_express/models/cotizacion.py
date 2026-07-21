@@ -37,7 +37,7 @@ class CotizacionExpress(models.Model):
 
     date = fields.Date(string='Fecha', default=fields.Date.today, required=True)
     city = fields.Char(string='Ciudad', default='Colima')
-    state_location = fields.Char(string='Estado', default='Col.')
+    state_location = fields.Char(string='Estado (Ubicación)', default='Col.')
 
     user_id = fields.Many2one('res.users', string='Vendedor', default=lambda self: self.env.user, required=True)
     signature_id = fields.Many2one('seller.signature', string='Firma del Vendedor',

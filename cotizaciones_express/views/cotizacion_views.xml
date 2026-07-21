@@ -10,6 +10,7 @@
                 <field name="date"/>
                 <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                 <field name="user_id"/>
+                <field name="currency_id" column_invisible="True"/>
                 <field name="amount_total" sum="Total de Cotizaciones"/>
                 <field name="amount_confirmed" sum="Total Vendido (Confirmado)"/>
                 <field name="state" widget="badge" decoration-success="state == 'confirmed'" decoration-info="state == 'sent'" decoration-warning="state == 'draft'" decoration-danger="state == 'cancelled'"/>
@@ -99,6 +100,7 @@
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="selected"/>
+                <field name="currency_id" column_invisible="True"/>
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_total" sum="IVA"/>
                 <field name="total" sum="Total"/>
@@ -147,6 +149,7 @@
                 <field name="price_unit"/>
                 <field name="discount"/>
                 <field name="iva_percent"/>
+                <field name="currency_id" column_invisible="True"/>
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_amount" sum="IVA"/>
                 <field name="total" sum="Total"/>
@@ -383,6 +386,7 @@
                     <list editable="bottom" create="false" delete="false">
                         <field name="selected" widget="boolean_toggle"/>
                         <field name="name" string="Opción"/>
+                        <field name="currency_id" column_invisible="True"/>
                         <field name="total" string="Monto"/>
                     </list>
                 </field>
