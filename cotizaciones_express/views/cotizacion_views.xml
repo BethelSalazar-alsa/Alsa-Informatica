@@ -21,7 +21,7 @@
         <field name="name">cotizacion.express.form</field>
         <field name="model">cotizacion.express</field>
         <field name="arch" type="xml">
-            <form class="o_cotizacion_express_form" autosave="1">
+            <form class="o_cotizacion_express_form">
                 <header>
                     <button name="action_send_to_client" string="Enviar al Cliente" type="object" class="oe_highlight" invisible="state not in ['draft']"/>
                     <button name="action_confirm" string="Confirmar Venta" type="object" class="oe_highlight" invisible="state not in ['draft', 'sent']"/>
