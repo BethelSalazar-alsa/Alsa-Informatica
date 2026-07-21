@@ -1,6 +1,6 @@
 {
     'name': 'Cotizaciones Express',
-    'version': '19.0.1.0.21',
+    'version': '19.0.1.0.22',
     'category': 'Sales',
     'summary': 'Cotizaciones con vista dividida y previsualización de PDF en tiempo real',
     'author': 'Alsa Informática',
