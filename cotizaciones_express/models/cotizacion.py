@@ -334,7 +334,7 @@ class SaleOrder(models.Model):
     is_express = fields.Boolean(string='Es Cotización Express', default=False)
 
     @api.model
-    def _search(self, domain, offset=0, limit=None, order=None):
+    def _search(self, domain, *args, **kwargs):
         if not self.env.context.get('show_express_orders'):
             domain = [('is_express', '=', False)] + list(domain)
-        return super(SaleOrder, self)._search(domain, offset, limit, order)
+        return super(SaleOrder, self)._search(domain, *args, **kwargs)
