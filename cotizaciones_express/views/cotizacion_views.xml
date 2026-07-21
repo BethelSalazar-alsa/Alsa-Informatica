@@ -4,7 +4,7 @@
         <field name="name">cotizacion.express.tree</field>
         <field name="model">cotizacion.express</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="name"/>
                 <field name="partner_id"/>
                 <field name="date"/>
@@ -12,7 +12,7 @@
                 <field name="amount_total" sum="Total de Cotizaciones"/>
                 <field name="amount_confirmed" sum="Total Vendido (Confirmado)"/>
                 <field name="state" widget="badge" decoration-success="state == 'confirmed'" decoration-info="state == 'sent'" decoration-warning="state == 'draft'" decoration-danger="state == 'cancelled'"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -74,14 +74,14 @@
         <field name="name">cotizacion.express.option.tree</field>
         <field name="model">cotizacion.express.option</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="selected" widget="badge" decoration-success="selected == True"/>
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_total" sum="IVA"/>
                 <field name="total" sum="Total"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -115,7 +115,7 @@
         <field name="name">cotizacion.express.option.line.tree</field>
         <field name="model">cotizacion.express.option.line</field>
         <field name="arch" type="xml">
-            <tree>
+            <list>
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="quantity"/>
@@ -124,7 +124,7 @@
                 <field name="subtotal" sum="Subtotal"/>
                 <field name="iva_amount" sum="IVA"/>
                 <field name="total" sum="Total"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -212,12 +212,12 @@
         <field name="name">cotizacion.express.stage.list</field>
         <field name="model">cotizacion.express.stage</field>
         <field name="arch" type="xml">
-            <tree editable="bottom">
+            <list editable="bottom">
                 <field name="sequence" widget="handle"/>
                 <field name="name"/>
                 <field name="state_type"/>
                 <field name="fold"/>
-            </tree>
+            </list>
         </field>
     </record>
 
@@ -314,7 +314,7 @@
     <record id="action_cotizacion_express_report" model="ir.actions.act_window">
         <field name="name">Resultados de Ventas</field>
         <field name="res_model">cotizacion.express.option.line</field>
-        <field name="view_mode">tree,graph</field>
+        <field name="view_mode">list,graph</field>
         <field name="domain">[('cotizacion_state', '=', 'confirmed'), ('option_selected', '=', True)]</field>
         <field name="context">{'search_default_group_product': 1}</field>
     </record>
@@ -322,13 +322,13 @@
     <record id="action_cotizacion_express" model="ir.actions.act_window">
         <field name="name">Cotizaciones Express</field>
         <field name="res_model">cotizacion.express</field>
-        <field name="view_mode">tree,kanban,form</field>
+        <field name="view_mode">list,kanban,form</field>
     </record>
 
     <record id="action_cotizacion_express_stage" model="ir.actions.act_window">
         <field name="name">Etapas de Cotización</field>
         <field name="res_model">cotizacion.express.stage</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <!-- MENUS -->
