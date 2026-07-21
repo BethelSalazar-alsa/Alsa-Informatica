@@ -266,7 +266,12 @@ class CotizacionExpressOption(models.Model):
                     ('cotizacion_id', '=', vals['cotizacion_id']),
                     ('selected', '=', True)
                 ]).write({'selected': False})
-        return super(CotizacionExpressOption, self).create(vals_list)
+        records = super(CotizacionExpressOption, self).create(vals_list)
+        if not self.env.context.get('skip_pdf_preview_generation'):
+            for rec in records:
+                if rec.cotizacion_id:
+                    rec.cotizacion_id._generate_pdf_preview()
+        return records
 
     def write(self, vals):
         if vals.get('selected'):
@@ -274,7 +279,20 @@ class CotizacionExpressOption(models.Model):
                 if rec.cotizacion_id:
                     other_options = rec.cotizacion_id.option_ids - rec
                     other_options.write({'selected': False})
-        return super(CotizacionExpressOption, self).write(vals)
+        res = super(CotizacionExpressOption, self).write(vals)
+        if not self.env.context.get('skip_pdf_preview_generation'):
+            for rec in self:
+                if rec.cotizacion_id:
+                    rec.cotizacion_id._generate_pdf_preview()
+        return res
+
+    def unlink(self):
+        parents = self.mapped('cotizacion_id')
+        res = super(CotizacionExpressOption, self).unlink()
+        if not self.env.context.get('skip_pdf_preview_generation'):
+            for parent in parents:
+                parent._generate_pdf_preview()
+        return res
 
 
 class CotizacionExpressOptionLine(models.Model):
@@ -320,6 +338,31 @@ class CotizacionExpressOptionLine(models.Model):
             'res_id': self.id,
             'target': 'new',
         }
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        records = super(CotizacionExpressOptionLine, self).create(vals_list)
+        if not self.env.context.get('skip_pdf_preview_generation'):
+            for rec in records:
+                if rec.option_id and rec.option_id.cotizacion_id:
+                    rec.option_id.cotizacion_id._generate_pdf_preview()
+        return records
+
+    def write(self, vals):
+        res = super(CotizacionExpressOptionLine, self).write(vals)
+        if not self.env.context.get('skip_pdf_preview_generation'):
+            for rec in self:
+                if rec.option_id and rec.option_id.cotizacion_id:
+                    rec.option_id.cotizacion_id._generate_pdf_preview()
+        return res
+
+    def unlink(self):
+        parents = self.mapped('option_id.cotizacion_id')
+        res = super(CotizacionExpressOptionLine, self).unlink()
+        if not self.env.context.get('skip_pdf_preview_generation'):
+            for parent in parents:
+                parent._generate_pdf_preview()
+        return res
 
 
 class SaleOrder(models.Model):
