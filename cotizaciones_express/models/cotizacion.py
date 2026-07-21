@@ -62,7 +62,6 @@ class CotizacionExpress(models.Model):
 
     company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string='Moneda')
-    crm_lead_id = fields.Many2one('crm.lead', string='Oportunidad CRM')
     notes = fields.Html(string='Notas / Términos')
     pdf_preview = fields.Binary(string='Vista Previa PDF', attachment=False)
     amount_total = fields.Monetary(string='Total', compute='_compute_amount_total', store=True)
@@ -176,24 +175,11 @@ class CotizacionExpress(models.Model):
         if not selected:
             raise UserError(_('Debe seleccionar al menos una opción como "Seleccionada por el Cliente"'))
         option = selected[0]
-        if not self.crm_lead_id:
-            lead = self.env['crm.lead'].create({
-                'name': self.name,
-                'partner_id': self.partner_id.id,
-                'expected_revenue': option.total,
-                'description': self.notes or '',
-                'user_id': self.user_id.id,
-                'team_id': self.env['crm.team'].search([], limit=1).id if self.env['crm.team'].search_count([]) else False,
-            })
-            self.crm_lead_id = lead.id
             
         vals = {
             'partner_id': self.partner_id.id,
             'origin': self.name,
             'user_id': self.user_id.id,
-            'team_id': self.crm_lead_id.team_id.id if self.crm_lead_id else False,
-            'campaign_id': self.crm_lead_id.campaign_id.id if self.crm_lead_id else False,
-            'medium_id': self.crm_lead_id.medium_id.id if self.crm_lead_id else False,
             'note': option.description or '',
             'order_line': [],
             'is_express': True,
@@ -216,6 +202,7 @@ class CotizacionExpress(models.Model):
                 'name': line.name + ('\n' + line.description if line.description else ''),
                 'product_uom_qty': line.quantity,
                 'price_unit': line.price_unit,
+                'discount': line.discount,
                 'tax_ids': [(6, 0, self.env['account.tax'].search([
                     ('amount', '=', line.iva_percent),
                     ('type_tax_use', '=', 'sale'),
@@ -223,8 +210,6 @@ class CotizacionExpress(models.Model):
             }
             self.env['sale.order.line'].create(order_line_vals)
             
-        if self.crm_lead_id and 'sale_order_id' in self.crm_lead_id._fields:
-            self.crm_lead_id.write({'sale_order_id': order.id})
         self.state = 'confirmed'
         return {
             'type': 'ir.actions.act_window',
@@ -254,16 +239,23 @@ class CotizacionExpressOption(models.Model):
     selected = fields.Boolean(string='Seleccionada por el Cliente', default=False)
     sequence = fields.Integer(string='Secuencia', default=10)
 
+    discount_general = fields.Float(string='Descuento General %', default=0.0)
+    amount_lines_subtotal = fields.Monetary(string='Subtotal Líneas', compute='_compute_option_totals', store=True)
+    amount_lines_iva = fields.Monetary(string='IVA Líneas', compute='_compute_option_totals', store=True)
+    discount_general_amount = fields.Monetary(string='Monto Descuento General', compute='_compute_option_totals', store=True)
     subtotal = fields.Monetary(string='Subtotal', compute='_compute_option_totals', store=True)
     iva_total = fields.Monetary(string='IVA Total', compute='_compute_option_totals', store=True)
     total = fields.Monetary(string='Total', compute='_compute_option_totals', store=True)
     currency_id = fields.Many2one('res.currency', related='cotizacion_id.currency_id')
 
-    @api.depends('line_ids.subtotal', 'line_ids.iva_amount')
+    @api.depends('line_ids.subtotal', 'line_ids.iva_amount', 'discount_general')
     def _compute_option_totals(self):
         for rec in self:
-            rec.subtotal = sum(rec.line_ids.mapped('subtotal'))
-            rec.iva_total = sum(rec.line_ids.mapped('iva_amount'))
+            rec.amount_lines_subtotal = sum(rec.line_ids.mapped('subtotal'))
+            rec.amount_lines_iva = sum(rec.line_ids.mapped('iva_amount'))
+            rec.discount_general_amount = rec.amount_lines_subtotal * (rec.discount_general / 100.0)
+            rec.subtotal = rec.amount_lines_subtotal - rec.discount_general_amount
+            rec.iva_total = rec.amount_lines_iva * (1.0 - rec.discount_general / 100.0)
             rec.total = rec.subtotal + rec.iva_total
 
     @api.model_create_multi
@@ -297,6 +289,7 @@ class CotizacionExpressOptionLine(models.Model):
     price_unit = fields.Monetary(string='Precio Unitario', required=True)
     currency_id = fields.Many2one('res.currency', related='option_id.currency_id')
     iva_percent = fields.Float(string='IVA %', default=16.0)
+    discount = fields.Float(string='Descuento %', default=0.0)
     subtotal = fields.Monetary(string='Subtotal', compute='_compute_line_totals', store=True)
     iva_amount = fields.Monetary(string='IVA', compute='_compute_line_totals', store=True)
     total = fields.Monetary(string='Total', compute='_compute_line_totals', store=True)
@@ -309,10 +302,11 @@ class CotizacionExpressOptionLine(models.Model):
     partner_id = fields.Many2one('res.partner', related='option_id.cotizacion_id.partner_id', store=True, string='Cliente')
     date = fields.Date(related='option_id.cotizacion_id.date', store=True, string='Fecha')
 
-    @api.depends('price_unit', 'quantity', 'iva_percent')
+    @api.depends('price_unit', 'quantity', 'iva_percent', 'discount')
     def _compute_line_totals(self):
         for rec in self:
-            rec.subtotal = rec.price_unit * rec.quantity
+            subtotal_before_discount = rec.price_unit * rec.quantity
+            rec.subtotal = subtotal_before_discount * (1.0 - rec.discount / 100.0)
             rec.iva_amount = rec.subtotal * (rec.iva_percent / 100.0)
             rec.total = rec.subtotal + rec.iva_amount
 

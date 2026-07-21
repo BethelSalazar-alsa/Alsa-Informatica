@@ -1,10 +1,10 @@
 {
     'name': 'Cotizaciones Express',
-    'version': '19.0.1.0.4',
+    'version': '19.0.1.0.5',
     'category': 'Sales',
     'summary': 'Cotizaciones con vista dividida y previsualización de PDF en tiempo real',
     'author': 'Alsa Informática',
-    'depends': ['base', 'contacts', 'sale', 'crm', 'mail'],
+    'depends': ['base', 'contacts', 'sale', 'mail'],
     'data': [
         'security/ir.model.access.csv',
         'data/ir_sequence.xml',
