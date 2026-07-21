@@ -32,8 +32,7 @@
                         style="font-family: 'Arial', sans-serif; color: #000; font-size: 13px; padding: 0px !important;">
 
                         <!-- 1. FECHA -->
-                        <div style="height: 1cm; width: 100%; clear: both;"/>
-                        <div style="text-align: right; width: 100%; font-size: 13px; margin-top: 0px; margin-bottom: 18px; color: #000;">
+                        <div style="text-align: right; width: 100%; font-size: 13px; margin-top: 4px; margin-bottom: 10px; color: #000;">
                             <span t-esc="doc.city or 'Colima'"/>, <span t-esc="doc.state_location or 'Col.'"/>, <t t-if="doc.date">
                                 <t t-esc="doc.date.strftime('%d')"/> de
                                 <t t-set="months" t-value="['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']"/>
@@ -43,7 +42,7 @@
                         </div>
 
                         <!-- 2. DATOS DEL CLIENTE -->
-                        <div style="margin-bottom: 14px;">
+                        <div style="margin-bottom: 10px;">
                             <div style="text-transform: uppercase; font-weight: bold; line-height: 1.4; text-align: left;">
                                 <span t-if="doc.partner_id.parent_id" t-field="doc.partner_id.parent_id.name"
                                     style="font-size: 15px; display: block; margin-bottom: 2px;" />
@@ -70,7 +69,7 @@
                         </div>
 
                         <!-- 3. TABLA DE PRODUCTOS -->
-                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
                             <thead>
                                 <tr style="border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; text-transform: uppercase; font-weight: bold; font-size: 11px;">
                                     <th style="width: 7%; border: none; padding: 4px 0; text-align: center;">CANT.</th>
@@ -180,7 +179,7 @@
 
                         <!-- TOTAL GENERAL -->
                         <t t-if="doc.option_ids">
-                            <div style="margin-top: 12px; text-align: right; font-size: 13px;">
+                            <div style="margin-top: 8px; text-align: right; font-size: 13px;">
                                 <span style="font-weight: bold;">TOTAL COTIZACIÓN: </span>
                                 <span t-field="doc.amount_total"
                                     t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
@@ -188,10 +187,10 @@
                         </t>
 
                         <!-- 4. CONDICIONES Y FIRMA -->
-                        <div style="margin-top: 20px;">
+                        <div style="margin-top: 14px;">
 
                             <!-- CONDICIONES COMERCIALES -->
-                            <div style="font-size: 11px; line-height: 1.6; text-align: left; margin-bottom: 16px; color: #333;">
+                            <div style="font-size: 11px; line-height: 1.5; text-align: left; margin-bottom: 10px; color: #333;">
                                 <t t-if="doc.notes">
                                     <t t-out="doc.notes"/>
                                 </t>
@@ -203,7 +202,7 @@
                             </div>
 
                             <!-- DESPEDIDA -->
-                            <div style="text-align: left; margin-bottom: 20px; font-size: 12px; line-height: 1.5; color: #000;">
+                            <div style="text-align: left; margin-bottom: 12px; font-size: 12px; line-height: 1.4; color: #000;">
                                 Sin más por el momento y a sus órdenes para cualquier duda ó aclaración, se despide de usted su S.S.
                             </div>
 
