@@ -178,6 +178,15 @@
                             </tbody>
                         </table>
 
+                        <!-- TOTAL GENERAL -->
+                        <t t-if="doc.option_ids">
+                            <div style="margin-top: 12px; text-align: right; font-size: 13px;">
+                                <span style="font-weight: bold;">TOTAL COTIZACIÓN: </span>
+                                <span t-field="doc.amount_total"
+                                    t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                            </div>
+                        </t>
+
                         <!-- 4. CONDICIONES Y FIRMA -->
                         <div style="margin-top: 20px;">
 
@@ -200,7 +209,7 @@
 
                             <!-- BLOQUE DE FIRMA -->
                             <div style="text-align: center; width: 100%;">
-                                <div style="display: inline-block; text-align: center; min-width: 280px; max-width: 440px;">
+                                <div style="display: inline-block; text-align: center; min-width: 280px; max-width: 440px; page-break-inside: avoid;">
                                     <span style="font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 8px; font-size: 12px; letter-spacing: 1.5px; color: #000;">ATENTAMENTE</span>
 
                                     <!-- Imagen de firma -->
