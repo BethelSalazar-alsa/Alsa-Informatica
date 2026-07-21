@@ -1,6 +1,4 @@
-import base64
 import logging
-import time
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -64,9 +62,6 @@ class CotizacionExpress(models.Model):
     company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string='Moneda')
     notes = fields.Html(string='Notas / Términos')
-    pdf_preview = fields.Binary(string='Vista Previa PDF', attachment=False)
-    pdf_filename = fields.Char(string='Nombre PDF', default='cotizacion.pdf')
-    pdf_toggle = fields.Boolean(string='PDF Toggle', default=False)
     preview_html = fields.Html(string='Vista Previa', compute='_compute_preview_html', sanitize=False)
     template_id = fields.Many2one('cotizacion.express.template', string='Cargar Plantilla')
     option_template_id = fields.Many2one('cotizacion.express.template.option', string='Cargar Paquete')
@@ -94,11 +89,23 @@ class CotizacionExpress(models.Model):
         if self.stage_id:
             self.state = self.stage_id.state_type
 
-    @api.depends('name')
+    @api.depends('write_date')
     def _compute_preview_html(self):
         for rec in self:
-            record_id = rec._origin.id if rec._origin else 0
-            rec.preview_html = f'<iframe src="/cotizacion/preview_html/{record_id}" style="width: 100%; height: 100%; border: none; min-height: 650px; background: white;"></iframe>'
+            if rec.id and isinstance(rec.id, int):
+                t = int(rec.write_date.timestamp()) if rec.write_date else 0
+                rec.preview_html = (
+                    f'<div style="width: 100%; height: 100%; min-height: 650px;">'
+                    f'<iframe src="/report/pdf/cotizaciones_express.cotizacion_preview_template/{rec.id}?t={t}" '
+                    f'style="width: 100%; height: 100%; border: none; min-height: 650px;"></iframe>'
+                    f'</div>'
+                )
+            else:
+                rec.preview_html = (
+                    '<div style="display: flex; align-items: center; justify-content: center; height: 650px; '
+                    'background: #f8f9fa; color: #666; font-size: 14px;">'
+                    'Guarde la cotización para ver la vista previa del PDF.</div>'
+                )
 
     @api.depends('option_ids.total', 'option_ids.selected')
     def _compute_amount_total(self):
@@ -111,32 +118,14 @@ class CotizacionExpress(models.Model):
             else:
                 rec.amount_total = 0.0
 
-    def _generate_pdf_preview(self):
-        """Método interno para renderizar el PDF y guardarlo en el campo binario"""
-        for record in self:
-            try:
-                report_id = self.env.ref('cotizaciones_express.report_cotizacion_express')
-                pdf_content, dummy = self.env['ir.actions.report']._render_qweb_pdf(report_id, res_ids=record.ids)
-                filename = f"cotizacion_{record.name or 'nueva'}_{int(time.time())}.pdf"
-                # Usamos super().write() para evitar recursión infinita y guardar de forma silenciosa
-                super(CotizacionExpress, record).write({
-                    'pdf_preview': pdf_content,
-                    'pdf_filename': filename,
-                    'pdf_toggle': not record.pdf_toggle,
-                })
-            except Exception as e:
-                _logger.error("Error generating PDF preview: %s", e)
-
     def action_load_template(self):
         self.ensure_one()
         if not self.template_id:
             return
         self.notes = self.template_id.notes
         
-        # Limpiar opciones actuales
         self.option_ids.unlink()
         
-        # Crear nuevas opciones a partir de la plantilla
         for t_option in self.template_id.option_ids:
             option = self.env['cotizacion.express.option'].create({
                 'cotizacion_id': self.id,
@@ -153,9 +142,6 @@ class CotizacionExpress(models.Model):
                     'discount': t_line.discount,
                     'iva_percent': t_line.iva_percent,
                 })
-        
-        # Forzar recarga del PDF
-        self._generate_pdf_preview()
 
     def action_load_option_template(self):
         self.ensure_one()
@@ -163,7 +149,6 @@ class CotizacionExpress(models.Model):
             return
         t_option = self.option_template_id
         
-        # Crear nueva opción
         option = self.env['cotizacion.express.option'].create({
             'cotizacion_id': self.id,
             'name': t_option.name,
@@ -180,14 +165,10 @@ class CotizacionExpress(models.Model):
                 'iva_percent': t_line.iva_percent,
             })
             
-        # Limpiar el campo
         self.option_template_id = False
-        # Forzar recarga del PDF
-        self._generate_pdf_preview()
 
     @api.model_create_multi
     def create(self, vals_list):
-        """Se ejecuta la primera vez que el usuario hace clic en Guardar"""
         for vals in vals_list:
             if not vals.get('name') or vals.get('name') == 'Nueva':
                 vals['name'] = self.env['ir.sequence'].next_by_code('cotizacion.express') or 'Nueva'
@@ -199,12 +180,10 @@ class CotizacionExpress(models.Model):
                 stage = self.env['cotizacion.express.stage'].browse(vals['stage_id'])
                 if stage:
                     vals['state'] = stage.state_type
-        records = super(CotizacionExpress, self.with_context(skip_pdf_preview_generation=True)).create(vals_list)
-        records._generate_pdf_preview()
+        records = super(CotizacionExpress, self).create(vals_list)
         return records
 
     def write(self, vals):
-        """Se ejecuta cada vez que el usuario guarda cambios"""
         if 'stage_id' in vals:
             stage = self.env['cotizacion.express.stage'].browse(vals['stage_id'])
             if stage:
@@ -214,10 +193,7 @@ class CotizacionExpress(models.Model):
             if stage:
                 vals['stage_id'] = stage.id
                 
-        res = super(CotizacionExpress, self.with_context(skip_pdf_preview_generation=True)).write(vals)
-        # Evitamos bucle infinito: solo regeneramos si el cambio NO viene del propio PDF
-        if 'pdf_preview' not in vals:
-            self._generate_pdf_preview()
+        res = super(CotizacionExpress, self).write(vals)
         return res
 
     def action_send_to_client(self):
@@ -380,10 +356,6 @@ class CotizacionExpressOption(models.Model):
                     ('selected', '=', True)
                 ]).write({'selected': False})
         records = super(CotizacionExpressOption, self).create(vals_list)
-        if not self.env.context.get('skip_pdf_preview_generation'):
-            for rec in records:
-                if rec.cotizacion_id:
-                    rec.cotizacion_id._generate_pdf_preview()
         return records
 
     def write(self, vals):
@@ -393,18 +365,11 @@ class CotizacionExpressOption(models.Model):
                     other_options = rec.cotizacion_id.option_ids - rec
                     other_options.write({'selected': False})
         res = super(CotizacionExpressOption, self).write(vals)
-        if not self.env.context.get('skip_pdf_preview_generation'):
-            for rec in self:
-                if rec.cotizacion_id:
-                    rec.cotizacion_id._generate_pdf_preview()
         return res
 
     def unlink(self):
         parents = self.mapped('cotizacion_id')
         res = super(CotizacionExpressOption, self).unlink()
-        if not self.env.context.get('skip_pdf_preview_generation'):
-            for parent in parents:
-                parent._generate_pdf_preview()
         return res
 
 
@@ -459,26 +424,15 @@ class CotizacionExpressOptionLine(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         records = super(CotizacionExpressOptionLine, self).create(vals_list)
-        if not self.env.context.get('skip_pdf_preview_generation'):
-            for rec in records:
-                if rec.option_id and rec.option_id.cotizacion_id:
-                    rec.option_id.cotizacion_id._generate_pdf_preview()
         return records
 
     def write(self, vals):
         res = super(CotizacionExpressOptionLine, self).write(vals)
-        if not self.env.context.get('skip_pdf_preview_generation'):
-            for rec in self:
-                if rec.option_id and rec.option_id.cotizacion_id:
-                    rec.option_id.cotizacion_id._generate_pdf_preview()
         return res
 
     def unlink(self):
         parents = self.mapped('option_id.cotizacion_id')
         res = super(CotizacionExpressOptionLine, self).unlink()
-        if not self.env.context.get('skip_pdf_preview_generation'):
-            for parent in parents:
-                parent._generate_pdf_preview()
         return res
 
 
@@ -503,20 +457,14 @@ class CotizacionConfirmWizard(models.TransientModel):
 
     def action_confirm(self):
         self.ensure_one()
-        # Actualizar opciones seleccionadas en la cotización
         for line in self.line_ids:
             line.option_id.selected = line.selected
         
-        # Actualizar estado de la cotización a confirmado
         self.cotizacion_id.state = 'confirmed'
         
-        # Buscar e indicar la etapa correspondiente a "confirmed"
         stage = self.env['cotizacion.express.stage'].search([('state_type', '=', 'confirmed')], limit=1)
         if stage:
             self.cotizacion_id.stage_id = stage.id
-            
-        # Regenerar la vista previa del PDF
-        self.cotizacion_id._generate_pdf_preview()
         return {'type': 'ir.actions.act_window_close'}
 
 
