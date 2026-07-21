@@ -67,6 +67,7 @@ class CotizacionExpress(models.Model):
     pdf_preview = fields.Binary(string='Vista Previa PDF', attachment=False)
     pdf_filename = fields.Char(string='Nombre PDF', default='cotizacion.pdf')
     pdf_toggle = fields.Boolean(string='PDF Toggle', default=False)
+    preview_html = fields.Html(string='Vista Previa', compute='_compute_preview_html', sanitize=False)
     template_id = fields.Many2one('cotizacion.express.template', string='Cargar Plantilla')
     option_template_id = fields.Many2one('cotizacion.express.template.option', string='Cargar Paquete')
     tag_ids = fields.Many2many('cotizacion.express.tag', string='Etiquetas')
@@ -93,6 +94,7 @@ class CotizacionExpress(models.Model):
         if self.stage_id:
             self.state = self.stage_id.state_type
 
+    @api.depends('name')
     def _compute_preview_html(self):
         for rec in self:
             rec.preview_html = f'<iframe src="/cotizacion/preview_html/{rec.id or 0}" style="width: 100%; height: 100%; border: none; min-height: 650px; background: white;"></iframe>'
