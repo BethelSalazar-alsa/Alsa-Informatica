@@ -349,27 +349,13 @@
     <record id="action_cotizacion_express" model="ir.actions.act_window">
         <field name="name">Cotizaciones Express</field>
         <field name="res_model">cotizacion.express</field>
-        <field name="view_mode">tree,form,graph,pivot</field>
-    </record>
-
-    <record id="action_cotizacion_express_view_tree" model="ir.actions.act_window.view">
-        <field name="sequence" eval="10"/>
-        <field name="view_mode">tree</field>
-        <field name="view_id" ref="view_cotizacion_express_tree"/>
-        <field name="act_window_id" ref="action_cotizacion_express"/>
-    </record>
-
-    <record id="action_cotizacion_express_view_form" model="ir.actions.act_window.view">
-        <field name="sequence" eval="20"/>
-        <field name="view_mode">form</field>
-        <field name="view_id" ref="view_cotizacion_express_form"/>
-        <field name="act_window_id" ref="action_cotizacion_express"/>
+        <field name="view_mode">list,form,graph,pivot</field>
     </record>
 
     <record id="action_cotizacion_express_stage" model="ir.actions.act_window">
         <field name="name">Etapas de Cotización</field>
         <field name="res_model">cotizacion.express.stage</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <!-- MENUS -->
@@ -380,7 +366,7 @@
     <record id="action_cotizacion_express_tag" model="ir.actions.act_window">
         <field name="name">Etiquetas de Cotización</field>
         <field name="res_model">cotizacion.express.tag</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <menuitem id="menu_cotizacion_express_tag" name="Etiquetas" parent="menu_cotizaciones_root" action="action_cotizacion_express_tag" sequence="45"/>
@@ -477,7 +463,7 @@
     <record id="action_cotizacion_express_template" model="ir.actions.act_window">
         <field name="name">Plantillas de Cotización</field>
         <field name="res_model">cotizacion.express.template</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <record id="view_cotizacion_express_template_option_form" model="ir.ui.view">
@@ -534,7 +520,7 @@
     <record id="action_cotizacion_express_template_option" model="ir.actions.act_window">
         <field name="name">Plantillas de Paquetes</field>
         <field name="res_model">cotizacion.express.template.option</field>
-        <field name="view_mode">tree,form</field>
+        <field name="view_mode">list,form</field>
     </record>
 
     <!-- MENUS FOR TEMPLATES -->
