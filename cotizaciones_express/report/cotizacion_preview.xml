@@ -179,7 +179,7 @@
                         </table>
 
                         <!-- 4. CONDICIONES Y FIRMA -->
-                        <div style="page-break-inside: avoid; margin-top: 20px;">
+                        <div style="margin-top: 20px;">
 
                             <!-- CONDICIONES COMERCIALES -->
                             <div style="font-size: 11px; line-height: 1.6; text-align: left; margin-bottom: 16px; color: #333;">
@@ -194,14 +194,14 @@
                             </div>
 
                             <!-- CONTENEDOR DE DESPEDIDA Y FIRMA PARA EVITAR PAGINACIÓN SOLA -->
-                            <div style="page-break-inside: avoid;">
+                            <div style="page-break-inside: avoid; padding-top: 10px;">
                                 <!-- DESPEDIDA -->
                                 <div style="text-align: left; margin-bottom: 20px; font-size: 12px; line-height: 1.5; color: #000;">
                                     Sin más por el momento y a sus órdenes para cualquier duda ó aclaración, se despide de usted su S.S.
                                 </div>
 
                                 <!-- BLOQUE DE FIRMA -->
-                                <div style="margin-top: 20px; text-align: center; width: 100%;">
+                                <div style="margin-top: 10px; text-align: center; width: 100%;">
                                     <div style="display: inline-block; text-align: center; min-width: 280px; max-width: 440px;">
                                         <span style="font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 8px; font-size: 12px; letter-spacing: 1.5px; color: #000;">ATENTAMENTE</span>
 
