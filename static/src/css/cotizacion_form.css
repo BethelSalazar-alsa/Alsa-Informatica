@@ -1,0 +1,15 @@
+/* Make the form sheet container span the full width of the screen */
+.o_form_view .o_form_sheet_bg .o_form_sheet.o_cotizacion_express_sheet {
+    max-width: 100% !important;
+    width: 100% !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
+}
+
+/* Ensure the form renderer container also stretches to full width */
+.o_form_renderer.o_cotizacion_express_form {
+    width: 100% !important;
+    max-width: 100% !important;
+}
