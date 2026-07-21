@@ -13,3 +13,19 @@
     width: 100% !important;
     max-width: 100% !important;
 }
+
+/* PDF viewer panel: full viewport height so it doesn't scroll away */
+.o_cotizacion_express_sheet .o_field_html {
+    min-height: calc(100vh - 140px);
+    height: calc(100vh - 140px);
+    overflow: auto;
+    display: block;
+}
+
+/* Make the iframe inside the html field fill the panel */
+.o_cotizacion_express_sheet .o_field_html iframe {
+    width: 100%;
+    min-height: calc(100vh - 160px);
+    border: none;
+    display: block;
+}
