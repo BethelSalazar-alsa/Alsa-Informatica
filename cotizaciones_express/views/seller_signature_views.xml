@@ -4,6 +4,7 @@
         <field name="name">seller.signature.list</field>
         <field name="model">seller.signature</field>
         <field name="arch" type="xml">
+            <!-- list view for Odoo 19 compatibility -->
             <list>
                 <field name="user_id"/>
                 <field name="signature_name"/>
