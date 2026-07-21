@@ -97,7 +97,8 @@ class CotizacionExpress(models.Model):
     @api.depends('name')
     def _compute_preview_html(self):
         for rec in self:
-            rec.preview_html = f'<iframe src="/cotizacion/preview_html/{rec.id or 0}" style="width: 100%; height: 100%; border: none; min-height: 650px; background: white;"></iframe>'
+            record_id = rec._origin.id if rec._origin else 0
+            rec.preview_html = f'<iframe src="/cotizacion/preview_html/{record_id}" style="width: 100%; height: 100%; border: none; min-height: 650px; background: white;"></iframe>'
 
     @api.depends('option_ids.total', 'option_ids.selected')
     def _compute_amount_total(self):
