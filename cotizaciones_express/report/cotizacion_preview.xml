@@ -184,7 +184,7 @@
                             <!-- CONDICIONES COMERCIALES -->
                             <div style="font-size: 11px; line-height: 1.6; text-align: left; margin-bottom: 16px; color: #333;">
                                 <t t-if="doc.notes">
-                                    <t t-raw="doc.notes"/>
+                                    <t t-out="doc.notes"/>
                                 </t>
                                 <t t-else="">
                                     <p style="margin: 2px 0;">1.- Los precios incluyen IVA y son válidos por 10 días y/o agotar existencias.</p>

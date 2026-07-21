@@ -1,5 +1,6 @@
 import base64
 import logging
+import time
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -109,8 +110,6 @@ class CotizacionExpress(models.Model):
             try:
                 report_id = self.env.ref('cotizaciones_express.report_cotizacion_express')
                 pdf_content, dummy = self.env['ir.actions.report']._render_qweb_pdf(report_id, res_ids=record.ids)
-                # Generamos un nombre de archivo único con un timestamp para evitar el cacheo del navegador
-                import time
                 filename = f"cotizacion_{record.name or 'nueva'}_{int(time.time())}.pdf"
                 # Usamos super().write() para evitar recursión infinita y guardar de forma silenciosa
                 super(CotizacionExpress, record).write({
