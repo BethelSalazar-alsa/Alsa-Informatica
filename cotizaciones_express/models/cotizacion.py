@@ -96,7 +96,7 @@ class CotizacionExpress(models.Model):
                 t = int(rec.write_date.timestamp()) if rec.write_date else 0
                 rec.preview_html = (
                     f'<div style="width: 100%; height: 100%; min-height: 650px;">'
-                    f'<iframe src="/report/pdf/cotizaciones_express.cotizacion_preview_template/{rec.id}?t={t}" '
+                    f'<iframe src="/report/pdf/cotizaciones_express.cotizacion_preview_template/{rec.id}?t={t}#view=FitH" '
                     f'style="width: 100%; height: 100%; border: none; min-height: 650px;"></iframe>'
                     f'</div>'
                 )
