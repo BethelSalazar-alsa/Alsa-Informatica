@@ -248,43 +248,45 @@ class CotizacionExpress(models.Model):
         selected = self.option_ids.filtered('selected')
         if not selected:
             raise UserError(_('Debe seleccionar al menos una opción como "Seleccionada por el Cliente"'))
-        option = selected[0]
+        
+        notes = [opt.description for opt in selected if opt.description]
         vals = {
             'partner_id': self.partner_id.id,
             'origin': self.name,
             'user_id': self.user_id.id,
-            'note': option.description or '',
+            'note': '\n\n'.join(notes) if notes else '',
             'order_line': [],
             'is_express': True,
         }
         order = self.env['sale.order'].create(vals)
-        for line in option.line_ids:
-            product = self.env['product.product'].search([('name', '=', line.name)], limit=1)
-            if not product:
-                product = self.env['product.product'].search([('name', '=', 'Concepto Cotización')], limit=1)
-            if not product:
-                product = self.env['product.product'].create({
-                    'name': 'Concepto Cotización',
-                    'type': 'service',
-                    'sale_ok': True,
-                    'purchase_ok': False,
-                })
-            # Calculamos el descuento combinado (descuento por línea + descuento general de la opción)
-            final_discount = 100.0 * (1.0 - (1.0 - line.discount / 100.0) * (1.0 - option.discount_general / 100.0))
-            order_line_vals = {
-                'order_id': order.id,
-                'product_id': product.id,
-                'name': line.name + ('\n' + line.description if line.description else ''),
-                'product_uom_qty': line.quantity,
-                'price_unit': line.price_unit,
-                'discount': final_discount,
-                'tax_ids': [(6, 0, self.env['account.tax'].search([
-                    ('amount', '=', line.iva_percent),
-                    ('type_tax_use', '=', 'sale'),
-                ], limit=1).ids)] if line.iva_percent else False,
-            }
-            self.env['sale.order.line'].create(order_line_vals)
-            
+        for option in selected:
+            for line in option.line_ids:
+                product = self.env['product.product'].search([('name', '=', line.name)], limit=1)
+                if not product:
+                    product = self.env['product.product'].search([('name', '=', 'Concepto Cotización')], limit=1)
+                if not product:
+                    product = self.env['product.product'].create({
+                        'name': 'Concepto Cotización',
+                        'type': 'service',
+                        'sale_ok': True,
+                        'purchase_ok': False,
+                    })
+                # Calculamos el descuento combinado (descuento por línea + descuento general de la opción)
+                final_discount = 100.0 * (1.0 - (1.0 - line.discount / 100.0) * (1.0 - option.discount_general / 100.0))
+                order_line_vals = {
+                    'order_id': order.id,
+                    'product_id': product.id,
+                    'name': line.name + ('\n' + line.description if line.description else ''),
+                    'product_uom_qty': line.quantity,
+                    'price_unit': line.price_unit,
+                    'discount': final_discount,
+                    'tax_ids': [(6, 0, self.env['account.tax'].search([
+                        ('amount', '=', line.iva_percent),
+                        ('type_tax_use', '=', 'sale'),
+                    ], limit=1).ids)] if line.iva_percent else False,
+                }
+                self.env['sale.order.line'].create(order_line_vals)
+                
         if self.crm_lead_id and 'sale_order_id' in self.crm_lead_id._fields:
             self.crm_lead_id.write({'sale_order_id': order.id})
         self.state = 'confirmed'
@@ -346,26 +348,6 @@ class CotizacionExpressOption(models.Model):
             'sequence': line.sequence,
         }) for line in self.line_ids]
         self.copy({'selected': False, 'name': self.name + ' (copia)', 'line_ids': lines})
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        for vals in vals_list:
-            if vals.get('selected') and vals.get('cotizacion_id'):
-                self.env['cotizacion.express.option'].search([
-                    ('cotizacion_id', '=', vals['cotizacion_id']),
-                    ('selected', '=', True)
-                ]).write({'selected': False})
-        records = super(CotizacionExpressOption, self).create(vals_list)
-        return records
-
-    def write(self, vals):
-        if vals.get('selected'):
-            for rec in self:
-                if rec.cotizacion_id:
-                    other_options = rec.cotizacion_id.option_ids - rec
-                    other_options.write({'selected': False})
-        res = super(CotizacionExpressOption, self).write(vals)
-        return res
 
     def unlink(self):
         parents = self.mapped('cotizacion_id')
