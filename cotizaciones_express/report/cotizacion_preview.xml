@@ -7,22 +7,22 @@
 
                     <!-- ENCABEZADO -->
                     <div class="header"
-                        style="font-family: 'Times New Roman', Times, serif; color: #1C355E; width: 100%; border-bottom: 2px solid #1C355E; padding-bottom: 4px; margin-bottom: 0px;">
-                        <table style="width: 100%; border-collapse: collapse; border: none; background: transparent; margin: 0;">
+                        style="font-family: 'Times New Roman', Times, serif; color: #1C355E; width: 100% !important; display: block !important; border-bottom: 2px solid #1C355E; padding-bottom: 6px; margin: 0 !important;">
+                        <table style="width: 100% !important; table-layout: fixed !important; border-collapse: collapse; border: none; background: transparent; margin: 0 !important; padding: 0 !important;">
                             <tr style="border: none;">
-                                <td style="width: 40%; border: none; text-align: left !important; vertical-align: middle; padding: 0;">
+                                <td style="width: 45%; border: none; text-align: left !important; vertical-align: middle; padding: 0;">
                                     <img t-if="doc.company_id.logo" t-att-src="image_data_uri(doc.company_id.logo)"
                                         style="max-height: 55px; max-width: 100%;" alt="Logo ALSA" />
                                     <t t-if="not doc.company_id.logo">
-                                        <strong style="font-size: 18pt; color: #1C355E; letter-spacing: 1px;">ALSA</strong><br />
-                                        <span style="font-size: 14pt; color: #555; text-transform: uppercase;">Informática</span>
+                                        <strong style="font-size: 20pt; color: #1C355E; letter-spacing: 1px;">ALSA</strong><br />
+                                        <span style="font-size: 15pt; color: #555; text-transform: uppercase;">Informática</span>
                                     </t>
                                 </td>
-                                <td style="width: 60%; border: none; text-align: right !important; vertical-align: middle; padding: 0; line-height: 1.35; color: #333;">
-                                    <div style="text-align: right !important; width: 100%; float: right;">
-                                        <strong style="font-size: 15.5pt; color: #1C355E; display: block; text-align: right !important;">Alsa Informática</strong>
-                                        <span style="font-size: 14pt; display: block; text-align: right !important;">Conmutador: 312 311 23 25</span>
-                                        <span style="font-size: 14pt; display: block; text-align: right !important;">WhatsApp Ventas: 312 120 26 45</span>
+                                <td style="width: 55%; border: none; text-align: right !important; vertical-align: middle; padding: 0; line-height: 1.35; color: #333;">
+                                    <div style="text-align: right !important; width: 100% !important;">
+                                        <strong style="font-size: 16pt; color: #1C355E; display: block; text-align: right !important; width: 100% !important;">Alsa Informática</strong>
+                                        <span style="font-size: 14.5pt; display: block; text-align: right !important; width: 100% !important;">Conmutador: 312 311 23 25</span>
+                                        <span style="font-size: 14.5pt; display: block; text-align: right !important; width: 100% !important;">WhatsApp Ventas: 312 120 26 45</span>
                                     </div>
                                 </td>
                             </tr>
@@ -238,13 +238,19 @@
 
                     <!-- PIE DE PÁGINA -->
                     <div class="footer"
-                        style="font-family: 'Times New Roman', Times, serif; color: #1C355E; width: 100%; border-top: 2px solid #1C355E; padding-top: 6px; text-align: center !important;">
-                        <div style="text-align: center !important; width: 100%; font-size: 15.5pt; font-weight: bold; color: #1C355E; margin-bottom: 3px;">
-                            alsainformatica.com.mx &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; contacto@alsainformatica.com.mx
-                        </div>
-                        <div style="text-align: center !important; width: 100%; font-size: 14pt; color: #333;">
-                            Av. Manuel J. Clouthier 182-C Col. El Ángel, C.P. 28979. Villa de Álvarez, Colima
-                        </div>
+                        style="font-family: 'Times New Roman', Times, serif; color: #1C355E; width: 100% !important; display: block !important; border-top: 2px solid #1C355E; padding-top: 6px; margin: 0 !important; text-align: center !important;">
+                        <table style="width: 100% !important; table-layout: fixed !important; border-collapse: collapse; border: none; background: transparent; margin: 0 !important; padding: 0 !important; text-align: center !important;">
+                            <tr style="border: none;">
+                                <td style="width: 100% !important; text-align: center !important; padding: 2px 0; border: none; font-weight: bold; color: #1C355E; font-size: 16pt;">
+                                    alsainformatica.com.mx &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; contacto@alsainformatica.com.mx
+                                </td>
+                            </tr>
+                            <tr style="border: none;">
+                                <td style="width: 100% !important; text-align: center !important; padding: 3px 0 0 0; border: none; color: #333; font-size: 14.5pt;">
+                                    Av. Manuel J. Clouthier 182-C Col. El Ángel, C.P. 28979. Villa de Álvarez, Colima
+                                </td>
+                            </tr>
+                        </table>
                     </div>
 
                 </t>
