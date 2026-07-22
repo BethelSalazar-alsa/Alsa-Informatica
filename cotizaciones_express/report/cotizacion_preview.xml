@@ -103,7 +103,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <t t-foreach="doc.option_ids.filtered(lambda o: o.selected) if doc.state == 'confirmed' else doc.option_ids" t-as="option">
+                                <t t-set="selected_opts" t-value="doc.option_ids.filtered(lambda o: o.selected)"/>
+                                <t t-foreach="selected_opts if doc.state == 'confirmed' else doc.option_ids" t-as="option">
                                     <!-- Nombre de la Opción como sección -->
                                     <tr style="border: none;">
                                         <td colspan="6"
@@ -193,6 +194,21 @@
                                         <td style="border-top: 1.5px solid #000; padding: 3px 0; text-align: right; font-size: 11pt !important; font-weight: bold; color: #000; border-left: none; border-right: none; border-bottom: none;">Total:</td>
                                         <td style="border-top: 1.5px solid #000; padding: 3px 0; text-align: right; font-size: 11pt !important; font-weight: bold; color: #000; border-left: none; border-right: none; border-bottom: none;">
                                             <span t-field="option.total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important;" />
+                                        </td>
+                                    </tr>
+                                </t>
+
+                                <!-- TOTAL COMBINADO DE OPCIONES (Solo cuando se confirman y hay 2 o más opciones elegidas) -->
+                                <t t-if="doc.state == 'confirmed' and len(selected_opts) &gt; 1">
+                                    <tr style="border: none; page-break-inside: avoid;">
+                                        <td colspan="6" style="padding: 8px 0 2px 0; border: none;"/>
+                                    </tr>
+                                    <tr style="border: none; page-break-inside: avoid;">
+                                        <td colspan="4" style="border-top: 2px solid #1C355E; border-bottom: 2px solid #1C355E; padding: 5px 4px; text-align: right; font-weight: bold; font-size: 11pt !important; color: #1C355E; text-transform: uppercase;">
+                                            TOTAL OPCIONES SELECCIONADAS:
+                                        </td>
+                                        <td colspan="2" style="border-top: 2px solid #1C355E; border-bottom: 2px solid #1C355E; padding: 5px 0; text-align: right; font-weight: bold; font-size: 11pt !important; color: #1C355E;">
+                                            <span t-field="doc.amount_total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important;" />
                                         </td>
                                     </tr>
                                 </t>
