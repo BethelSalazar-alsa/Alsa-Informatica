@@ -97,7 +97,9 @@ class CotizacionExpress(models.Model):
                 rec.preview_html = (
                     f'<div style="width: 100%; height: 100%; min-height: 650px;">'
                     f'<iframe src="/report/pdf/cotizaciones_express.cotizacion_preview_template/{rec.id}?t={t}#zoom=page-width&view=FitH" '
-                    f'style="width: 100%; height: 100%; border: none; min-height: 650px;"></iframe>'
+                    f'style="width: 100%; height: 100%; border: none; min-height: 650px;" '
+                    f'sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-downloads" '
+                    f'title="Preview PDF"></iframe>'
                     f'</div>'
                 )
             else:
