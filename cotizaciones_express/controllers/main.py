@@ -26,38 +26,56 @@ class CotizacionExpressController(http.Controller):
     def preview_js(self, **kwargs):
         js = r"""(function() {
     try {
-        var parentDoc = parent.document;
+        var parentWin = null;
+        var parentDoc = null;
+        try {
+            if (window.parent && window.parent !== window) {
+                parentWin = window.parent;
+                parentDoc = parentWin.document;
+            }
+        } catch (e) {
+            return;
+        }
+
         if (!parentDoc) return;
 
         var lastInputTime = 0;
-        parentDoc.addEventListener('input', function() {
-            lastInputTime = Date.now();
-        }, true);
-        
-        parentDoc.addEventListener('change', function() {
-            // Force a reload soon after a change event (e.g. selecting a dropdown)
-            lastInputTime = 0; 
-            triggerReload(500);
-        }, true);
+        function onInput() { lastInputTime = Date.now(); }
+        function onChange() { lastInputTime = 0; triggerReload(500); }
+
+        try {
+            parentDoc.addEventListener('input', onInput, true);
+            parentDoc.addEventListener('change', onChange, true);
+        } catch (e) {}
+
+        window.addEventListener('unload', function() {
+            try {
+                if (parentDoc) {
+                    parentDoc.removeEventListener('input', onInput, true);
+                    parentDoc.removeEventListener('change', onChange, true);
+                }
+            } catch (e) {}
+        });
 
         function getRecordId() {
-            var formEl = parentDoc.querySelector('.o_form_view');
-            if (formEl && formEl.dataset.recordId) {
-                var id = parseInt(formEl.dataset.recordId, 10);
-                if (id > 0) return id;
-            }
+            try {
+                var formEl = parentDoc.querySelector('.o_form_view');
+                if (formEl && formEl.dataset.recordId) {
+                    var id = parseInt(formEl.dataset.recordId, 10);
+                    if (id > 0) return id;
+                }
 
-            var pathname = parent.window.location.pathname;
-            var match = pathname.match(/\/cotizacion\.express\/(\d+)/);
-            if (match) return parseInt(match[1], 10);
+                var pathname = parentWin.location.pathname;
+                var match = pathname.match(/\/cotizacion\.express\/(\d+)/);
+                if (match) return parseInt(match[1], 10);
 
-            var hash = parent.window.location.hash;
-            var hashMatch = hash.match(/[#&]id=(\d+)/);
-            if (hashMatch) return parseInt(hashMatch[1], 10);
-            
-            var queryMatch = parent.window.location.search.match(/[?&]id=(\d+)/);
-            if (queryMatch) return parseInt(queryMatch[1], 10);
-
+                var hash = parentWin.location.hash;
+                var hashMatch = hash.match(/[#&]id=(\d+)/);
+                if (hashMatch) return parseInt(hashMatch[1], 10);
+                
+                var queryMatch = parentWin.location.search.match(/[?&]id=(\d+)/);
+                if (queryMatch) return parseInt(queryMatch[1], 10);
+            } catch(e) {}
             return 0;
         }
 
@@ -84,31 +102,32 @@ class CotizacionExpressController(http.Controller):
         function triggerReload(delay) {
             if (reloadTimeout) clearTimeout(reloadTimeout);
             reloadTimeout = setTimeout(function() {
-                var activeId = getRecordId();
-                if (activeId > 0 && activeId !== currentId) {
-                    window.location.href = "/cotizacion/preview_html/" + activeId + "?t=" + Date.now();
-                } else if (activeId > 0) {
-                    window.location.reload();
-                } else if (currentId > 0) {
-                    window.location.href = "/cotizacion/preview_html/0?t=" + Date.now();
-                }
+                try {
+                    var activeId = getRecordId();
+                    if (activeId > 0 && activeId !== currentId) {
+                        window.location.href = "/cotizacion/preview_html/" + activeId + "?t=" + Date.now();
+                    } else if (activeId > 0) {
+                        window.location.reload();
+                    } else if (currentId > 0) {
+                        window.location.href = "/cotizacion/preview_html/0?t=" + Date.now();
+                    }
+                } catch(e) {}
             }, delay || 1000);
         }
 
-        // Periodic check and reload (every 2.5s) if user is not typing
         setInterval(function() {
-            var activeId = getRecordId();
-            if (activeId !== currentId) {
-                // ID changed (e.g. saved new record), reload immediately
-                triggerReload(100);
-            } else if (activeId > 0 && (Date.now() - lastInputTime > 2000)) {
-                // Normal refresh to get saved database changes
-                window.location.reload();
-            }
+            try {
+                var activeId = getRecordId();
+                if (activeId !== currentId) {
+                    triggerReload(100);
+                } else if (activeId > 0 && (Date.now() - lastInputTime > 2000)) {
+                    window.location.reload();
+                }
+            } catch(e) {}
         }, 2500);
 
     } catch (e) {
-        console.error("Preview iframe error:", e);
+        console.warn("Preview iframe safe catch:", e);
     }
 })();"""
         return request.make_response(js, [('Content-Type', 'application/javascript; charset=utf-8')])
