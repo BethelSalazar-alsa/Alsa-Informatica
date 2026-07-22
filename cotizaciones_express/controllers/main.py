@@ -26,55 +26,49 @@ class CotizacionExpressController(http.Controller):
     def preview_js(self, **kwargs):
         js = r"""(function() {
     try {
-        var parentWin = null;
-        var parentDoc = null;
-        try {
-            if (window.parent && window.parent !== window) {
-                parentWin = window.parent;
-                parentDoc = parentWin.document;
-            }
-        } catch (e) {
-            return;
-        }
-
-        if (!parentDoc) return;
-
-        var lastInputTime = 0;
-        function onInput() { lastInputTime = Date.now(); }
-        function onChange() { lastInputTime = 0; triggerReload(500); }
-
-        try {
-            parentDoc.addEventListener('input', onInput, true);
-            parentDoc.addEventListener('change', onChange, true);
-        } catch (e) {}
-
-        window.addEventListener('unload', function() {
+        function getParentDoc() {
             try {
-                if (parentDoc) {
-                    parentDoc.removeEventListener('input', onInput, true);
-                    parentDoc.removeEventListener('change', onChange, true);
+                if (window.parent && window.parent !== window && window.parent.document) {
+                    return window.parent.document;
                 }
             } catch (e) {}
-        });
+            return null;
+        }
+
+        function getParentWin() {
+            try {
+                if (window.parent && window.parent !== window) {
+                    return window.parent;
+                }
+            } catch (e) {}
+            return null;
+        }
 
         function getRecordId() {
             try {
-                var formEl = parentDoc.querySelector('.o_form_view');
-                if (formEl && formEl.dataset.recordId) {
-                    var id = parseInt(formEl.dataset.recordId, 10);
-                    if (id > 0) return id;
+                var pDoc = getParentDoc();
+                if (pDoc) {
+                    var formEl = pDoc.querySelector('.o_form_view');
+                    if (formEl && formEl.dataset && formEl.dataset.recordId) {
+                        var id = parseInt(formEl.dataset.recordId, 10);
+                        if (id > 0) return id;
+                    }
                 }
 
-                var pathname = parentWin.location.pathname;
-                var match = pathname.match(/\/cotizacion\.express\/(\d+)/);
-                if (match) return parseInt(match[1], 10);
+                var pWin = getParentWin();
+                if (pWin && pWin.location) {
+                    var pathname = pWin.location.pathname || '';
+                    var match = pathname.match(/\/cotizacion\.express\/(\d+)/);
+                    if (match) return parseInt(match[1], 10);
 
-                var hash = parentWin.location.hash;
-                var hashMatch = hash.match(/[#&]id=(\d+)/);
-                if (hashMatch) return parseInt(hashMatch[1], 10);
-                
-                var queryMatch = parentWin.location.search.match(/[?&]id=(\d+)/);
-                if (queryMatch) return parseInt(queryMatch[1], 10);
+                    var hash = pWin.location.hash || '';
+                    var hashMatch = hash.match(/[#&]id=(\d+)/);
+                    if (hashMatch) return parseInt(hashMatch[1], 10);
+
+                    var search = pWin.location.search || '';
+                    var queryMatch = search.match(/[?&]id=(\d+)/);
+                    if (queryMatch) return parseInt(queryMatch[1], 10);
+                }
             } catch(e) {}
             return 0;
         }
@@ -83,15 +77,20 @@ class CotizacionExpressController(http.Controller):
         var currentUrlMatch = window.location.pathname.match(/\/preview_html\/(\d+)/);
         var currentId = currentUrlMatch ? parseInt(currentUrlMatch[1], 10) : 0;
 
-        var pdfLink = parentDoc.getElementById('cotizacion_pdf_link');
-        if (pdfLink) {
-            if (parentId > 0) {
-                pdfLink.href = "/report/pdf/cotizaciones_express.cotizacion_preview_template/" + parentId;
-                pdfLink.style.display = "";
-            } else {
-                pdfLink.style.display = "none";
+        try {
+            var pDoc = getParentDoc();
+            if (pDoc) {
+                var pdfLink = pDoc.getElementById('cotizacion_pdf_link');
+                if (pdfLink) {
+                    if (parentId > 0) {
+                        pdfLink.href = "/report/pdf/cotizaciones_express.cotizacion_preview_template/" + parentId;
+                        pdfLink.style.display = "";
+                    } else {
+                        pdfLink.style.display = "none";
+                    }
+                }
             }
-        }
+        } catch (e) {}
 
         if (currentId === 0 && parentId > 0) {
             window.location.href = "/cotizacion/preview_html/" + parentId + "?t=" + Date.now();
@@ -118,13 +117,11 @@ class CotizacionExpressController(http.Controller):
         setInterval(function() {
             try {
                 var activeId = getRecordId();
-                if (activeId !== currentId) {
+                if (activeId > 0 && activeId !== currentId) {
                     triggerReload(100);
-                } else if (activeId > 0 && (Date.now() - lastInputTime > 2000)) {
-                    window.location.reload();
                 }
             } catch(e) {}
-        }, 2500);
+        }, 3000);
 
     } catch (e) {
         console.warn("Preview iframe safe catch:", e);
