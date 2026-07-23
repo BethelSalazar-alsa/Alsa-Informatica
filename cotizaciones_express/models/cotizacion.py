@@ -64,7 +64,6 @@ class CotizacionExpress(models.Model):
     notes = fields.Html(string='Notas / Términos')
     preview_html = fields.Html(string='Vista Previa', compute='_compute_preview_html', sanitize=False)
     template_id = fields.Many2one('cotizacion.express.template', string='Cargar Plantilla')
-    option_template_id = fields.Many2one('cotizacion.express.template.option', string='Cargar Paquete')
     tag_ids = fields.Many2many('cotizacion.express.tag', string='Etiquetas')
     amount_total = fields.Monetary(string='Total', compute='_compute_amount_total', store=True)
     amount_confirmed = fields.Monetary(string='Monto Confirmado', compute='_compute_amount_confirmed', store=True, currency_field='currency_id')
@@ -145,29 +144,6 @@ class CotizacionExpress(models.Model):
                     'iva_percent': t_line.iva_percent,
                 })
 
-    def action_load_option_template(self):
-        self.ensure_one()
-        if not self.option_template_id:
-            return
-        t_option = self.option_template_id
-        
-        option = self.env['cotizacion.express.option'].create({
-            'cotizacion_id': self.id,
-            'name': t_option.name,
-            'discount_general': t_option.discount_general,
-        })
-        for t_line in t_option.line_ids:
-            self.env['cotizacion.express.option.line'].create({
-                'option_id': option.id,
-                'name': t_line.name,
-                'description': t_line.description,
-                'quantity': t_line.quantity,
-                'price_unit': t_line.price_unit,
-                'discount': t_line.discount,
-                'iva_percent': t_line.iva_percent,
-            })
-            
-        self.option_template_id = False
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -52,19 +52,12 @@
                                 </group>
                             </group>
 
-                            <group string="Plantillas y Paquetes">
+                            <group string="Plantilla de Cotización">
                                 <group>
                                     <label for="template_id"/>
                                     <div class="o_row">
                                         <field name="template_id" options="{'no_create': True}" placeholder="Seleccionar Plantilla..."/>
                                         <button name="action_load_template" type="object" string="Aplicar Plantilla" class="btn-primary" invisible="not template_id" confirm="¿Está seguro de aplicar esta plantilla? Se borrarán todas las opciones de la cotización actual."/>
-                                    </div>
-                                </group>
-                                <group>
-                                    <label for="option_template_id"/>
-                                    <div class="o_row">
-                                        <field name="option_template_id" options="{'no_create': True}" placeholder="Seleccionar Paquete..."/>
-                                        <button name="action_load_option_template" type="object" string="Agregar Paquete" class="btn-secondary" invisible="not option_template_id"/>
                                     </div>
                                 </group>
                             </group>
@@ -414,7 +407,7 @@
                         </h1>
                     </div>
                     <notebook>
-                        <page string="Opciones / Paquetes" name="options">
+                        <page string="Opciones de Plantilla" name="options">
                             <field name="option_ids">
                                 <list>
                                     <field name="name"/>
@@ -471,66 +464,8 @@
         <field name="view_mode">list,form</field>
     </record>
 
-    <record id="view_cotizacion_express_template_option_form" model="ir.ui.view">
-        <field name="name">cotizacion.express.template.option.form</field>
-        <field name="model">cotizacion.express.template.option</field>
-        <field name="arch" type="xml">
-            <form string="Plantilla de Opción / Paquete">
-                <sheet>
-                    <div class="oe_title">
-                        <label for="name" class="oe_edit_only"/>
-                        <h1>
-                            <field name="name" placeholder="Nombre de la Opción..."/>
-                        </h1>
-                    </div>
-                    <group>
-                        <group>
-                            <field name="template_id" options="{'no_create': True}"/>
-                        </group>
-                        <group>
-                            <field name="discount_general"/>
-                        </group>
-                    </group>
-                    <notebook>
-                        <page string="Productos" name="lines">
-                            <field name="line_ids">
-                                <list>
-                                    <field name="name"/>
-                                    <field name="description" widget="html" options="{'style-inline': true}"/>
-                                    <field name="quantity"/>
-                                    <field name="price_unit"/>
-                                    <field name="discount"/>
-                                    <field name="iva_percent"/>
-                                </list>
-                            </field>
-                        </page>
-                    </notebook>
-                </sheet>
-            </form>
-        </field>
-    </record>
-
-    <record id="view_cotizacion_express_template_option_tree" model="ir.ui.view">
-        <field name="name">cotizacion.express.template.option.tree</field>
-        <field name="model">cotizacion.express.template.option</field>
-        <field name="arch" type="xml">
-            <list>
-                <field name="name"/>
-                <field name="template_id"/>
-                <field name="discount_general"/>
-            </list>
-        </field>
-    </record>
-
-    <record id="action_cotizacion_express_template_option" model="ir.actions.act_window">
-        <field name="name">Plantillas de Paquetes</field>
-        <field name="res_model">cotizacion.express.template.option</field>
-        <field name="view_mode">list,form</field>
-    </record>
-
     <!-- MENUS FOR TEMPLATES -->
     <menuitem id="menu_cotizacion_express_template" name="Plantillas de Cotización" parent="menu_cotizaciones_root" action="action_cotizacion_express_template" sequence="25"/>
-    <menuitem id="menu_cotizacion_express_template_option" name="Plantillas de Paquetes" parent="menu_cotizaciones_root" action="action_cotizacion_express_template_option" sequence="30"/>
 
     <!-- FORM VIEW FOR TEMPLATE LINE POP-UP MODAL -->
     <record id="view_cotizacion_express_template_option_line_form" model="ir.ui.view">

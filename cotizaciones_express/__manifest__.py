@@ -12,7 +12,7 @@ Cotizaciones Express permite a los consultores y ejecutivos de ventas crear, est
 Características Principales:
 ----------------------------
 * **Previsualización PDF en Vivo en Pantalla Dividida:** Visualiza en tiempo real el documento final impreso mientras escribes los datos de la cotización, productos y términos comerciales.
-* **Gestión de Múltiples Opciones y Paquetes:** Configura paquetes de productos o servicios organizados por opciones alternativas (Opción 1, Opción 2, Paquete A, etc.).
+* **Gestión de Múltiples Opciones:** Configura opciones alternativas de productos o servicios (Opción 1, Opción 2, etc.).
 * **Firma de Vendedor Integrada:** Vincula la firma digital del consultor en informática para emitir propuestas formales y autorizadas.
 * **Gestión Kanban por Etapas:** Rastrea la evolución comercial desde Borrador hasta Venta Confirmada.
 * **Totales Inteligentes en PDF:** Suma automáticamente las opciones seleccionadas únicamente cuando se confirma la venta, manteniendo las opciones como alternativas independientes en etapa de borrador.
