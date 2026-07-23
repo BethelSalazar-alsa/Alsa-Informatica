@@ -36,7 +36,7 @@
             <t t-foreach="docs" t-as="doc">
                 <t t-call="web.basic_layout">
 
-                    <!-- ESTILOS FIDEDIGNOS FORMATO CONTPAQI ALSA -->
+                    <!-- ESTILOS FIDEDIGNOS FORMATO CONTPAQI ALSA (LETRA MÁS GRANDE Y LEGIBLE) -->
                     <style>
                         * {
                             box-sizing: border-box;
@@ -44,8 +44,8 @@
                         .contpaqi-page {
                             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
                             color: #222;
-                            font-size: 9.5pt;
-                            line-height: 1.35;
+                            font-size: 11pt;
+                            line-height: 1.4;
                         }
                         .header-table {
                             width: 100%;
@@ -53,53 +53,53 @@
                             margin-bottom: 12px;
                         }
                         .company-right-info {
-                            font-size: 8.5pt !important;
+                            font-size: 10.5pt !important;
                             color: #333;
-                            line-height: 1.3;
+                            line-height: 1.35;
                             text-align: right;
                         }
                         .company-title-bold {
-                            font-size: 10pt !important;
+                            font-size: 12pt !important;
                             font-weight: bold;
                             color: #002060;
                             text-transform: uppercase;
                         }
                         .client-section {
-                            font-size: 9pt !important;
-                            line-height: 1.35;
-                            margin-bottom: 12px;
+                            font-size: 11pt !important;
+                            line-height: 1.4;
+                            margin-bottom: 14px;
                             color: #111;
                         }
                         .client-title-name {
-                            font-size: 10.5pt !important;
+                            font-size: 13pt !important;
                             font-weight: bold;
                             color: #000;
                         }
                         .quote-title {
-                            font-size: 15pt !important;
+                            font-size: 17pt !important;
                             font-weight: bold;
                             color: #002060;
-                            margin-bottom: 8px;
+                            margin-bottom: 10px;
                         }
                         .obs-container {
-                            font-size: 8.5pt !important;
+                            font-size: 10.5pt !important;
                             color: #222;
-                            margin-bottom: 12px;
-                            line-height: 1.35;
+                            margin-bottom: 14px;
+                            line-height: 1.4;
                         }
                         .obs-container ul {
-                            margin: 2px 0 4px 16px;
+                            margin: 4px 0 6px 18px;
                             padding: 0;
                         }
                         .obs-important-note {
                             font-weight: normal;
-                            margin-top: 4px;
+                            margin-top: 6px;
                         }
                         .meta-bar {
                             background-color: #eef2f6;
                             border-radius: 4px;
-                            padding: 6px 12px;
-                            margin-bottom: 14px;
+                            padding: 8px 14px;
+                            margin-bottom: 16px;
                             width: 100%;
                         }
                         .meta-table {
@@ -107,55 +107,55 @@
                             border-collapse: collapse;
                         }
                         .meta-label {
-                            font-size: 8.5pt !important;
+                            font-size: 10.5pt !important;
                             font-weight: bold;
                             color: #111;
                         }
                         .meta-val {
-                            font-size: 9pt !important;
+                            font-size: 11pt !important;
                             color: #222;
                         }
                         .items-table {
                             width: 100%;
                             border-collapse: collapse;
-                            margin-bottom: 12px;
+                            margin-bottom: 14px;
                         }
                         .items-table th {
                             border-bottom: 1.5px solid #222;
                             border-top: 1.5px solid #222;
-                            font-size: 9pt !important;
-                            font-weight: normal;
+                            font-size: 11pt !important;
+                            font-weight: bold;
                             color: #111;
-                            padding: 5px 4px;
+                            padding: 6px 5px;
                         }
                         .items-table td {
-                            padding: 6px 4px;
-                            font-size: 8.5pt !important;
+                            padding: 7px 5px;
+                            font-size: 10.5pt !important;
                             vertical-align: top;
                             border-bottom: 1px solid #f0f0f0;
                         }
                         .totals-table {
-                            width: 320px;
+                            width: 340px;
                             float: right;
                             border-collapse: collapse;
-                            margin-bottom: 16px;
+                            margin-bottom: 18px;
                         }
                         .totals-table td {
-                            padding: 4px 6px;
-                            font-size: 9pt !important;
+                            padding: 5px 8px;
+                            font-size: 11pt !important;
                         }
                         .total-grand-row td {
-                            font-size: 10pt !important;
+                            font-size: 13pt !important;
                             font-weight: bold;
                             color: #002060;
-                            border-top: 1px solid #ccc;
+                            border-top: 1.5px solid #ccc;
                         }
                         .privacy-notice {
-                            font-size: 8pt !important;
+                            font-size: 10pt !important;
                             color: #333;
                             clear: both;
-                            margin-top: 15px;
-                            margin-bottom: 10px;
+                            margin-top: 18px;
+                            margin-bottom: 12px;
                         }
                         .privacy-notice a {
                             color: #002060;
@@ -168,58 +168,59 @@
                             width: 100%;
                             background-color: #eef2f6;
                             border-radius: 6px 6px 0 0;
-                            padding: 6px 8px 4px 8px;
+                            padding: 8px 10px 6px 10px;
                             text-align: center;
-                            font-size: 7.5pt !important;
+                            font-size: 9pt !important;
                             color: #111;
                         }
                         .bank-title-main {
                             font-weight: bold;
-                            font-size: 8pt !important;
+                            font-size: 11pt !important;
                             color: #000;
-                            margin-bottom: 2px;
+                            margin-bottom: 3px;
                         }
                         .bank-beneficiary {
-                            font-size: 7.5pt !important;
-                            margin-bottom: 4px;
+                            font-size: 9.5pt !important;
+                            margin-bottom: 6px;
                         }
                         .bank-grid-table {
                             width: 100%;
                             border-collapse: collapse;
-                            margin-bottom: 4px;
+                            margin-bottom: 6px;
                         }
                         .bank-grid-table td {
                             width: 25%;
                             vertical-align: top;
                             text-align: center;
-                            padding: 2px 4px;
-                            font-size: 7.5pt !important;
-                            line-height: 1.2;
+                            padding: 3px 4px;
+                            font-size: 9pt !important;
+                            line-height: 1.25;
                         }
                         .bank-name-header {
                             font-weight: bold;
+                            font-size: 9.5pt !important;
                             color: #000;
                             text-transform: uppercase;
                         }
                         .bank-note-blue {
                             color: #002060;
                             font-weight: bold;
-                            font-size: 7.5pt !important;
-                            margin-top: 2px;
+                            font-size: 9.5pt !important;
+                            margin-top: 4px;
                         }
                         .thanks-text {
                             color: #002060;
                             font-weight: bold;
-                            font-size: 7.5pt !important;
-                            margin-top: 1px;
+                            font-size: 9.5pt !important;
+                            margin-top: 2px;
                         }
                         .regimen-bottom-line {
                             text-align: center;
-                            font-size: 7.5pt !important;
+                            font-size: 9pt !important;
                             color: #333;
                             border-top: 1px solid #ddd;
-                            padding-top: 3px;
-                            margin-top: 3px;
+                            padding-top: 4px;
+                            margin-top: 4px;
                         }
                     </style>
 
@@ -354,15 +355,17 @@
                                             </td>
                                             <td style="text-align: right;">
                                                 <span t-field="line.product_uom_qty" t-options='{"widget": "float", "precision": 2}'/>
-                                                <div style="font-size: 7.5pt; color: #555;" t-if="line.product_uom">
-                                                    <span t-field="line.product_uom.name"/>
+                                                <t t-set="uom_obj" t-value="getattr(line, 'product_uom_id', False) or getattr(line, 'product_uom', False)"/>
+                                                <div style="font-size: 7.5pt; color: #555;" t-if="uom_obj">
+                                                    <span t-out="uom_obj.name"/>
                                                 </div>
                                             </td>
                                             <td style="text-align: right;">
                                                 <span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
                                             </td>
                                             <td style="text-align: right;">
-                                                <span t-out="', '.join(map(lambda x: (x.description or x.name), line.tax_id)) if line.tax_id else 'IVA(16%)'"/>
+                                                <t t-set="taxes_obj" t-value="getattr(line, 'tax_id', False) or getattr(line, 'tax_ids', False)"/>
+                                                <span t-out="', '.join(map(lambda x: (x.description or x.name), taxes_obj)) if taxes_obj else 'IVA(16%)'"/>
                                             </td>
                                             <td style="text-align: right; font-weight: bold;">
                                                 <span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
