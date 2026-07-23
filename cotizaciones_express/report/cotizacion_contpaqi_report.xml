@@ -1,0 +1,420 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Formato Carta CONTPAQi (US Letter: 216mm x 279mm) -->
+    <record id="paperformat_cotizacion_contpaqi" model="report.paperformat">
+        <field name="name">Carta CONTPAQi (Cotizaciones Express)</field>
+        <field name="default" eval="False"/>
+        <field name="format">custom</field>
+        <field name="page_width">216</field>
+        <field name="page_height">279</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">12</field>
+        <field name="margin_bottom">28</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">10</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Acción de Reporte CONTPAQi -->
+    <record id="report_cotizacion_contpaqi" model="ir.actions.report">
+        <field name="name">Cotización Formato CONTPAQi</field>
+        <field name="model">cotizacion.express</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">cotizaciones_express.cotizacion_contpaqi_template</field>
+        <field name="report_file">cotizaciones_express.cotizacion_contpaqi_template</field>
+        <field name="print_report_name">'Cotizacion_CONTPAQi_' + (object.name or '')</field>
+        <field name="paperformat_id" ref="paperformat_cotizacion_contpaqi"/>
+    </record>
+
+    <!-- Plantilla de Reporte CONTPAQi -->
+    <template id="cotizacion_contpaqi_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.basic_layout">
+
+                    <!-- ESTILOS EXCLUSIVOS FORMATO CONTPAQI -->
+                    <style>
+                        * {
+                            box-sizing: border-box;
+                        }
+                        .contpaqi-container {
+                            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+                            color: #222;
+                            font-size: 10pt;
+                            line-height: 1.35;
+                        }
+                        .header-contpaqi {
+                            border-bottom: 2px solid #1C355E;
+                            padding-bottom: 6px;
+                            margin-bottom: 8px;
+                        }
+                        .company-title {
+                            font-size: 11pt !important;
+                            font-weight: bold;
+                            color: #1C355E;
+                            text-transform: uppercase;
+                        }
+                        .company-info {
+                            font-size: 8.5pt !important;
+                            color: #444;
+                            line-height: 1.25;
+                        }
+                        .quote-badge {
+                            background: #f1f4f9;
+                            border: 1px solid #1C355E;
+                            border-radius: 4px;
+                            padding: 4px 8px;
+                            text-align: center;
+                            display: inline-block;
+                        }
+                        .quote-number {
+                            font-size: 9.5pt !important;
+                            font-weight: bold;
+                            color: #1C355E;
+                            letter-spacing: 0.5px;
+                        }
+                        .client-box {
+                            background: #fafbfc;
+                            border: 1px solid #dcdfe6;
+                            border-radius: 5px;
+                            padding: 8px 12px;
+                            margin-bottom: 8px;
+                        }
+                        .client-name {
+                            font-size: 11.5pt !important;
+                            font-weight: bold;
+                            color: #1C355E;
+                            text-transform: uppercase;
+                            margin-bottom: 3px;
+                        }
+                        .client-details {
+                            font-size: 9.5pt !important;
+                            color: #333;
+                        }
+                        .contact-badge {
+                            font-size: 9pt !important;
+                            color: #1C355E;
+                            font-weight: bold;
+                        }
+                        .table-contpaqi {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 8px;
+                        }
+                        .table-contpaqi th {
+                            background-color: #1C355E;
+                            color: #ffffff;
+                            font-size: 8.5pt !important;
+                            font-weight: bold;
+                            text-transform: uppercase;
+                            padding: 5px 6px;
+                            border: 1px solid #1C355E;
+                        }
+                        .table-contpaqi td {
+                            padding: 4px 6px;
+                            font-size: 9pt !important;
+                            border-bottom: 1px solid #e2e8f0;
+                            vertical-align: top;
+                        }
+                        .option-header-row td {
+                            background-color: #edf2f7;
+                            font-weight: bold;
+                            color: #1C355E;
+                            font-size: 9.5pt !important;
+                            text-transform: uppercase;
+                            border-bottom: 1.5px solid #cbd5e0;
+                        }
+                        .obs-box {
+                            border: 1px dashed #a0aec0;
+                            background-color: #fffdf5;
+                            border-radius: 4px;
+                            padding: 6px 10px;
+                            font-size: 8.5pt !important;
+                            margin-bottom: 8px;
+                        }
+                        .footer-contpaqi {
+                            font-size: 8pt !important;
+                            color: #333;
+                            border-top: 1.5px solid #1C355E;
+                            padding-top: 4px;
+                            text-align: center;
+                        }
+                        .bank-box {
+                            background: #f7fafc;
+                            border: 1px solid #cbd5e0;
+                            border-radius: 4px;
+                            padding: 4px 8px;
+                            margin-bottom: 4px;
+                            font-size: 8pt !important;
+                        }
+                    </style>
+
+                    <div class="contpaqi-container page">
+
+                        <!-- 1. ENCABEZADO: DATOS DE LA EMPRESA VENDEDORA + NUMERO COTIZACIÓN -->
+                        <div class="header-contpaqi">
+                            <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                                <tr>
+                                    <!-- LOGO Y DATOS DE ALSA INFORMÁTICA -->
+                                    <td style="width: 60%; vertical-align: top;">
+                                        <table style="width: 100%; border-collapse: collapse;">
+                                            <tr>
+                                                <td style="width: 120px; vertical-align: top; padding-right: 8px;">
+                                                    <img t-if="doc.company_id.logo" t-att-src="image_data_uri(doc.company_id.logo)"
+                                                        style="max-height: 50px; max-width: 110px;" alt="Logo Empresa" />
+                                                </td>
+                                                <td style="vertical-align: top;" class="company-info">
+                                                    <div class="company-title">
+                                                        <span t-field="doc.company_id.name"/>
+                                                    </div>
+                                                    <div>
+                                                        <strong>RFC:</strong> <span t-esc="doc.company_id.vat or 'CIA080101XXX'"/> &amp;bull; 
+                                                        <strong>Régimen Fiscal:</strong> 601 - General de Ley Personas Morales
+                                                    </div>
+                                                    <div>
+                                                        Av. Manuel J. Clouthier 182-C Col. El Ángel, C.P. 28979. Villa de Álvarez, Colima
+                                                    </div>
+                                                    <div>
+                                                        <strong>Conmutador:</strong> 312 311 23 25 &amp;bull; <strong>WhatsApp Ventas:</strong> 312 120 26 45
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+
+                                    <!-- TITULO, FOLIO Y FECHA -->
+                                    <td style="width: 40%; text-align: right; vertical-align: top;">
+                                        <div style="font-size: 13pt !important; font-weight: bold; color: #1C355E; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px;">
+                                            COTIZACIÓN COMERCIAL
+                                        </div>
+                                        <div class="quote-badge" style="margin-bottom: 4px;">
+                                            <span style="font-size: 8pt; text-transform: uppercase; color: #666; display: block;">FOLIO / NÚMERO</span>
+                                            <span class="quote-number" t-field="doc.name"/>
+                                        </div>
+                                        <div style="font-size: 8.5pt !important; color: #444; margin-top: 2px;">
+                                            <strong>Fecha de Emisión:</strong> 
+                                            <span t-esc="doc.city or 'Colima'"/>, <span t-esc="doc.state_location or 'Col.'"/> a 
+                                            <t t-if="doc.date">
+                                                <t t-esc="doc.date.strftime('%d')"/> de
+                                                <t t-set="months" t-value="['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']"/>
+                                                <t t-esc="months[int(doc.date.strftime('%m'))-1]"/> de
+                                                <t t-esc="doc.date.strftime('%Y')"/>
+                                            </t>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- 2. DATOS DEL CLIENTE Y CONTACTO -->
+                        <div class="client-box">
+                            <table style="width: 100%; border-collapse: collapse;">
+                                <tr>
+                                    <!-- INFORMACIÓN DEL CLIENTE (MÁS GRANDE Y CLARA) -->
+                                    <td style="width: 60%; vertical-align: top; padding-right: 10px;">
+                                        <div style="font-size: 8pt !important; text-transform: uppercase; color: #718096; font-weight: bold; letter-spacing: 0.5px;">DATOS DEL CLIENTE</div>
+                                        <div class="client-name">
+                                            <span t-if="doc.partner_id.parent_id" t-field="doc.partner_id.parent_id.name"/>
+                                            <span t-else="" t-field="doc.partner_id.name"/>
+                                        </div>
+                                        <div class="client-details">
+                                            <t t-if="doc.partner_id.vat">
+                                                <strong>RFC:</strong> <span t-field="doc.partner_id.vat"/> &amp;bull; 
+                                            </t>
+                                            <t t-if="doc.partner_id.street">
+                                                <strong>Dirección:</strong> <span t-field="doc.partner_id.street"/>
+                                                <span t-if="doc.partner_id.street2">, <span t-field="doc.partner_id.street2"/></span>
+                                                <span t-if="doc.partner_id.zip">, C.P. <span t-field="doc.partner_id.zip"/></span>
+                                                <span t-if="doc.partner_id.city">, <span t-field="doc.partner_id.city"/></span>
+                                            </t>
+                                        </div>
+                                    </td>
+
+                                    <!-- PERSONA DE CONTACTO Y EJECUTIVO DE VENTAS -->
+                                    <td style="width: 40%; vertical-align: top; border-left: 1px solid #e2e8f0; padding-left: 10px;">
+                                        <div style="font-size: 8pt !important; text-transform: uppercase; color: #718096; font-weight: bold; letter-spacing: 0.5px;">ATENCIÓN / CONTACTO</div>
+                                        <div style="font-size: 9.5pt !important; font-weight: bold; color: #2d3748; margin-bottom: 2px;">
+                                            <t t-if="doc.partner_id.parent_id">
+                                                <span t-field="doc.partner_id.name"/>
+                                            </t>
+                                            <t t-elif="doc.partner_id.child_ids">
+                                                <span t-field="doc.partner_id.child_ids[0].name"/>
+                                            </t>
+                                            <t t-else="">
+                                                <span t-field="doc.partner_name"/>
+                                            </t>
+                                        </div>
+                                        <div style="font-size: 8.5pt !important; color: #4a5568;">
+                                            <t t-if="doc.partner_phone">
+                                                <strong>Teléfono:</strong> <span t-esc="doc.partner_phone"/><br/>
+                                            </t>
+                                            <t t-if="doc.partner_email">
+                                                <strong>Email:</strong> <span t-esc="doc.partner_email"/><br/>
+                                            </t>
+                                            <strong>Atendido por:</strong> <span t-field="doc.user_id.name"/> (<span t-field="doc.user_id.email"/>)
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- 3. TABLA DE CONCEPTOS / PRODUCTOS (FORMATO CONTPAQi) -->
+                        <table class="table-contpaqi">
+                            <thead>
+                                <tr>
+                                    <th style="width: 8%; text-align: center;">CANT.</th>
+                                    <th style="width: 44%; text-align: left;">CONCEPTO / DESCRIPCIÓN</th>
+                                    <th style="width: 14%; text-align: right;">P. UNITARIO</th>
+                                    <th style="width: 9%; text-align: right;">DESC %</th>
+                                    <th style="width: 11%; text-align: right;">IVA (16%)</th>
+                                    <th style="width: 14%; text-align: right;">IMPORTE TOTAL</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-set="selected_opts" t-value="doc.option_ids.filtered(lambda o: o.selected)"/>
+                                <t t-foreach="selected_opts if doc.state == 'confirmed' else doc.option_ids" t-as="option">
+                                    
+                                    <!-- Encabezado de Opción / Paquete -->
+                                    <tr class="option-header-row">
+                                        <td colspan="6">
+                                            <span t-field="option.name"/>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Descripción General de la Opción -->
+                                    <tr t-if="option.description" style="border: none;">
+                                        <td colspan="6" style="padding: 3px 6px; font-size: 8.5pt !important; color: #4a5568; background-color: #fcfcfc;">
+                                            <span t-field="option.description"/>
+                                        </td>
+                                    </tr>
+
+                                    <!-- Productos de la Opción -->
+                                    <t t-foreach="option.line_ids" t-as="line">
+                                        <tr style="page-break-inside: avoid;">
+                                            <td style="text-align: center; font-weight: bold;">
+                                                <span t-field="line.quantity" t-options='{"widget": "integer"}'/>
+                                            </td>
+                                            <td style="text-align: left;">
+                                                <strong style="color: #1a202c;"><span t-field="line.name"/></strong>
+                                                <div t-if="line.description" style="font-size: 8pt !important; color: #718096; margin-top: 1px;">
+                                                    <span t-field="line.description"/>
+                                                </div>
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                            </td>
+                                            <td style="text-align: right; color: #718096;">
+                                                <span t-if="line.discount &gt; 0"><span t-out="int(line.discount) if line.discount.is_integer() else line.discount"/>%</span>
+                                                <span t-else="">-</span>
+                                            </td>
+                                            <td style="text-align: right; color: #718096;">
+                                                <span t-field="line.iva_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                            </td>
+                                            <td style="text-align: right; font-weight: bold; color: #1a202c;">
+                                                <span t-field="line.total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </t>
+
+                                    <!-- Subtotales por Opción -->
+                                    <tr style="page-break-inside: avoid;">
+                                        <td colspan="4" style="border: none;"/>
+                                        <td style="text-align: right; font-size: 8.5pt !important; color: #718096; border-top: 1px solid #cbd5e0;">Subtotal:</td>
+                                        <td style="text-align: right; font-size: 8.5pt !important; color: #4a5568; border-top: 1px solid #cbd5e0;">
+                                            <span t-field="option.subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr style="page-break-inside: avoid;">
+                                        <td colspan="4" style="border: none;"/>
+                                        <td style="text-align: right; font-size: 8.5pt !important; color: #718096; border: none;">IVA (16%):</td>
+                                        <td style="text-align: right; font-size: 8.5pt !important; color: #4a5568; border: none;">
+                                            <span t-field="option.iva_total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                    <tr style="page-break-inside: avoid;">
+                                        <td colspan="4" style="border: none;"/>
+                                        <td style="text-align: right; font-size: 9.5pt !important; font-weight: bold; color: #1C355E; border-top: 1.5px solid #1C355E;">TOTAL:</td>
+                                        <td style="text-align: right; font-size: 9.5pt !important; font-weight: bold; color: #1C355E; border-top: 1.5px solid #1C355E;">
+                                            <span t-field="option.total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- 4. OBSERVACIONES Y CONDICIONES COMERCIALES -->
+                        <div class="obs-box" style="page-break-inside: avoid;">
+                            <div style="font-weight: bold; text-transform: uppercase; color: #1C355E; margin-bottom: 2px; font-size: 8.5pt !important;">
+                                OBSERVACIONES Y CONDICIONES COMERCIALES
+                            </div>
+                            <t t-if="doc.notes">
+                                <t t-out="doc.notes"/>
+                            </t>
+                            <t t-else="">
+                                <div style="color: #4a5568;">
+                                    1. Precios expresados en moneda nacional e incluyen IVA (16%).<br/>
+                                    2. Vigencia de la cotización: 10 días naturales a partir de la fecha de emisión.<br/>
+                                    3. Tiempo de entrega: 2 a 3 días hábiles sujeto a disponibilidad de inventario.<br/>
+                                    4. Forma de Pago: Contado anticipado para iniciar la orden de servicio/pedido.
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- 5. FIRMA DEL CONSULTOR DE VENTAS -->
+                        <div style="text-align: center; width: 100%; margin-top: 8px; page-break-inside: avoid;">
+                            <div style="display: inline-block; text-align: center; min-width: 260px; max-width: 380px;">
+                                <span style="font-weight: bold; text-transform: uppercase; font-size: 8.5pt !important; letter-spacing: 1px; color: #2d3748; display: block; margin-bottom: 4px;">
+                                    ATENTAMENTE
+                                </span>
+                                <div style="height: 35px; position: relative; text-align: center;">
+                                    <t t-if="doc.signature_id and doc.signature_id.signature_image">
+                                        <img t-attf-src="/web/image/seller.signature/{{ doc.signature_id.id }}/signature_image"
+                                            style="position: absolute; top: -12px; left: 50%; margin-left: -70px; width: 140px; max-height: 70px; z-index: 10;" />
+                                    </t>
+                                </div>
+                                <div style="border-top: 1px solid #1a202c; padding-top: 2px;">
+                                    <strong style="text-transform: uppercase; font-size: 9pt !important; display: block;" t-field="doc.user_id.name"/>
+                                    <span style="font-size: 8pt !important; color: #1C355E; font-weight: bold; text-transform: uppercase; display: block;">
+                                        CONSULTORÍA EN INFORMÁTICA ALSA S.A. DE C.V.
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- 6. PIE DE PÁGINA (DATOS BANCARIOS + RÉGIMEN FISCAL) -->
+                    <div class="footer footer-contpaqi">
+                        <!-- DATOS BANCARIOS -->
+                        <div class="bank-box">
+                            <table style="width: 100%; border-collapse: collapse; text-align: center;">
+                                <tr>
+                                    <td style="width: 33%; text-align: center; vertical-align: middle;">
+                                        <strong>BANCO:</strong> BBVA Bancomer
+                                    </td>
+                                    <td style="width: 34%; text-align: center; vertical-align: middle;">
+                                        <strong>CUENTA / CLABE:</strong> 012 090 00112345678 9
+                                    </td>
+                                    <td style="width: 33%; text-align: center; vertical-align: middle;">
+                                        <strong>BENEFICIARIO:</strong> CONSULTORÍA EN INFORMÁTICA ALSA S.A. DE C.V.
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- RÉGIMEN FISCAL Y CONTACTO -->
+                        <div style="font-size: 8pt !important; color: #4a5568;">
+                            <strong>CONSULTORÍA EN INFORMÁTICA ALSA S.A. DE C.V.</strong> &amp;bull; 
+                            RFC: <span t-esc="doc.company_id.vat or 'CIA080101XXX'"/> &amp;bull; 
+                            Régimen Fiscal: 601 General de Ley Personas Morales<br/>
+                            alsainformatica.com.mx &amp;bull; contacto@alsainformatica.com.mx &amp;bull; Av. Manuel J. Clouthier 182-C, Col. El Ángel, C.P. 28979, Villa de Álvarez, Colima
+                        </div>
+                    </div>
+
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
