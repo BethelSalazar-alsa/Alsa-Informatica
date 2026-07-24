@@ -145,9 +145,8 @@
                                 </tbody>
                             </table>
 
-                            <!-- CONTENEDOR DE TOTALES Y CONDICIONES (Para evitar firma huérfana) -->
+                            <!-- Totales de la opción -->
                             <div style="page-break-inside: avoid; break-inside: avoid; margin-top: 4px;">
-                                <!-- Totales de la opción -->
                                 <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px; table-layout: fixed !important;">
                                     <tbody>
                                         <t t-if="option.discount_total &gt; 0">
@@ -198,11 +197,13 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                            </div>
 
-                                <!-- Si es la última opción, pintar el total combinado, notas y firma -->
-                                <t t-if="option_last">
-                                    <!-- TOTAL COMBINADO DE OPCIONES -->
-                                    <t t-if="doc.state == 'confirmed' and len(selected_opts) &gt; 1">
+                            <!-- Si es la última opción, pintar el total combinado, notas y firma -->
+                            <t t-if="option_last">
+                                <!-- TOTAL COMBINADO DE OPCIONES -->
+                                <t t-if="doc.state == 'confirmed' and len(selected_opts) &gt; 1">
+                                    <div style="page-break-inside: avoid; break-inside: avoid; margin-top: 6px;">
                                         <table style="width: 100%; border-collapse: collapse; margin-bottom: 8px; table-layout: fixed !important;">
                                             <tbody>
                                                 <tr style="border: none;">
@@ -215,50 +216,50 @@
                                                 </tr>
                                             </tbody>
                                         </table>
-                                    </t>
+                                    </div>
+                                </t>
 
-                                    <!-- CONDICIONES COMERCIALES / NOTAS -->
-                                    <div style="margin-bottom: 12px; margin-top: 6px;">
-                                        <t t-if="doc.notes">
-                                            <t t-out="doc.notes"/>
-                                        </t>
-                                        <t t-else="">
-                                            <p style="margin: 0; font-size: 11pt !important;">1.- Los precios incluyen IVA y son válidos por 10 días y/o agotar existencias.</p>
-                                            <p style="margin: 0; font-size: 11pt !important;">2.- Tiempo de entrega: 2 - 3 días contra confirmación del pedido.</p>
-                                            <p style="margin: 0; font-size: 11pt !important;">3.- Forma de pago: Contado anticipado para ordenar.</p>
-                                        </t>
+                                <!-- CONDICIONES COMERCIALES / NOTAS -->
+                                <div style="margin-bottom: 10px; margin-top: 4px; page-break-inside: avoid; break-inside: avoid;">
+                                    <t t-if="doc.notes">
+                                        <t t-out="doc.notes"/>
+                                    </t>
+                                    <t t-else="">
+                                        <p style="margin: 0; font-size: 11pt !important;">1.- Los precios incluyen IVA y son válidos por 10 días y/o agotar existencias.</p>
+                                        <p style="margin: 0; font-size: 11pt !important;">2.- Tiempo de entrega: 2 - 3 días contra confirmación del pedido.</p>
+                                        <p style="margin: 0; font-size: 11pt !important;">3.- Forma de pago: Contado anticipado para ordenar.</p>
+                                    </t>
+                                </div>
+
+                                <!-- DESPEDIDA Y BLOQUE DE FIRMA -->
+                                <div style="margin-top: 6px; page-break-inside: avoid; break-inside: avoid;">
+                                    <div style="text-align: left; margin-bottom: 8px; font-size: 11pt !important; line-height: 1.3; color: #000;">
+                                        Sin más por el momento y a sus órdenes para cualquier duda ó aclaración, se despide de usted su S.S.
                                     </div>
 
-                                    <!-- DESPEDIDA Y BLOQUE DE FIRMA -->
-                                    <div style="margin-top: 8px;">
-                                        <div style="text-align: left; margin-bottom: 14px; font-size: 11pt !important; line-height: 1.3; color: #000;">
-                                            Sin más por el momento y a sus órdenes para cualquier duda ó aclaración, se despide de usted su S.S.
-                                        </div>
+                                    <div style="text-align: center; width: 100%;">
+                                        <div style="margin: 0 auto; width: 340px; text-align: center; page-break-inside: avoid; break-inside: avoid;">
+                                            <span style="font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; font-size: 11pt !important; letter-spacing: 1.5px; color: #000;">ATENTAMENTE</span>
 
-                                        <div style="text-align: center; width: 100%;">
-                                            <div style="display: inline-block; text-align: center; min-width: 280px; max-width: 440px;">
-                                                <span style="font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; font-size: 11pt !important; letter-spacing: 1.5px; color: #000;">ATENTAMENTE</span>
+                                            <!-- Imagen de firma -->
+                                            <div style="height: 50px; position: relative; text-align: center; margin-bottom: 0px;">
+                                                <t t-if="doc.signature_id and doc.signature_id.signature_image">
+                                                    <img t-attf-src="/web/image/seller.signature/{{ doc.signature_id.id }}/signature_image"
+                                                        style="position: absolute; top: -30px; left: 50%; margin-left: -100px; width: 200px; max-height: 100px; z-index: 10; pointer-events: none; object-fit: contain;" />
+                                                </t>
+                                                <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height: 50px;" />
+                                            </div>
 
-                                                <!-- Imagen de firma -->
-                                                <div style="height: 55px; position: relative; text-align: center; margin-bottom: 0px;">
-                                                    <t t-if="doc.signature_id and doc.signature_id.signature_image">
-                                                        <img t-attf-src="/web/image/seller.signature/{{ doc.signature_id.id }}/signature_image"
-                                                            style="position: absolute; top: -35px; left: 50%; margin-left: -150px; width: 300px; max-height: 170px; z-index: 10; pointer-events: none; object-fit: contain;" />
-                                                    </t>
-                                                    <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height: 55px;" />
-                                                </div>
-
-                                                <!-- Línea y nombre del vendedor -->
-                                                <div style="border-top: 1.5px solid #000; padding-top: 4px; margin-top: 2px;">
-                                                    <span t-field="doc.user_id.name"
-                                                        style="font-weight: bold; text-transform: uppercase; display: block; font-size: 11pt !important; color: #000;" />
-                                                    <span style="font-size: 11pt !important; display: block; color: #1C355E; margin-top: 2px; font-weight: bold; text-transform: uppercase;">CONSULTORÍA EN INFORMÁTICA ALSA</span>
-                                                </div>
+                                            <!-- Línea y nombre del vendedor -->
+                                            <div style="border-top: 1.5px solid #000; padding-top: 4px; margin-top: 2px;">
+                                                <span t-field="doc.user_id.name"
+                                                    style="font-weight: bold; text-transform: uppercase; display: block; font-size: 11pt !important; color: #000;" />
+                                                <span style="font-size: 11pt !important; display: block; color: #1C355E; margin-top: 2px; font-weight: bold; text-transform: uppercase;">CONSULTORÍA EN INFORMÁTICA ALSA</span>
                                             </div>
                                         </div>
                                     </div>
-                                </t>
-                            </div>
+                                </div>
+                            </t>
                         </t>
                     </div>
 

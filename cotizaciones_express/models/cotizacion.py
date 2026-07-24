@@ -185,6 +185,46 @@ class CotizacionExpress(models.Model):
         res = super(CotizacionExpress, self).write(vals)
         return res
 
+    @api.returns('self', lambda value: value.id)
+    def copy(self, default=None):
+        self.ensure_one()
+        default = dict(default or {})
+        
+        seq_name = self.env['ir.sequence'].next_by_code('cotizacion.express') or 'Nueva'
+        for prefix in ['COT-', 'COT', 'cot-', 'cot']:
+            if seq_name.startswith(prefix):
+                seq_name = seq_name[len(prefix):]
+        import datetime
+        import re
+        year_suffix = f"-{str(datetime.date.today().year)[-2:]}"
+        if not re.search(r'-\d{2}$', seq_name):
+            seq_name = f"{seq_name}{year_suffix}"
+        default['name'] = seq_name
+        
+        copied_options = []
+        for option in self.option_ids:
+            copied_lines = []
+            for line in option.line_ids:
+                copied_lines.append((0, 0, {
+                    'name': line.name,
+                    'description': line.description,
+                    'quantity': line.quantity,
+                    'price_unit': line.price_unit,
+                    'iva_percent': line.iva_percent,
+                    'discount': line.discount,
+                    'sequence': line.sequence,
+                }))
+            copied_options.append((0, 0, {
+                'name': option.name,
+                'description': option.description,
+                'selected': option.selected,
+                'sequence': option.sequence,
+                'discount_general': option.discount_general,
+                'line_ids': copied_lines,
+            }))
+        default['option_ids'] = copied_options
+        return super(CotizacionExpress, self).copy(default=default)
+
     def action_send_to_client(self):
         self.ensure_one()
         self.state = 'sent'
