@@ -321,6 +321,9 @@ class CotizacionExpressOption(models.Model):
     sequence = fields.Integer(string='Secuencia', default=10)
 
     discount_general = fields.Float(string='Descuento General %', default=0.0)
+    amount_lines_before_discount = fields.Monetary(string='Subtotal sin Descuento', compute='_compute_option_totals', store=True)
+    discount_lines_amount = fields.Monetary(string='Descuento en Líneas', compute='_compute_option_totals', store=True)
+    discount_total = fields.Monetary(string='Descuento Total', compute='_compute_option_totals', store=True)
     amount_lines_subtotal = fields.Monetary(string='Subtotal Líneas', compute='_compute_option_totals', store=True)
     amount_lines_iva = fields.Monetary(string='IVA Líneas', compute='_compute_option_totals', store=True)
     discount_general_amount = fields.Monetary(string='Monto Descuento General', compute='_compute_option_totals', store=True)
@@ -329,14 +332,18 @@ class CotizacionExpressOption(models.Model):
     total = fields.Monetary(string='Total', compute='_compute_option_totals', store=True)
     currency_id = fields.Many2one('res.currency', related='cotizacion_id.currency_id')
 
-    @api.depends('line_ids.subtotal', 'line_ids.iva_amount', 'discount_general')
+    @api.depends('line_ids.subtotal', 'line_ids.iva_amount', 'line_ids.price_unit', 'line_ids.quantity', 'discount_general')
     def _compute_option_totals(self):
         for rec in self:
+            lines_before_discount = sum(line.price_unit * line.quantity for line in rec.line_ids)
+            rec.amount_lines_before_discount = lines_before_discount
             rec.amount_lines_subtotal = sum(rec.line_ids.mapped('subtotal'))
+            rec.discount_lines_amount = lines_before_discount - rec.amount_lines_subtotal
             rec.amount_lines_iva = sum(rec.line_ids.mapped('iva_amount'))
             rec.discount_general_amount = rec.amount_lines_subtotal * (rec.discount_general / 100.0)
             rec.subtotal = rec.amount_lines_subtotal - rec.discount_general_amount
             rec.iva_total = rec.amount_lines_iva * (1.0 - rec.discount_general / 100.0)
+            rec.discount_total = rec.discount_lines_amount + rec.discount_general_amount
             rec.total = rec.subtotal + rec.iva_total
 
     def action_duplicate(self):

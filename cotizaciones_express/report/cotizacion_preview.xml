@@ -103,10 +103,9 @@
                             <thead>
                                 <tr style="text-transform: uppercase; font-weight: bold; font-size: 11pt !important;">
                                     <th style="width: 8%; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; border-left: none; border-right: none; padding: 6px 0; text-align: center; font-size: 11pt !important;">CANT.</th>
-                                    <th style="width: 46%; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; border-left: none; border-right: none; padding: 6px 8px; text-align: left; font-size: 11pt !important;">DESCRIPCIÓN</th>
-                                    <th style="width: 18%; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; border-left: none; border-right: none; padding: 6px 10px 6px 0; text-align: right; font-size: 11pt !important;">P. UNITARIO</th>
-                                    <th style="width: 12%; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; border-left: none; border-right: none; padding: 6px 10px 6px 0; text-align: right; font-size: 11pt !important;">DESC. %</th>
-                                    <th style="width: 16%; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; border-left: none; border-right: none; padding: 6px 0; text-align: right; font-size: 11pt !important;">TOTAL C/IVA</th>
+                                    <th style="width: 58%; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; border-left: none; border-right: none; padding: 6px 8px; text-align: left; font-size: 11pt !important;">DESCRIPCIÓN</th>
+                                    <th style="width: 16%; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; border-left: none; border-right: none; padding: 6px 10px 6px 0; text-align: right; font-size: 11pt !important;">P. UNITARIO</th>
+                                    <th style="width: 18%; border-top: 1.5px solid #000; border-bottom: 1.5px solid #000; border-left: none; border-right: none; padding: 6px 0; text-align: right; font-size: 11pt !important;">IMPORTE</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -114,14 +113,14 @@
                                 <t t-foreach="selected_opts if doc.state == 'confirmed' else doc.option_ids" t-as="option">
                                     <!-- Nombre de la Opción como sección -->
                                     <tr style="border: none;">
-                                        <td colspan="5"
+                                        <td colspan="4"
                                             style="padding: 6px 0 2px 0; font-weight: bold; text-transform: uppercase; font-size: 11pt !important; text-align: left; border: none; color: #1C355E; border-bottom: 1px solid #dee2e6;">
                                             <span t-field="option.name" style="font-size: 11pt !important;" />
                                         </td>
                                     </tr>
                                     <!-- Descripción General de la Opción (Vendedor) -->
                                     <tr t-if="option.description" style="border: none;">
-                                        <td colspan="5" style="border: none; padding: 3px 4px; font-size: 11pt !important; color: #444; line-height: 1.3;">
+                                        <td colspan="4" style="border: none; padding: 3px 4px; font-size: 11pt !important; color: #444; line-height: 1.3;">
                                             <span t-field="option.description" style="font-size: 11pt !important;"/>
                                         </td>
                                     </tr>
@@ -131,7 +130,7 @@
                                             <td style="width: 8%; vertical-align: top; padding: 4px 0; font-weight: bold; text-align: center; border: none; font-size: 11pt !important;">
                                                 <span t-field="line.quantity" t-options='{"widget": "integer"}' style="font-size: 11pt !important;" />
                                             </td>
-                                            <td style="width: 46%; vertical-align: top; padding: 4px 8px; text-align: left; border: none; line-height: 1.3; font-size: 11pt !important;">
+                                            <td style="width: 58%; vertical-align: top; padding: 4px 8px; text-align: left; border: none; line-height: 1.3; font-size: 11pt !important;">
                                                 <span t-field="line.name" style="font-weight: bold; display: block; font-size: 11pt !important;"/>
                                                 <!-- Descripción HTML del producto -->
                                                 <div t-if="line.description"
@@ -139,37 +138,33 @@
                                                     <span t-field="line.description" style="font-size: 11pt !important;"/>
                                                 </div>
                                             </td>
-                                            <td style="width: 18%; vertical-align: top; padding: 4px 10px 4px 0; text-align: right; border: none; font-size: 11pt !important;">
-                                                <span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important;" />
+                                            <td style="width: 16%; vertical-align: top; padding: 4px 10px 4px 0; text-align: right; border: none; font-size: 11pt !important; font-weight: bold; color: #000;">
+                                                <span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important; font-weight: bold;"/>
                                             </td>
-                                            <td style="width: 12%; vertical-align: top; padding: 4px 10px 4px 0; text-align: right; border: none; font-size: 11pt !important; color: #444;">
-                                                <span t-if="line.discount &gt; 0" style="font-size: 11pt !important;"><span t-out="int(line.discount) if line.discount.is_integer() else line.discount" style="font-size: 11pt !important;"/>%</span>
-                                                <span t-else="" style="font-size: 11pt !important;">-</span>
-                                            </td>
-                                            <td style="width: 16%; vertical-align: top; padding: 4px 0; font-weight: bold; text-align: right; border: none; font-size: 11pt !important;">
+                                            <td style="width: 18%; vertical-align: top; padding: 4px 0; font-weight: bold; text-align: right; border: none; font-size: 11pt !important;">
                                                 <span t-field="line.total"
                                                     t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important;" />
                                             </td>
                                         </tr>
                                     </t>
                                     <!-- Subtotales por opción -->
-                                    <t t-if="option.discount_general &gt; 0">
+                                    <t t-if="option.discount_total &gt; 0">
                                         <tr style="border: none; page-break-inside: avoid;">
-                                            <td colspan="3" style="border: none; padding: 1px 0;"/>
-                                            <td style="border-top: 1px solid #eee; padding: 2px 0; text-align: right; font-size: 11pt !important; color: #666; border-left: none; border-right: none; border-bottom: none;">Subtotal Líneas:</td>
+                                            <td colspan="2" style="border: none; padding: 1px 0;"/>
+                                            <td style="border-top: 1px solid #eee; padding: 2px 0; text-align: right; font-size: 11pt !important; color: #666; border-left: none; border-right: none; border-bottom: none;">Subtotal sin Desc.:</td>
                                             <td style="border-top: 1px solid #eee; padding: 2px 0; text-align: right; font-size: 11pt !important; color: #666; border-left: none; border-right: none; border-bottom: none;">
-                                                <span t-field="option.amount_lines_subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important;" />
+                                                <span t-field="option.amount_lines_before_discount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important;" />
                                             </td>
                                         </tr>
                                         <tr style="border: none; page-break-inside: avoid;">
-                                            <td colspan="3" style="border: none; padding: 1px 0;"/>
-                                            <td style="padding: 2px 0; text-align: right; font-size: 11pt !important; color: #e04f4f; border: none;">Desc. General (<span t-out="int(option.discount_general) if option.discount_general.is_integer() else option.discount_general" style="font-size: 11pt !important;"/>%):</td>
+                                            <td colspan="2" style="border: none; padding: 1px 0;"/>
+                                            <td style="padding: 2px 0; text-align: right; font-size: 11pt !important; color: #e04f4f; border: none;">Descuento:</td>
                                             <td style="padding: 2px 0; text-align: right; font-size: 11pt !important; color: #e04f4f; border: none;">
-                                                -<span t-field="option.discount_general_amount" t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important;" />
+                                                -<span t-field="option.discount_total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important;" />
                                             </td>
                                         </tr>
                                         <tr style="border: none; page-break-inside: avoid;">
-                                            <td colspan="3" style="border: none; padding: 1px 0;"/>
+                                            <td colspan="2" style="border: none; padding: 1px 0;"/>
                                             <td style="padding: 2px 0; text-align: right; font-size: 11pt !important; color: #666; border: none;">Subtotal Neto:</td>
                                             <td style="padding: 2px 0; text-align: right; font-size: 11pt !important; color: #666; border: none;">
                                                 <span t-field="option.subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important;" />
@@ -178,7 +173,7 @@
                                     </t>
                                     <t t-else="">
                                         <tr style="border: none; page-break-inside: avoid;">
-                                            <td colspan="3" style="border: none; padding: 1px 0;"/>
+                                            <td colspan="2" style="border: none; padding: 1px 0;"/>
                                             <td style="border-top: 1px solid #eee; padding: 2px 0; text-align: right; font-size: 11pt !important; color: #666; border-left: none; border-right: none; border-bottom: none;">Subtotal:</td>
                                             <td style="border-top: 1px solid #eee; padding: 2px 0; text-align: right; font-size: 11pt !important; color: #666; border-left: none; border-right: none; border-bottom: none;">
                                                 <span t-field="option.subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important;" />
@@ -186,14 +181,14 @@
                                         </tr>
                                     </t>
                                     <tr style="border: none; page-break-inside: avoid;">
-                                        <td colspan="3" style="border: none; padding: 1px 0;"/>
+                                        <td colspan="2" style="border: none; padding: 1px 0;"/>
                                         <td style="padding: 2px 0; text-align: right; font-size: 11pt !important; color: #666; border: none;">IVA:</td>
                                         <td style="padding: 2px 0; text-align: right; font-size: 11pt !important; color: #666; border: none;">
                                             <span t-field="option.iva_total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important;" />
                                         </td>
                                     </tr>
                                     <tr style="border: none; page-break-inside: avoid;">
-                                        <td colspan="3" style="border: none; padding: 1px 0;"/>
+                                        <td colspan="2" style="border: none; padding: 1px 0;"/>
                                         <td style="border-top: 1.5px solid #000; padding: 3px 0; text-align: right; font-size: 11pt !important; font-weight: bold; color: #000; border-left: none; border-right: none; border-bottom: none;">Total:</td>
                                         <td style="border-top: 1.5px solid #000; padding: 3px 0; text-align: right; font-size: 11pt !important; font-weight: bold; color: #000; border-left: none; border-right: none; border-bottom: none;">
                                             <span t-field="option.total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important;" />
@@ -204,10 +199,10 @@
                                 <!-- TOTAL COMBINADO DE OPCIONES (Solo cuando se confirman y hay 2 o más opciones elegidas) -->
                                 <t t-if="doc.state == 'confirmed' and len(selected_opts) &gt; 1">
                                     <tr style="border: none; page-break-inside: avoid;">
-                                        <td colspan="5" style="padding: 8px 0 2px 0; border: none;"/>
+                                        <td colspan="4" style="padding: 8px 0 2px 0; border: none;"/>
                                     </tr>
                                     <tr style="border: none; page-break-inside: avoid;">
-                                        <td colspan="3" style="border-top: 2px solid #1C355E; border-bottom: 2px solid #1C355E; padding: 5px 4px; text-align: right; font-weight: bold; font-size: 11pt !important; color: #1C355E; text-transform: uppercase;">
+                                        <td colspan="2" style="border-top: 2px solid #1C355E; border-bottom: 2px solid #1C355E; padding: 5px 4px; text-align: right; font-weight: bold; font-size: 11pt !important; color: #1C355E; text-transform: uppercase;">
                                             TOTAL OPCIONES SELECCIONADAS:
                                         </td>
                                         <td colspan="2" style="border-top: 2px solid #1C355E; border-bottom: 2px solid #1C355E; padding: 5px 0; text-align: right; font-weight: bold; font-size: 11pt !important; color: #1C355E;">
@@ -218,12 +213,10 @@
                             </tbody>
                         </table>
 
-
-                        <!-- 4. CONDICIONES Y FIRMA -->
-                        <div style="margin-top: 10px; page-break-inside: avoid; break-inside: avoid;">
-
-                            <!-- CONDICIONES COMERCIALES -->
-                            <div style="font-size: 11pt !important; line-height: 1.4; text-align: left; margin-bottom: 8px; color: #333;">
+                        <div style="margin-top: 8px;">
+                            <!-- NOTAS / CONDICIONES COMERCIALES -->
+                            <div style="margin-bottom: 12px; page-break-inside: avoid; break-inside: avoid;">
+                                <strong style="color: #1C355E; display: block; border-bottom: 1px solid #1C355E; padding-bottom: 2px; margin-bottom: 4px; font-size: 11pt !important;">Condiciones Comerciales:</strong>
                                 <t t-if="doc.notes">
                                     <t t-out="doc.notes"/>
                                 </t>
@@ -246,12 +239,12 @@
                                         <span style="font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; font-size: 11pt !important; letter-spacing: 1.5px; color: #000;">ATENTAMENTE</span>
 
                                         <!-- Imagen de firma -->
-                                        <div style="height: 100px; position: relative; text-align: center; margin-bottom: 0px;">
+                                        <div style="height: 55px; position: relative; text-align: center; margin-bottom: 0px;">
                                             <t t-if="doc.signature_id and doc.signature_id.signature_image">
                                                 <img t-attf-src="/web/image/seller.signature/{{ doc.signature_id.id }}/signature_image"
                                                     style="position: absolute; top: -35px; left: 50%; margin-left: -150px; width: 300px; max-height: 170px; z-index: 10; pointer-events: none; object-fit: contain;" />
                                             </t>
-                                            <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height: 100px;" />
+                                            <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height: 55px;" />
                                         </div>
 
                                         <!-- Línea y nombre del vendedor -->
