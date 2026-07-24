@@ -185,10 +185,13 @@ class CotizacionExpress(models.Model):
         res = super(CotizacionExpress, self).write(vals)
         return res
 
-    @api.returns('self', lambda value: value.id)
     def copy(self, default=None):
         self.ensure_one()
         default = dict(default or {})
+        
+        # Resetear estado a borrador y etapa por defecto
+        default['state'] = 'draft'
+        default['stage_id'] = self._default_stage_id()
         
         seq_name = self.env['ir.sequence'].next_by_code('cotizacion.express') or 'Nueva'
         for prefix in ['COT-', 'COT', 'cot-', 'cot']:
