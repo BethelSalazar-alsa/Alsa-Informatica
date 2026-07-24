@@ -149,7 +149,12 @@ class CotizacionExpress(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if not vals.get('name') or vals.get('name') == 'Nueva':
-                vals['name'] = self.env['ir.sequence'].next_by_code('cotizacion.express') or 'Nueva'
+                seq_name = self.env['ir.sequence'].next_by_code('cotizacion.express') or 'Nueva'
+                # Eliminar prefijos antiguos como COT- o COT si la secuencia los tuviera
+                for prefix in ['COT-', 'COT', 'cot-', 'cot']:
+                    if seq_name.startswith(prefix):
+                        seq_name = seq_name[len(prefix):]
+                vals['name'] = seq_name
             if 'state' in vals and 'stage_id' not in vals:
                 stage = self.env['cotizacion.express.stage'].search([('state_type', '=', vals['state'])], limit=1)
                 if stage:
