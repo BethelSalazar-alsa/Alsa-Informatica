@@ -154,6 +154,12 @@ class CotizacionExpress(models.Model):
                 for prefix in ['COT-', 'COT', 'cot-', 'cot']:
                     if seq_name.startswith(prefix):
                         seq_name = seq_name[len(prefix):]
+                # Asegurar que termine en el año en curso (ej. -26 para 2026, -27 para 2027)
+                import datetime
+                import re
+                year_suffix = f"-{str(datetime.date.today().year)[-2:]}"
+                if not re.search(r'-\d{2}$', seq_name):
+                    seq_name = f"{seq_name}{year_suffix}"
                 vals['name'] = seq_name
             if 'state' in vals and 'stage_id' not in vals:
                 stage = self.env['cotizacion.express.stage'].search([('state_type', '=', vals['state'])], limit=1)

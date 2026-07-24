@@ -27,26 +27,22 @@
 
                     <!-- ENCABEZADO -->
                     <div class="header"
-                        style="font-family: 'Times New Roman', Times, serif !important; font-size: 11pt !important; color: #1C355E; width: 100% !important; display: block !important; border-bottom: 2px solid #1C355E; padding-bottom: 4px; margin: 0 !important;">
-                        <table style="width: 100% !important; table-layout: fixed !important; border-collapse: collapse; border: none; background: transparent; margin: 0 !important; padding: 0 !important;">
-                            <tr style="border: none;">
-                                <td style="width: 45%; border: none; text-align: left !important; vertical-align: middle; padding: 0;">
-                                    <img t-if="doc.company_id.logo" t-att-src="image_data_uri(doc.company_id.logo)"
-                                        style="max-height: 55px; max-width: 100%;" alt="Logo ALSA" />
-                                    <t t-if="not doc.company_id.logo">
-                                        <strong style="font-size: 11pt !important; color: #1C355E; letter-spacing: 1px;">ALSA</strong><br />
-                                        <span style="font-size: 11pt !important; color: #555; text-transform: uppercase;">Informática</span>
-                                    </t>
-                                </td>
-                                <td style="width: 55%; border: none; text-align: right !important; vertical-align: middle; padding: 0; line-height: 1.3; color: #333;">
-                                    <div style="text-align: right !important; width: 100% !important;">
-                                        <strong style="font-size: 11pt !important; color: #1C355E; display: block; text-align: right !important; width: 100% !important;">Alsa Informática</strong>
-                                        <span style="font-size: 11pt !important; display: block; text-align: right !important; width: 100% !important; color: #222;">Conmutador: 312 311 23 25</span>
-                                        <span style="font-size: 11pt !important; display: block; text-align: right !important; width: 100% !important; color: #222;">WhatsApp: 312 550 13 53</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </table>
+                        style="font-family: 'Times New Roman', Times, serif !important; font-size: 11pt !important; color: #1C355E; width: 100% !important; border-bottom: 2px solid #1C355E; padding-bottom: 4px; margin: 0 !important; overflow: hidden;">
+                        <!-- Logo a la izquierda -->
+                        <div style="float: left; width: 40%; text-align: left; vertical-align: middle;">
+                            <img t-if="doc.company_id.logo" t-att-src="image_data_uri(doc.company_id.logo)"
+                                style="max-height: 55px; max-width: 100%;" alt="Logo ALSA" />
+                            <t t-if="not doc.company_id.logo">
+                                <strong style="font-size: 11pt !important; color: #1C355E; letter-spacing: 1px;">ALSA</strong><br />
+                                <span style="font-size: 11pt !important; color: #555; text-transform: uppercase;">Informática</span>
+                            </t>
+                        </div>
+                        <!-- Texto a la derecha extrema -->
+                        <div style="float: right; width: 55%; text-align: right; line-height: 1.3; color: #333; padding-top: 5px;">
+                            <strong style="font-size: 11pt !important; color: #1C355E; display: block; font-weight: bold;">Alsa Informática</strong>
+                            <span style="font-size: 11pt !important; display: block; color: #222;">Conmutador: 312 311 23 25</span>
+                            <span style="font-size: 11pt !important; display: block; color: #222;">WhatsApp: 312 550 13 53</span>
+                        </div>
                     </div>
 
                     <!-- CUERPO PRINCIPAL -->
@@ -270,19 +266,13 @@
 
                     <!-- PIE DE PÁGINA -->
                     <div class="footer"
-                        style="font-family: 'Times New Roman', Times, serif !important; font-size: 11pt !important; color: #1C355E; width: 100% !important; display: block !important; border-top: 2px solid #1C355E; padding-top: 5px; margin: 0 !important; text-align: center !important;">
-                        <table style="width: 100% !important; table-layout: fixed !important; border-collapse: collapse; border: none; background: transparent; margin: 0 auto !important; padding: 0 !important; text-align: center !important;">
-                            <tr style="border: none;">
-                                <td style="width: 100% !important; text-align: center !important; padding: 2px 0; border: none; font-weight: bold; color: #1C355E; font-size: 11pt !important;">
-                                    alsainformatica.com.mx &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; contacto@alsainformatica.com.mx
-                                </td>
-                            </tr>
-                            <tr style="border: none;">
-                                <td style="width: 100% !important; text-align: center !important; padding: 2px 0 0 0; border: none; color: #333; font-size: 11pt !important;">
-                                    Av. Manuel J. Clouthier 182-C Col. El Ángel, C.P. 28979. Villa de Álvarez, Colima
-                                </td>
-                            </tr>
-                        </table>
+                        style="font-family: 'Times New Roman', Times, serif !important; font-size: 11pt !important; color: #1C355E; width: 100% !important; border-top: 2px solid #1C355E; padding-top: 5px; margin: 0 !important; text-align: center !important; overflow: hidden;">
+                        <div style="width: 100% !important; text-align: center !important; font-weight: bold; color: #1C355E; font-size: 11pt !important; margin-bottom: 2px; display: block !important;">
+                            alsainformatica.com.mx &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;•&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp; contacto@alsainformatica.com.mx
+                        </div>
+                        <div style="width: 100% !important; text-align: center !important; color: #333; font-size: 11pt !important; display: block !important;">
+                            Av. Manuel J. Clouthier 182-C Col. El Ángel, C.P. 28979. Villa de Álvarez, Colima
+                        </div>
                     </div>
 
                 </t>
