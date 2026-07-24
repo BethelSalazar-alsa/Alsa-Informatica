@@ -42,7 +42,7 @@
                                     <div style="text-align: right !important; width: 100% !important;">
                                         <strong style="font-size: 11pt !important; color: #1C355E; display: block; text-align: right !important; width: 100% !important;">Alsa Informática</strong>
                                         <span style="font-size: 11pt !important; display: block; text-align: right !important; width: 100% !important; color: #222;">Conmutador: 312 311 23 25</span>
-                                        <span style="font-size: 11pt !important; display: block; text-align: right !important; width: 100% !important; color: #222;">WhatsApp Ventas: 312 120 26 45</span>
+                                        <span style="font-size: 11pt !important; display: block; text-align: right !important; width: 100% !important; color: #222;">WhatsApp: 312 550 13 53</span>
                                     </div>
                                 </td>
                             </tr>
@@ -53,14 +53,19 @@
                     <div class="page"
                         style="font-family: 'Times New Roman', Times, serif !important; color: #000; font-size: 11pt !important; padding: 0px !important;">
 
-                        <!-- 1. FECHA -->
-                        <div style="text-align: right; width: 100%; font-size: 11pt !important; margin-top: 4px; margin-bottom: 8px; color: #000;">
-                            <span t-esc="doc.city or 'Colima'"/>, <span t-esc="doc.state_location or 'Col.'"/>, <t t-if="doc.date">
-                                <t t-esc="doc.date.strftime('%d')"/> de
-                                <t t-set="months" t-value="['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']"/>
-                                <t t-esc="months[int(doc.date.strftime('%m'))-1]"/> de
-                                <t t-esc="doc.date.strftime('%Y')"/>
-                            </t>
+                        <!-- 1. NÚMERO DE SERIE Y FECHA -->
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; font-size: 11pt !important; margin-top: 4px; margin-bottom: 8px; color: #000;">
+                            <div style="font-weight: bold; color: #1C355E; font-size: 11pt !important;">
+                                <span t-field="doc.serial_number" style="font-size: 11pt !important;"/>
+                            </div>
+                            <div style="text-align: right; font-size: 11pt !important;">
+                                <span t-esc="doc.city or 'Colima'"/>, <span t-esc="doc.state_location or 'Col.'"/>, <t t-if="doc.date">
+                                    <t t-esc="doc.date.strftime('%d')"/> de
+                                    <t t-set="months" t-value="['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre']"/>
+                                    <t t-esc="months[int(doc.date.strftime('%m'))-1]"/> de
+                                    <t t-esc="doc.date.strftime('%Y')"/>
+                                </t>
+                            </div>
                         </div>
 
                         <!-- 2. DATOS DEL CLIENTE -->
@@ -98,7 +103,7 @@
                                     <th style="width: 37%; border: none; padding: 4px 4px; text-align: left; font-size: 11pt !important;">DESCRIPCIÓN</th>
                                     <th style="width: 15%; border: none; padding: 4px 0; text-align: right; font-size: 11pt !important;">P. UNITARIO</th>
                                     <th style="width: 10%; border: none; padding: 4px 0; text-align: right; font-size: 11pt !important;">DESC. %</th>
-                                    <th style="width: 12%; border: none; padding: 4px 0; text-align: right; font-size: 11pt !important;">IVA (16%)</th>
+                                <!--<th style="width: 12%; border: none; padding: 4px 0; text-align: right; font-size: 11pt !important;">IVA (16%)</th> --> 
                                     <th style="width: 18%; border: none; padding: 4px 0; text-align: right; font-size: 11pt !important;">TOTAL C/IVA</th>
                                 </tr>
                             </thead>
@@ -139,10 +144,10 @@
                                                 <span t-if="line.discount &gt; 0" style="font-size: 11pt !important;"><span t-out="int(line.discount) if line.discount.is_integer() else line.discount" style="font-size: 11pt !important;"/>%</span>
                                                 <span t-else="" style="font-size: 11pt !important;">-</span>
                                             </td>
-                                            <td style="vertical-align: top; padding: 3px 0; text-align: right; border: none; font-size: 11pt !important; color: #444;">
+                                            <!--<td style="vertical-align: top; padding: 3px 0; text-align: right; border: none; font-size: 11pt !important; color: #444;">
                                                 <span t-field="line.iva_amount"
                                                     t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important;" />
-                                            </td>
+                                            </td>-->
                                             <td style="vertical-align: top; padding: 3px 0; font-weight: bold; text-align: right; border: none; font-size: 11pt !important;">
                                                 <span t-field="line.total"
                                                     t-options='{"widget": "monetary", "display_currency": doc.currency_id}' style="font-size: 11pt !important;" />
@@ -233,29 +238,29 @@
 
                             <!-- DESPEDIDA Y BLOQUE DE FIRMA JUNTOS -->
                             <div style="page-break-inside: avoid; break-inside: avoid;">
-                                <div style="text-align: left; margin-bottom: 10px; font-size: 11pt !important; line-height: 1.3; color: #000;">
+                                <div style="text-align: left; margin-bottom: 4px; font-size: 11pt !important; line-height: 1.3; color: #000;">
                                     Sin más por el momento y a sus órdenes para cualquier duda ó aclaración, se despide de usted su S.S.
                                 </div>
 
                                 <!-- BLOQUE DE FIRMA -->
-                                <div style="text-align: center; width: 100%;">
+                                <div style="text-align: center; width: 100%; margin-top: 6px;">
                                     <div style="display: inline-block; text-align: center; min-width: 280px; max-width: 440px; page-break-inside: avoid; break-inside: avoid;">
-                                        <span style="font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 6px; font-size: 11pt !important; letter-spacing: 1.5px; color: #000;">ATENTAMENTE</span>
+                                        <span style="font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; font-size: 11pt !important; letter-spacing: 1.5px; color: #000;">ATENTAMENTE</span>
 
                                         <!-- Imagen de firma -->
-                                        <div style="height: 45px; position: relative; text-align: center; margin-bottom: 4px;">
+                                        <div style="height: 55px; position: relative; text-align: center; margin-bottom: 0px;">
                                             <t t-if="doc.signature_id and doc.signature_id.signature_image">
                                                 <img t-attf-src="/web/image/seller.signature/{{ doc.signature_id.id }}/signature_image"
-                                                    style="position: absolute; top: -15px; left: 50%; margin-left: -80px; width: 160px; max-height: 90px; z-index: 10; pointer-events: none; object-fit: contain;" />
+                                                    style="position: absolute; top: -20px; left: 50%; margin-left: -100px; width: 200px; max-height: 110px; z-index: 10; pointer-events: none; object-fit: contain; opacity: 0.85;" />
                                             </t>
-                                            <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height: 45px;" />
+                                            <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height: 55px;" />
                                         </div>
 
                                         <!-- Línea y nombre del vendedor -->
                                         <div style="border-top: 1.5px solid #000; padding-top: 4px; margin-top: 2px;">
                                             <span t-field="doc.user_id.name"
                                                 style="font-weight: bold; text-transform: uppercase; display: block; font-size: 11pt !important; color: #000;" />
-                                            <span style="font-size: 11pt !important; display: block; color: #1C355E; margin-top: 2px; font-weight: bold; text-transform: uppercase;">CONSULTORÍA EN INFORMÁTICA ALSA S.A. DE C.V.</span>
+                                            <span style="font-size: 11pt !important; display: block; color: #1C355E; margin-top: 2px; font-weight: bold; text-transform: uppercase;">CONSULTORÍA EN INFORMÁTICA ALSA</span>
                                         </div>
                                     </div>
                                 </div>

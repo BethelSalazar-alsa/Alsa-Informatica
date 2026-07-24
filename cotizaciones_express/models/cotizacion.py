@@ -1,4 +1,5 @@
 import logging
+from datetime import date
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -65,6 +66,7 @@ class CotizacionExpress(models.Model):
     preview_html = fields.Html(string='Vista Previa', compute='_compute_preview_html', sanitize=False)
     template_id = fields.Many2one('cotizacion.express.template', string='Cargar Plantilla')
     tag_ids = fields.Many2many('cotizacion.express.tag', string='Etiquetas')
+    serial_number = fields.Char(string='Número de Serie', copy=False, readonly=True)
     amount_total = fields.Monetary(string='Total', compute='_compute_amount_total', store=True)
     amount_confirmed = fields.Monetary(string='Monto Confirmado', compute='_compute_amount_confirmed', store=True, currency_field='currency_id')
 
@@ -94,16 +96,15 @@ class CotizacionExpress(models.Model):
             if rec.id and isinstance(rec.id, int):
                 t = int(rec.write_date.timestamp()) if rec.write_date else 0
                 pdf_url = f"/report/pdf/cotizaciones_express.cotizacion_preview_template/{rec.id}"
-                html_url = f"/report/html/cotizaciones_express.cotizacion_preview_template/{rec.id}"
                 rec.preview_html = (
                     f'<div style="width: 100%; height: 100%; display: flex; flex-direction: column;">'
                     f'<div style="background: #f1f4f8; padding: 6px 10px; border-bottom: 1px solid #d9e2ec; display: flex; justify-content: space-between; align-items: center; border-radius: 4px 4px 0 0;">'
                     f'<span style="font-weight: bold; color: #002060; font-size: 12px;">Vista Previa PDF</span>'
                     f'<div>'
                     f'<a href="{pdf_url}" target="_blank" style="display: inline-block; padding: 4px 10px; font-size: 11px; color: #002060; background: #fff; border: 1px solid #002060; border-radius: 4px; text-decoration: none; margin-right: 6px; font-weight: bold;">'
-                    f'↗Pestaña Completa</a>'
-                    f'<a href="{html_url}" target="_blank" style="display: inline-block; padding: 4px 10px; font-size: 11px; color: #fff; background: #002060; border: 1px solid #002060; border-radius: 4px; text-decoration: none; font-weight: bold;">'
-                    f'Imprimir</a>'
+                    f'↗️ Pestaña Completa</a>'
+                    f'<a href="{pdf_url}" target="_blank" style="display: inline-block; padding: 4px 10px; font-size: 11px; color: #fff; background: #002060; border: 1px solid #002060; border-radius: 4px; text-decoration: none; font-weight: bold;">'
+                    f'🖨️ Abrir e Imprimir PDF</a>'
                     f'</div>'
                     f'</div>'
                     f'<iframe src="{pdf_url}?t={t}#zoom=page-width&view=FitH" '
@@ -160,6 +161,11 @@ class CotizacionExpress(models.Model):
         for vals in vals_list:
             if not vals.get('name') or vals.get('name') == 'Nueva':
                 vals['name'] = self.env['ir.sequence'].next_by_code('cotizacion.express') or 'Nueva'
+            # Generar número de serie CO{año}-XXXX
+            if not vals.get('serial_number'):
+                year_suffix = str(date.today().year)[-2:]  # '26' para 2026
+                seq_num = self.env['ir.sequence'].next_by_code('cotizacion.express.serial') or '5000'
+                vals['serial_number'] = f'CO{year_suffix}-{seq_num}'
             if 'state' in vals and 'stage_id' not in vals:
                 stage = self.env['cotizacion.express.stage'].search([('state_type', '=', vals['state'])], limit=1)
                 if stage:
