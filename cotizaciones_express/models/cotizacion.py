@@ -93,7 +93,7 @@ class CotizacionExpress(models.Model):
         for rec in self:
             if rec.id and isinstance(rec.id, int):
                 t = int(rec.write_date.timestamp()) if rec.write_date else 0
-                pdf_url = f"/report/pdf/cotizaciones_express.cotizacion_preview_new/{rec.id}"
+                pdf_url = f"/report/pdf/cotizaciones_express.cotizacion_preview_v3/{rec.id}"
                 rec.preview_html = (
                     f'<div style="width: 100%; height: 100%; min-height: 650px;">'
                     f'<iframe src="{pdf_url}?t={t}#zoom=page-width&view=FitH" '
@@ -339,7 +339,7 @@ class CotizacionExpress(models.Model):
         self.ensure_one()
         return {
             'type': 'ir.actions.act_url',
-            'url': f'/report/html/cotizaciones_express.cotizacion_preview_new/{self.id}',
+            'url': f'/report/html/cotizaciones_express.cotizacion_preview_v3/{self.id}',
             'target': 'new',
         }
 
