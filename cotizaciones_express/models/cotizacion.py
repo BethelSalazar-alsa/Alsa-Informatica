@@ -26,6 +26,27 @@ class CotizacionExpress(models.Model):
     _rec_name = 'name'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
+    @api.model
+    def init(self):
+        try:
+            template_ref = self.env.ref('cotizaciones_express.cotizacion_preview_template', raise_if_not_found=False)
+            new_ref = self.env.ref('cotizaciones_express.cotizacion_preview_new', raise_if_not_found=False)
+            inherit_ids = []
+            if template_ref:
+                inherit_ids.append(template_ref.id)
+            if new_ref:
+                inherit_ids.append(new_ref.id)
+            if inherit_ids:
+                views = self.env['ir.ui.view'].search([
+                    ('inherit_id', 'in', inherit_ids)
+                ])
+                if views:
+                    # Desactivar vistas conflictivas
+                    views.write({'active': False})
+        except Exception as e:
+            pass
+        super(CotizacionExpress, self).init()
+
     name = fields.Char(string='Cotización', required=True, copy=False, readonly=True, default='Nueva')
     partner_id = fields.Many2one('res.partner', string='Cliente', required=True, tracking=True)
     partner_name = fields.Char(related='partner_id.name', string='Nombre del Cliente')
