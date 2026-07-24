@@ -1,6 +1,6 @@
 {
     'name': 'Cotizaciones Express',
-    'version': '19.0.1.0.39',
+    'version': '19.0.1.0.40',
     'category': 'Sales/Sales',
     'summary': 'Generación ágil de cotizaciones comerciales con múltiples opciones, previsualización PDF interactiva en vivo e integración de firmas.',
     'description': """
