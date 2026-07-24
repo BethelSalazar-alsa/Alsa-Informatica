@@ -93,10 +93,21 @@ class CotizacionExpress(models.Model):
         for rec in self:
             if rec.id and isinstance(rec.id, int):
                 t = int(rec.write_date.timestamp()) if rec.write_date else 0
+                pdf_url = f"/report/pdf/cotizaciones_express.cotizacion_preview_template/{rec.id}"
+                html_url = f"/report/html/cotizaciones_express.cotizacion_preview_template/{rec.id}"
                 rec.preview_html = (
-                    f'<div style="width: 100%; height: 100%; min-height: 650px;">'
-                    f'<iframe src="/report/pdf/cotizaciones_express.cotizacion_preview_template/{rec.id}?t={t}#zoom=page-width&view=FitH" '
-                    f'style="width: 100%; height: 100%; border: none; min-height: 650px;" '
+                    f'<div style="width: 100%; height: 100%; display: flex; flex-direction: column;">'
+                    f'<div style="background: #f1f4f8; padding: 6px 10px; border-bottom: 1px solid #d9e2ec; display: flex; justify-content: space-between; align-items: center; border-radius: 4px 4px 0 0;">'
+                    f'<span style="font-weight: bold; color: #002060; font-size: 12px;">Vista Previa PDF</span>'
+                    f'<div>'
+                    f'<a href="{pdf_url}" target="_blank" style="display: inline-block; padding: 4px 10px; font-size: 11px; color: #002060; background: #fff; border: 1px solid #002060; border-radius: 4px; text-decoration: none; margin-right: 6px; font-weight: bold;">'
+                    f'↗Pestaña Completa</a>'
+                    f'<a href="{html_url}" target="_blank" style="display: inline-block; padding: 4px 10px; font-size: 11px; color: #fff; background: #002060; border: 1px solid #002060; border-radius: 4px; text-decoration: none; font-weight: bold;">'
+                    f'Imprimir</a>'
+                    f'</div>'
+                    f'</div>'
+                    f'<iframe src="{pdf_url}?t={t}#zoom=page-width&view=FitH" '
+                    f'style="width: 100%; height: calc(100% - 36px); min-height: 620px; border: none;" '
                     f'title="Preview PDF"></iframe>'
                     f'</div>'
                 )
