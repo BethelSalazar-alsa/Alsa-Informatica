@@ -276,11 +276,24 @@ class CotizacionExpress(models.Model):
             'context': {'show_express_orders': True},
         }
 
+    def action_print_pdf(self):
+        self.ensure_one()
+        return self.env.ref('cotizaciones_express.report_cotizacion_express').report_action(self)
+
+    def action_print_direct(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/report/html/cotizaciones_express.cotizacion_preview_template/{self.id}',
+            'target': 'new',
+        }
+
     def action_cancel(self):
         self.state = 'cancelled'
 
     def action_draft(self):
         self.state = 'draft'
+
 
 
 class CotizacionExpressOption(models.Model):

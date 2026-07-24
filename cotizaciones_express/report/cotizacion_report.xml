@@ -24,6 +24,8 @@
         <field name="report_name">cotizaciones_express.cotizacion_preview_template</field>
         <field name="report_file">cotizaciones_express.cotizacion_preview_template</field>
         <field name="print_report_name">'Cotizacion_' + (object.name or '')</field>
+        <field name="binding_model_id" ref="model_cotizacion_express"/>
+        <field name="binding_type">report</field>
         <field name="paperformat_id" ref="paperformat_cotizacion_carta"/>
     </record>
 </odoo>
