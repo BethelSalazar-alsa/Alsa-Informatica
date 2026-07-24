@@ -37,6 +37,7 @@
                         <div style="flex: 1.2; min-width: 0; border-right: 1px solid #dee2e6; padding-right: 16px;">
                             <div class="oe_title">
                                 <h1><field name="name" placeholder="Cotización"/></h1>
+                                <h2 class="mt-0"><field name="serial_number" readonly="1" placeholder="Número de Serie"/></h2>
                             </div>
 
                             <group>
