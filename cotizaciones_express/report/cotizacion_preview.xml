@@ -238,16 +238,16 @@
                                     </div>
 
                                     <div style="text-align: center; width: 100%;">
-                                        <div style="margin: 0 auto; width: 340px; text-align: center; page-break-inside: avoid; break-inside: avoid;">
+                                        <div style="display: inline-block; text-align: center; min-width: 280px; max-width: 440px; page-break-inside: avoid; break-inside: avoid;">
                                             <span style="font-weight: bold; text-transform: uppercase; display: block; margin-bottom: 2px; font-size: 11pt !important; letter-spacing: 1.5px; color: #000;">ATENTAMENTE</span>
 
                                             <!-- Imagen de firma -->
-                                            <div style="height: 50px; position: relative; text-align: center; margin-bottom: 0px;">
+                                            <div style="height: 55px; position: relative; text-align: center; margin-bottom: 0px;">
                                                 <t t-if="doc.signature_id and doc.signature_id.signature_image">
                                                     <img t-attf-src="/web/image/seller.signature/{{ doc.signature_id.id }}/signature_image"
-                                                        style="position: absolute; top: -30px; left: 50%; margin-left: -100px; width: 200px; max-height: 100px; z-index: 10; pointer-events: none; object-fit: contain;" />
+                                                        style="position: absolute; top: -35px; left: 50%; margin-left: -150px; width: 300px; max-height: 170px; z-index: 10; pointer-events: none; object-fit: contain;" />
                                                 </t>
-                                                <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height: 50px;" />
+                                                <div t-if="not doc.signature_id or not doc.signature_id.signature_image" style="height: 55px;" />
                                             </div>
 
                                             <!-- Línea y nombre del vendedor -->
