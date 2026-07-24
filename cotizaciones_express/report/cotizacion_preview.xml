@@ -216,7 +216,6 @@
                         <div style="margin-top: 8px;">
                             <!-- NOTAS / CONDICIONES COMERCIALES -->
                             <div style="margin-bottom: 12px; page-break-inside: avoid; break-inside: avoid;">
-                                <strong style="color: #1C355E; display: block; border-bottom: 1px solid #1C355E; padding-bottom: 2px; margin-bottom: 4px; font-size: 11pt !important;">Condiciones Comerciales:</strong>
                                 <t t-if="doc.notes">
                                     <t t-out="doc.notes"/>
                                 </t>
