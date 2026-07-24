@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Formato Carta CONTPAQi (US Letter: 216mm x 279mm) -->
+    <record id="paperformat_cotizacion_contpaqi" model="report.paperformat">
+        <field name="name">Carta CONTPAQi (Módulo de Ventas / Sale Order)</field>
+        <field name="default" eval="False"/>
+        <field name="format">custom</field>
+        <field name="page_width">216</field>
+        <field name="page_height">279</field>
+        <field name="orientation">Portrait</field>
+        <field name="margin_top">10</field>
+        <field name="margin_bottom">48</field>
+        <field name="margin_left">10</field>
+        <field name="margin_right">10</field>
+        <field name="header_line" eval="False"/>
+        <field name="header_spacing">5</field>
+        <field name="dpi">90</field>
+    </record>
+
+    <!-- Acción de Reporte CONTPAQi para el Módulo de Ventas (sale.order) -->
+    <record id="report_sale_order_contpaqi" model="ir.actions.report">
+        <field name="name">Cotización Formato CONTPAQi (Ventas)</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">cotizaciones_express.report_saleorder_contpaqi_template</field>
+        <field name="report_file">cotizaciones_express.report_saleorder_contpaqi_template</field>
+        <field name="print_report_name">'Cotizacion_CONTPAQi_' + (object.name or '')</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+        <field name="paperformat_id" ref="paperformat_cotizacion_contpaqi"/>
+    </record>
+
+    <!-- Plantilla de Reporte CONTPAQi Principal -->
+    <template id="report_saleorder_contpaqi_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.basic_layout">
+
+                    <!-- ESTILOS FIDEDIGNOS FORMATO CONTPAQI ALSA (LETRA MÁS GRANDE Y LEGIBLE) -->
+                    <style>
+                        * {
+                            box-sizing: border-box;
+                        }
+                        .contpaqi-page {
+                            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+                            color: #222;
+                            font-size: 11pt;
+                            line-height: 1.4;
+                        }
+                        .header-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 12px;
+                        }
+                        .company-right-info {
+                            font-size: 10.5pt !important;
+                            color: #333;
+                            line-height: 1.35;
+                            text-align: right;
+                        }
+                        .company-title-bold {
+                            font-size: 12pt !important;
+                            font-weight: bold;
+                            color: #002060;
+                            text-transform: uppercase;
+                        }
+                        .client-section {
+                            font-size: 11pt !important;
+                            line-height: 1.4;
+                            margin-bottom: 14px;
+                            color: #111;
+                        }
+                        .client-title-name {
+                            font-size: 13pt !important;
+                            font-weight: bold;
+                            color: #000;
+                        }
+                        .quote-title {
+                            font-size: 17pt !important;
+                            font-weight: bold;
+                            color: #002060;
+                            margin-bottom: 10px;
+                        }
+                        .obs-container {
+                            font-size: 10.5pt !important;
+                            color: #222;
+                            margin-bottom: 14px;
+                            line-height: 1.4;
+                        }
+                        .obs-container ul {
+                            margin: 4px 0 6px 18px;
+                            padding: 0;
+                        }
+                        .obs-important-note {
+                            font-weight: normal;
+                            margin-top: 6px;
+                        }
+                        .meta-bar {
+                            background-color: #eef2f6;
+                            border-radius: 4px;
+                            padding: 8px 14px;
+                            margin-bottom: 16px;
+                            width: 100%;
+                        }
+                        .meta-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                        }
+                        .meta-label {
+                            font-size: 10.5pt !important;
+                            font-weight: bold;
+                            color: #111;
+                        }
+                        .meta-val {
+                            font-size: 11pt !important;
+                            color: #222;
+                        }
+                        .items-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 14px;
+                        }
+                        .items-table th {
+                            border-bottom: 1.5px solid #222;
+                            border-top: 1.5px solid #222;
+                            font-size: 11pt !important;
+                            font-weight: bold;
+                            color: #111;
+                            padding: 6px 5px;
+                        }
+                        .items-table td {
+                            padding: 7px 5px;
+                            font-size: 10.5pt !important;
+                            vertical-align: top;
+                            border-bottom: 1px solid #f0f0f0;
+                        }
+                        .totals-table {
+                            width: 340px;
+                            float: right;
+                            border-collapse: collapse;
+                            margin-bottom: 18px;
+                        }
+                        .totals-table td {
+                            padding: 5px 8px;
+                            font-size: 11pt !important;
+                        }
+                        .total-grand-row td {
+                            font-size: 13pt !important;
+                            font-weight: bold;
+                            color: #002060;
+                            border-top: 1.5px solid #ccc;
+                        }
+                        .privacy-notice {
+                            font-size: 10pt !important;
+                            color: #333;
+                            clear: both;
+                            margin-top: 18px;
+                            margin-bottom: 12px;
+                        }
+                        .privacy-notice a {
+                            color: #002060;
+                            text-decoration: none;
+                        }
+
+                        /* ESTILOS DEL PIE DE PÁGINA CON DATOS BANCARIOS REALES */
+                        .footer-bank-block {
+                            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif !important;
+                            width: 100%;
+                            background-color: #eef2f6;
+                            border-radius: 6px 6px 0 0;
+                            padding: 8px 10px 6px 10px;
+                            text-align: center;
+                            font-size: 9pt !important;
+                            color: #111;
+                        }
+                        .bank-title-main {
+                            font-weight: bold;
+                            font-size: 11pt !important;
+                            color: #000;
+                            margin-bottom: 3px;
+                        }
+                        .bank-beneficiary {
+                            font-size: 9.5pt !important;
+                            margin-bottom: 6px;
+                        }
+                        .bank-grid-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-bottom: 6px;
+                        }
+                        .bank-grid-table td {
+                            width: 25%;
+                            vertical-align: top;
+                            text-align: center;
+                            padding: 3px 4px;
+                            font-size: 9pt !important;
+                            line-height: 1.25;
+                        }
+                        .bank-name-header {
+                            font-weight: bold;
+                            font-size: 9.5pt !important;
+                            color: #000;
+                            text-transform: uppercase;
+                        }
+                        .bank-note-blue {
+                            color: #002060;
+                            font-weight: bold;
+                            font-size: 9.5pt !important;
+                            margin-top: 4px;
+                        }
+                        .thanks-text {
+                            color: #002060;
+                            font-weight: bold;
+                            font-size: 9.5pt !important;
+                            margin-top: 2px;
+                        }
+                        .regimen-bottom-line {
+                            text-align: center;
+                            font-size: 9pt !important;
+                            color: #333;
+                            border-top: 1px solid #ddd;
+                            padding-top: 4px;
+                            margin-top: 4px;
+                        }
+                    </style>
+
+                    <div class="contpaqi-page page">
+
+                        <!-- 1. ENCABEZADO: LOGO ALSA Y DATOS DE LA EMPRESA (DERECHA) -->
+                        <table class="header-table">
+                            <tr>
+                                <td style="width: 50%; vertical-align: top;">
+                                    <img t-if="doc.company_id.logo" t-att-src="image_data_uri(doc.company_id.logo)"
+                                        style="max-height: 60px; max-width: 180px;" alt="ALSA Informática" />
+                                    <div t-if="not doc.company_id.logo" style="font-size: 16pt; font-weight: bold; color: #002060;">
+                                        ALSA <span style="font-weight: normal; font-size: 12pt; color: #555;">Informática</span>
+                                    </div>
+                                </td>
+                                <td style="width: 50%; vertical-align: top;" class="company-right-info">
+                                    <div class="company-title-bold">CONSULTORIA EN INFORMATICA ALSA</div>
+                                    <div>Av. Manuel J. Clouthier #182-B, Col. El Ángel</div>
+                                    <div>28979 Villa de Álvarez</div>
+                                    <div><strong>Teléfono:</strong> 3123112325</div>
+                                    <div><strong>Correo:</strong> contacto@alsainformatica.com.mx</div>
+                                    <div><strong>Web:</strong> https://alsainformatica.com.mx</div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- 2. DATOS DEL CLIENTE Y CONTACTO (IZQUIERDA) -->
+                        <div class="client-section">
+                            <div class="client-title-name">
+                                <span t-field="doc.partner_id.name"/>
+                            </div>
+                            <div>
+                                <span t-field="doc.partner_id.street"/>
+                                <span t-if="doc.partner_id.street2">, <span t-field="doc.partner_id.street2"/></span>
+                                <span t-if="doc.partner_id.zip">, C.P. <span t-field="doc.partner_id.zip"/></span>
+                                <span t-if="doc.partner_id.city">, <span t-field="doc.partner_id.city"/></span>
+                                <span t-if="doc.partner_id.state_id">, <span t-field="doc.partner_id.state_id.name"/></span>
+                            </div>
+                            <div t-if="doc.partner_id.vat">
+                                <strong>RFC:</strong> <span t-field="doc.partner_id.vat"/>
+                            </div>
+                            <div style="margin-top: 4px;">
+                                <strong>Contacto:</strong> 
+                                <t t-if="doc.partner_invoice_id and doc.partner_invoice_id.name != doc.partner_id.name">
+                                    <span t-field="doc.partner_invoice_id.name"/>
+                                </t>
+                                <t t-elif="doc.partner_id.child_ids">
+                                    <span t-field="doc.partner_id.child_ids[0].name"/>
+                                </t>
+                                <t t-else="">
+                                    <span t-field="doc.partner_id.name"/>
+                                </t>
+                            </div>
+                            <div t-if="doc.partner_id.phone">
+                                <strong>Teléfono:</strong> <span t-field="doc.partner_id.phone"/>
+                            </div>
+                            <div t-if="doc.partner_id.email">
+                                <strong>Email:</strong> <span t-field="doc.partner_id.email"/>
+                            </div>
+                        </div>
+
+                        <!-- 3. NÚMERO DE COTIZACIÓN (FOLIO) -->
+                        <div class="quote-title">
+                            Número de cotización <span t-field="doc.name"/>
+                        </div>
+
+                        <!-- 4. OBSERVACIONES -->
+                        <div class="obs-container">
+                            <strong>Observaciones:</strong>
+                            <t t-if="doc.note">
+                                <div style="margin-top: 2px;">
+                                    <t t-out="doc.note"/>
+                                </div>
+                            </t>
+                            <t t-else="">
+                                <ul style="margin: 2px 0 4px 16px;">
+                                    <li>Consulte los servicios adicionales: Capacitación, Respaldos automáticos, Póliza de Soporte y Horas de Soporte.</li>
+                                    <li>Soporte Técnico: Sólo orientación gratuita. Intervenciones o asesorías tienen costo.</li>
+                                    <li>En la compra de Software CONTPAQi puede aplicar a 6 y 12 Meses sin Intereses con tarjetas participantes.</li>
+                                    <li>Servicios no cotizados se cobrarán por separado (Solicitar Cotización).</li>
+                                </ul>
+                                <div class="obs-important-note">
+                                    <strong>NOTA IMPORTANTE</strong> Se te hace una invitación a que revises el PDF de Requerimientos Técnicos para la instalación de la versión actual y tengas un buen funcionamiento del software CONTPAQi.
+                                </div>
+                            </t>
+                        </div>
+
+                        <!-- 5. BARRA DE FECHAS Y VENDEDOR -->
+                        <div class="meta-bar">
+                            <table class="meta-table">
+                                <tr>
+                                    <td style="width: 33%;">
+                                        <div class="meta-label">Fecha de cotización</div>
+                                        <div class="meta-val">
+                                            <span t-field="doc.date_order" t-options='{"widget": "date"}'/>
+                                        </div>
+                                    </td>
+                                    <td style="width: 33%;">
+                                        <div class="meta-label">Vencimiento</div>
+                                        <div class="meta-val">
+                                            <span t-if="doc.validity_date" t-field="doc.validity_date" t-options='{"widget": "date"}'/>
+                                            <span t-if="not doc.validity_date">-</span>
+                                        </div>
+                                    </td>
+                                    <td style="width: 34%;">
+                                        <div class="meta-label">Vendedor</div>
+                                        <div class="meta-val">
+                                            <span t-field="doc.user_id.name"/>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <!-- 6. TABLA DE PRODUCTOS / SERVICIOS -->
+                        <table class="items-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 52%; text-align: left;">Descripción</th>
+                                    <th style="width: 12%; text-align: right;">Cantidad</th>
+                                    <th style="width: 12%; text-align: right;">Precio unitario</th>
+                                    <th style="width: 11%; text-align: right;">Impuestos</th>
+                                    <th style="width: 13%; text-align: right;">Importe</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <t t-foreach="doc.order_line" t-as="line">
+                                    <t t-if="not line.display_type">
+                                        <tr>
+                                            <td style="text-align: left;">
+                                                <span t-field="line.name"/>
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <span t-field="line.product_uom_qty" t-options='{"widget": "float", "precision": 2}'/>
+                                                <t t-set="uom_obj" t-value="getattr(line, 'product_uom_id', False) or getattr(line, 'product_uom', False)"/>
+                                                <div style="font-size: 7.5pt; color: #555;" t-if="uom_obj">
+                                                    <span t-out="uom_obj.name"/>
+                                                </div>
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <span t-field="line.price_unit" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <t t-set="taxes_obj" t-value="getattr(line, 'tax_id', False) or getattr(line, 'tax_ids', False)"/>
+                                                <span t-out="', '.join(map(lambda x: (x.description or x.name), taxes_obj)) if taxes_obj else 'IVA(16%)'"/>
+                                            </td>
+                                            <td style="text-align: right; font-weight: bold;">
+                                                <span t-field="line.price_subtotal" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <t t-elif="line.display_type == 'line_section'">
+                                        <tr style="background-color: #f7fafc; font-weight: bold; color: #002060;">
+                                            <td colspan="5" style="padding: 4px; text-transform: uppercase;">
+                                                <span t-field="line.name"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                    <t t-elif="line.display_type == 'line_note'">
+                                        <tr style="font-style: italic; color: #555;">
+                                            <td colspan="5" style="padding: 3px 4px;">
+                                                <span t-field="line.name"/>
+                                            </td>
+                                        </tr>
+                                    </t>
+                                </t>
+                            </tbody>
+                        </table>
+
+                        <!-- 7. TOTALES -->
+                        <table class="totals-table">
+                            <tr>
+                                <td style="text-align: left; color: #333;">Subtotal</td>
+                                <td style="text-align: right; font-weight: bold; color: #111;">
+                                    <span t-field="doc.amount_untaxed" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="text-align: left; color: #333;">IVA 16%</td>
+                                <td style="text-align: right; font-weight: bold; color: #111;">
+                                    <span t-field="doc.amount_tax" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                </td>
+                            </tr>
+                            <tr class="total-grand-row">
+                                <td style="text-align: left;">Total</td>
+                                <td style="text-align: right;">
+                                    <span t-field="doc.amount_total" t-options='{"widget": "monetary", "display_currency": doc.currency_id}'/>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- 8. AVISO DE PRIVACIDAD -->
+                        <div class="privacy-notice">
+                            <strong>Aviso de privacidad:</strong> <a href="https://alsainformatica.odoo.com/aviso-de-privacidad" target="_blank">https://alsainformatica.odoo.com/aviso-de-privacidad</a>
+                        </div>
+
+                    </div>
+
+                    <!-- 9. PIE DE PÁGINA: DATOS BANCARIOS REALES DE ALSA + RÉGIMEN FISCAL -->
+                    <div class="footer footer-bank-block">
+                        <div class="bank-title-main">Datos Bancarios</div>
+                        <div class="bank-beneficiary">
+                            <strong>Beneficiario:</strong> CONSULTORÍA EN INFORMÁTICA ALSA &amp;nbsp;&amp;nbsp;&amp;bull;&amp;nbsp;&amp;nbsp; <strong>R.F.C.:</strong> CIA140814VE9
+                        </div>
+                        
+                        <!-- TABLA CON LOS 4 BANCOS REALES DE ALSA -->
+                        <table class="bank-grid-table">
+                            <tr>
+                                <td>
+                                    <div class="bank-name-header">BANORTE</div>
+                                    <div><strong>Sucursal:</strong> 1603</div>
+                                    <div><strong>Cuenta:</strong> 0254174548</div>
+                                    <div><strong>CLABE:</strong> 072098002541745480</div>
+                                </td>
+                                <td>
+                                    <div class="bank-name-header">BANAMEX</div>
+                                    <div><strong>Sucursal:</strong> 7009</div>
+                                    <div><strong>Cuenta:</strong> 459285</div>
+                                    <div><strong>CLABE:</strong> 002090700904592854</div>
+                                </td>
+                                <td>
+                                    <div class="bank-name-header">SANTANDER</div>
+                                    <div><strong>Sucursal:</strong> 4722</div>
+                                    <div><strong>Cuenta:</strong> 65507526171</div>
+                                    <div><strong>CLABE:</strong> 014090655075261717</div>
+                                </td>
+                                <td>
+                                    <div class="bank-name-header">BBVA</div>
+                                    <div>&amp;nbsp;</div>
+                                    <div><strong>Cuenta:</strong> 0120021148</div>
+                                    <div><strong>CLABE:</strong> 012090001200211489</div>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <div class="bank-note-blue">
+                            En el campo de "referencia" o "concepto" captura el número de cotización a pagar y envíalo a administracion@alsainformatica.com.mx o por whatsapp.
+                        </div>
+                        <div class="thanks-text">
+                            ¡Gracias por tu pago!
+                        </div>
+
+                        <div class="regimen-bottom-line">
+                            626 - Régimen Simplificado de Confianza - R.F.C.: CIA140814VE9
+                        </div>
+                    </div>
+
+                </t>
+            </t>
+        </t>
+    </template>
+</odoo>
