@@ -29,7 +29,6 @@ Características Principales:
         'views/cotizacion_views.xml',
         'report/cotizacion_preview.xml',
         'report/cotizacion_report.xml',
-        'report/cotizacion_contpaqi_report.xml',
         'data/mail_template.xml',
     ],
     'assets': {
