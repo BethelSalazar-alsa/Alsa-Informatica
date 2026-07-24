@@ -4,13 +4,8 @@
         <record id="seq_cotizacion_express" model="ir.sequence">
             <field name="name">Cotización Express</field>
             <field name="code">cotizacion.express</field>
-            <field name="prefix">COT-</field>
-            <field name="padding">5</field>
-            <field name="company_id" eval="False"/>
-        </record>
-        <record id="seq_cotizacion_express_serial" model="ir.sequence">
-            <field name="name">Número de Serie Cotización</field>
-            <field name="code">cotizacion.express.serial</field>
+            <field name="prefix"></field>
+            <field name="suffix">-%(y)s</field>
             <field name="number_next">5000</field>
             <field name="number_increment">1</field>
             <field name="padding">4</field>

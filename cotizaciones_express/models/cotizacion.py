@@ -1,5 +1,4 @@
 import logging
-from datetime import date
 from odoo import models, fields, api, _
 from odoo.exceptions import UserError
 
@@ -66,7 +65,6 @@ class CotizacionExpress(models.Model):
     preview_html = fields.Html(string='Vista Previa', compute='_compute_preview_html', sanitize=False)
     template_id = fields.Many2one('cotizacion.express.template', string='Cargar Plantilla')
     tag_ids = fields.Many2many('cotizacion.express.tag', string='Etiquetas')
-    serial_number = fields.Char(string='Número de Serie', copy=False, readonly=True)
     amount_total = fields.Monetary(string='Total', compute='_compute_amount_total', store=True)
     amount_confirmed = fields.Monetary(string='Monto Confirmado', compute='_compute_amount_confirmed', store=True, currency_field='currency_id')
 
@@ -152,11 +150,6 @@ class CotizacionExpress(models.Model):
         for vals in vals_list:
             if not vals.get('name') or vals.get('name') == 'Nueva':
                 vals['name'] = self.env['ir.sequence'].next_by_code('cotizacion.express') or 'Nueva'
-            # Generar número de serie CO{año}-XXXX
-            if not vals.get('serial_number'):
-                year_suffix = str(date.today().year)[-2:]  # '26' para 2026
-                seq_num = self.env['ir.sequence'].next_by_code('cotizacion.express.serial') or '5000'
-                vals['serial_number'] = f'CO{year_suffix}-{seq_num}'
             if 'state' in vals and 'stage_id' not in vals:
                 stage = self.env['cotizacion.express.stage'].search([('state_type', '=', vals['state'])], limit=1)
                 if stage:

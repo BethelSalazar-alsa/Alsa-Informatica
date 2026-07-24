@@ -53,10 +53,10 @@
                     <div class="page"
                         style="font-family: 'Times New Roman', Times, serif !important; color: #000; font-size: 11pt !important; padding: 0px !important;">
 
-                        <!-- 1. NÚMERO DE SERIE Y FECHA -->
+                        <!-- 1. COTIZACIÓN Y FECHA -->
                         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; font-size: 11pt !important; margin-top: 4px; margin-bottom: 8px; color: #000;">
                             <div style="font-weight: bold; color: #1C355E; font-size: 11pt !important;">
-                                <span t-field="doc.serial_number" style="font-size: 11pt !important;"/>
+                                Cotización: <span t-field="doc.name" style="font-size: 11pt !important;"/>
                             </div>
                             <div style="text-align: right; font-size: 11pt !important;">
                                 <span t-esc="doc.city or 'Colima'"/>, <span t-esc="doc.state_location or 'Col.'"/>, <t t-if="doc.date">
