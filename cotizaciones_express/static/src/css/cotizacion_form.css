@@ -174,7 +174,10 @@
     width: 100% !important;
 }
 
+.o_cotizacion_express_form.hide-chatter .o-mail-Chatter,
 .o_cotizacion_express_form.hide-chatter .o_chatter,
-.o_cotizacion_express_form.hide-chatter .oe_chatter {
+.o_cotizacion_express_form.hide-chatter .oe_chatter,
+.o_form_view:has(.hide-chatter) .o-mail-Chatter,
+.o_form_view:has(.hide-chatter) .o_chatter {
     display: none !important;
 }
