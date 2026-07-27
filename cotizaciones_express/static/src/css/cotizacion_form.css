@@ -99,13 +99,53 @@
     box-shadow: none !important;
 }
 
-.o_cotizacion_express_controls .btn-toggle.collapsed:hover {
-    transform: scale(1.1) !important;
-    background-color: #f8fafc !important;
-    color: #475569 !important;
+/* === LAYOUT: Form as flex parent of sheet_bg + chatter === */
+
+/* When chatter is HIDDEN: normal block flow, sheet takes 100% */
+.o_cotizacion_express_form.hide-chatter {
+    display: block !important;
+    width: 100% !important;
 }
 
-/* Hide PDF */
+.o_cotizacion_express_form.hide-chatter > .o_form_sheet_bg {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.o_cotizacion_express_form.hide-chatter > .o-mail-Chatter,
+.o_cotizacion_express_form.hide-chatter > .o_chatter {
+    display: none !important;
+}
+
+/* When chatter is VISIBLE: flex row, sheet 65% + chatter 35% */
+.o_cotizacion_express_form:not(.hide-chatter) {
+    display: flex !important;
+    flex-flow: row nowrap !important;
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+.o_cotizacion_express_form:not(.hide-chatter) > .o_form_sheet_bg {
+    width: 65% !important;
+    max-width: 65% !important;
+    flex: 1 1 65% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.o_cotizacion_express_form:not(.hide-chatter) > .o-mail-Chatter,
+.o_cotizacion_express_form:not(.hide-chatter) > .o_chatter {
+    width: 35% !important;
+    max-width: 35% !important;
+    flex: 1 1 35% !important;
+    box-sizing: border-box !important;
+    display: block !important;
+}
+
+/* === PDF TOGGLE === */
+
 .o_cotizacion_express_form.hide-pdf .o_cotizacion_right_column {
     display: none !important;
 }

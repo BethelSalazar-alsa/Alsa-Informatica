@@ -78,20 +78,21 @@ window.addEventListener('error', function(event) {
     }
 }, true);
 
-// --- PDF TOGGLE ---
+// --- TOGGLES ---
 document.addEventListener('click', function(e) {
-    const btn = e.target.closest('.btn-toggle-pdf');
-    if (!btn) return;
-    
-    const form = btn.closest('.o_cotizacion_express_form');
+    const form = e.target.closest('.o_cotizacion_express_form');
     if (!form) return;
-    
-    const isHidden = form.classList.contains('hide-pdf');
-    if (isHidden) {
-        form.classList.remove('hide-pdf');
-        btn.classList.remove('collapsed');
-    } else {
-        form.classList.add('hide-pdf');
-        btn.classList.add('collapsed');
+
+    const pdfBtn = e.target.closest('.btn-toggle-pdf');
+    if (pdfBtn) {
+        form.classList.toggle('hide-pdf');
+        pdfBtn.classList.toggle('collapsed');
+        return;
+    }
+
+    const chatterBtn = e.target.closest('.btn-toggle-chatter');
+    if (chatterBtn) {
+        form.classList.toggle('hide-chatter');
+        chatterBtn.classList.toggle('collapsed');
     }
 });
