@@ -19,6 +19,7 @@
 .o_cotizacion_express_sheet [name="preview_html"] {
     width: 100% !important;
     height: 100% !important;
+    min-height: calc(100vh - 120px) !important;
     display: flex !important;
     flex-direction: column !important;
     flex: 1 !important;
@@ -27,6 +28,7 @@
 .o_cotizacion_express_sheet [name="preview_html"] > div {
     width: 100% !important;
     height: 100% !important;
+    min-height: calc(100vh - 120px) !important;
     display: flex !important;
     flex-direction: column !important;
     flex: 1 !important;
@@ -35,6 +37,7 @@
 .o_cotizacion_express_sheet [name="preview_html"] iframe {
     width: 100% !important;
     height: 100% !important;
+    min-height: calc(100vh - 130px) !important;
     flex: 1 !important;
     border: none !important;
     display: block !important;
@@ -99,114 +102,90 @@
     box-shadow: none !important;
 }
 
-/* === LAYOUT: Form as flex parent of sheet_bg + chatter/PDF === */
+/* === VIEW SHARING GRID LAYOUT === */
 
-/* STATE 1: Neither - form block, only left column */
-.o_cotizacion_express_form.hide-pdf.hide-chatter {
-    display: block !important;
-    width: 100% !important;
-}
-
-.o_cotizacion_express_form.hide-pdf.hide-chatter > .o_form_sheet_bg {
+/* Base container styling */
+.o_form_view:has(.o_cotizacion_express_form) {
+    display: flex !important;
+    flex-flow: row nowrap !important;
     width: 100% !important;
     max-width: 100% !important;
 }
 
-/* STATE 2: Chatter only - form flex, sheet 65% + chatter 35% */
-.o_cotizacion_express_form.hide-pdf:not(.hide-chatter) {
-    display: flex !important;
-    flex-flow: row nowrap !important;
+/* 1. Sheet container width based on Chatter visibility */
+.o_form_view:has(.o_cotizacion_express_form.hide-chatter) .o_form_sheet_bg {
     width: 100% !important;
+    max-width: 100% !important;
+    flex: 1 1 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
-.o_cotizacion_express_form.hide-pdf:not(.hide-chatter) > .o_form_sheet_bg {
+.o_form_view:has(.o_cotizacion_express_form:not(.hide-chatter)) .o_form_sheet_bg {
     width: 65% !important;
     max-width: 65% !important;
     flex: 1 1 65% !important;
+    padding: 0 !important;
+    margin: 0 !important;
 }
 
-.o_cotizacion_express_form.hide-pdf:not(.hide-chatter) > .o-mail-Chatter,
-.o_cotizacion_express_form.hide-pdf:not(.hide-chatter) > .o_chatter {
+/* 2. Chatter sidebar styling when visible */
+.o_form_view:has(.o_cotizacion_express_form:not(.hide-chatter)) .o-mail-Chatter,
+.o_form_view:has(.o_cotizacion_express_form:not(.hide-chatter)) .o_chatter {
     width: 35% !important;
     max-width: 35% !important;
     flex: 1 1 35% !important;
-    display: block !important;
-}
-
-/* STATE 3: PDF only - form flex, sheet 65% + right column (moved) 35% */
-.o_cotizacion_express_form:not(.hide-pdf).hide-chatter {
-    display: flex !important;
-    flex-flow: row nowrap !important;
-    width: 100% !important;
-}
-
-.o_cotizacion_express_form:not(.hide-pdf).hide-chatter > .o_form_sheet_bg {
-    width: 65% !important;
-    max-width: 65% !important;
-    flex: 1 1 65% !important;
-}
-
-.o_cotizacion_express_form:not(.hide-pdf).hide-chatter > .o_cotizacion_right_column {
-    width: 35% !important;
-    max-width: 35% !important;
-    flex: 1 1 35% !important;
-    display: flex !important;
-    flex-direction: column !important;
     box-sizing: border-box !important;
-    height: auto !important;
-    min-height: calc(100vh - 110px) !important;
-    background: #f8f9fa !important;
-    border-radius: 6px !important;
-    padding: 12px !important;
-    overflow: hidden !important;
-}
-
-.o_cotizacion_express_form:not(.hide-pdf).hide-chatter > .o_cotizacion_right_column > div {
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-}
-
-.o_cotizacion_express_form:not(.hide-pdf).hide-chatter > .o_cotizacion_right_column [name="preview_html"],
-.o_cotizacion_express_form:not(.hide-pdf).hide-chatter > .o_cotizacion_right_column [name="preview_html"] > div {
-    width: 100% !important;
-    height: 100% !important;
-    flex: 1 !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-.o_cotizacion_express_form:not(.hide-pdf).hide-chatter > .o_cotizacion_right_column [name="preview_html"] iframe {
-    width: 100% !important;
-    height: 100% !important;
-    flex: 1 !important;
-    border: none !important;
-}
-
-/* STATE 4: Both visible - form flex, sheet 65% (left+right inside) + chatter 35% */
-.o_cotizacion_express_form:not(.hide-pdf):not(.hide-chatter) {
-    display: flex !important;
-    flex-flow: row nowrap !important;
-    width: 100% !important;
-}
-
-.o_cotizacion_express_form:not(.hide-pdf):not(.hide-chatter) > .o_form_sheet_bg {
-    width: 65% !important;
-    max-width: 65% !important;
-    flex: 1 1 65% !important;
-}
-
-.o_cotizacion_express_form:not(.hide-pdf):not(.hide-chatter) > .o-mail-Chatter,
-.o_cotizacion_express_form:not(.hide-pdf):not(.hide-chatter) > .o_chatter {
-    width: 35% !important;
-    max-width: 35% !important;
-    flex: 1 1 35% !important;
     display: block !important;
 }
 
-/* === TOGGLE RULES === */
+.o_form_view:has(.o_cotizacion_express_form.hide-chatter) .o-mail-Chatter,
+.o_form_view:has(.o_cotizacion_express_form.hide-chatter) .o_chatter {
+    display: none !important;
+}
 
+/* 3. Sheet container interior columns (Editor & PDF) */
+.o_cotizacion_left_column {
+    min-width: 0 !important;
+    transition: all 0.3s ease !important;
+}
+
+.o_cotizacion_right_column {
+    min-width: 0 !important;
+    transition: all 0.3s ease !important;
+}
+
+/* STATE A: Chatter is hidden, PDF is visible (Editor 65%, PDF 35% of the screen) */
+.o_cotizacion_express_form.hide-chatter:not(.hide-pdf) .o_cotizacion_left_column {
+    flex: 1 1 65% !important;
+    width: 65% !important;
+    border-right: 1px solid #dee2e6 !important;
+    padding-right: 16px !important;
+}
+
+.o_cotizacion_express_form.hide-chatter:not(.hide-pdf) .o_cotizacion_right_column {
+    flex: 1 1 35% !important;
+    width: 35% !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* STATE B: Chatter is visible, PDF is visible (Editor 50%, PDF 50% inside the 65% sheet) */
+.o_cotizacion_express_form:not(.hide-chatter):not(.hide-pdf) .o_cotizacion_left_column {
+    flex: 1 1 50% !important;
+    width: 50% !important;
+    border-right: 1px solid #dee2e6 !important;
+    padding-right: 16px !important;
+}
+
+.o_cotizacion_express_form:not(.hide-chatter):not(.hide-pdf) .o_cotizacion_right_column {
+    flex: 1 1 50% !important;
+    width: 50% !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+
+/* STATE C: PDF is hidden (Editor takes 100% of the sheet) */
 .o_cotizacion_express_form.hide-pdf .o_cotizacion_right_column {
     display: none !important;
 }
@@ -214,9 +193,14 @@
 .o_cotizacion_express_form.hide-pdf .o_cotizacion_left_column {
     flex: 1 1 100% !important;
     width: 100% !important;
+    border-right: none !important;
+    padding-right: 0 !important;
 }
 
-.o_cotizacion_express_form.hide-chatter > .o-mail-Chatter,
-.o_cotizacion_express_form.hide-chatter > .o_chatter {
+/* Fallback safety: Hide any duplicate chatter fields rendered inside the sheet container */
+.o_cotizacion_express_sheet [name="message_follower_ids"],
+.o_cotizacion_express_sheet [name="activity_ids"],
+.o_cotizacion_express_sheet [name="message_ids"],
+.o_cotizacion_express_sheet .oe_chatter {
     display: none !important;
 }

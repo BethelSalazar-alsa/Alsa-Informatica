@@ -79,31 +79,6 @@ window.addEventListener('error', function(event) {
 }, true);
 
 // --- TOGGLES ---
-function movePdfToChatterPosition(form) {
-    var rightCol = form.querySelector('.o_cotizacion_right_column');
-    var sheetBg = form.querySelector('.o_form_sheet_bg');
-    if (rightCol && sheetBg) {
-        sheetBg.after(rightCol);
-    }
-}
-
-function movePdfToOriginalPosition(form) {
-    var rightCol = form.querySelector('.o_cotizacion_right_column');
-    var flexContainer = form.querySelector('.o_cotizacion_flex_container');
-    if (rightCol && flexContainer) {
-        flexContainer.appendChild(rightCol);
-    }
-}
-
-function repositionPdf(form) {
-    if (form.classList.contains('hide-pdf')) return;
-    if (!form.classList.contains('hide-chatter')) {
-        movePdfToOriginalPosition(form);
-    } else {
-        movePdfToChatterPosition(form);
-    }
-}
-
 document.addEventListener('click', function(e) {
     var form = e.target.closest('.o_cotizacion_express_form');
     if (!form) return;
@@ -112,7 +87,6 @@ document.addEventListener('click', function(e) {
     if (pdfBtn) {
         form.classList.toggle('hide-pdf');
         pdfBtn.classList.toggle('collapsed');
-        repositionPdf(form);
         return;
     }
 
@@ -120,7 +94,6 @@ document.addEventListener('click', function(e) {
     if (chatterBtn) {
         form.classList.toggle('hide-chatter');
         chatterBtn.classList.toggle('collapsed');
-        repositionPdf(form);
         return;
     }
 });
