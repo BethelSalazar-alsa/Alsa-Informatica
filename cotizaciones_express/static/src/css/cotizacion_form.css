@@ -222,6 +222,32 @@
     display: none !important;
 }
 
+/* PDF in chatter position (PDF only: chatter hidden + PDF visible) */
+.o_form_view:has(.o_cotizacion_express_form.hide-chatter:not(.hide-pdf)) .o_form_sheet_bg {
+    width: 65% !important;
+    max-width: 65% !important;
+    flex: 1 1 65% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+.o_cotizacion_express_form.hide-chatter:not(.hide-pdf) .o_cotizacion_right_column {
+    width: 35% !important;
+    max-width: 35% !important;
+    flex: 1 1 35% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+    position: static !important;
+    height: auto !important;
+    min-height: calc(100vh - 110px) !important;
+    background: #f8f9fa !important;
+    border-radius: 6px !important;
+    padding: 12px !important;
+    align-self: flex-start !important;
+    overflow: hidden !important;
+}
+
 /* Fallback safety: Hide any duplicate chatter fields rendered inside the sheet container */
 .o_cotizacion_express_sheet [name="message_follower_ids"],
 .o_cotizacion_express_sheet [name="activity_ids"],

@@ -43,7 +43,7 @@
                         </div>
                     </div>
 
-                    <div style="display: flex; width: 100%; gap: 16px;">
+                    <div class="o_cotizacion_flex_container" style="display: flex; width: 100%; gap: 16px;">
                         <!-- Columna Izquierda: Crear Cotización -->
                         <div class="o_cotizacion_left_column" style="flex: 1.2; min-width: 0; padding-right: 8px;">
                             <div class="oe_title">

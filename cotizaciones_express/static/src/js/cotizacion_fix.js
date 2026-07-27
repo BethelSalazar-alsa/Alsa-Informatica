@@ -105,8 +105,40 @@ try {
         }
     }
 
+    function getFormView(form) {
+        return form.closest('.o_form_view');
+    }
+
+    function getSheetBg(formView) {
+        return formView ? formView.querySelector('.o_form_sheet_bg') : null;
+    }
+
+    function movePdfToChatterPosition(form) {
+        const rightCol = form.querySelector('.o_cotizacion_right_column');
+        const formView = getFormView(form);
+        const sheetBg = getSheetBg(formView);
+        if (rightCol && sheetBg && formView) {
+            sheetBg.after(rightCol);
+        }
+    }
+
+    function movePdfToOriginalPosition(form) {
+        const rightCol = form.querySelector('.o_cotizacion_right_column');
+        const flexContainer = form.querySelector('.o_cotizacion_flex_container');
+        if (rightCol && flexContainer) {
+            flexContainer.appendChild(rightCol);
+        }
+    }
+
+    function repositionPdf(form, pdfVisible, chatterVisible) {
+        if (pdfVisible && !chatterVisible) {
+            movePdfToChatterPosition(form);
+        } else if (pdfVisible && chatterVisible) {
+            movePdfToOriginalPosition(form);
+        }
+    }
+
     function initializeFormState(form) {
-        // Por defecto, ambos ocultos (false) si no se han definido en localStorage
         const pdfVisible = localStorage.getItem('cotizacion_pdf_visible') === 'true';
         const chatterVisible = localStorage.getItem('cotizacion_chatter_visible') === 'true';
         
@@ -122,10 +154,10 @@ try {
             form.classList.remove('hide-chatter');
         }
         
+        repositionPdf(form, pdfVisible, chatterVisible);
         updateButtonStates(form, pdfVisible, chatterVisible);
     }
 
-    // Escuchar creación/inserción de formularios en el DOM mediante MutationObserver
     const formObserver = new MutationObserver(function(mutations) {
         const form = document.querySelector('.o_cotizacion_express_form');
         if (form && !form.dataset.viewInitialized) {
@@ -138,13 +170,11 @@ try {
         if (document.body) {
             formObserver.observe(document.body, { childList: true, subtree: true });
         } else {
-            // Reintento en caso de carga temprana
             setTimeout(startObserving, 50);
         }
     }
     startObserving();
 
-    // Manejo de eventos click con delegación en document
     document.addEventListener('click', function(e) {
         const pdfBtn = e.target.closest('.btn-toggle-pdf');
         if (pdfBtn) {
@@ -159,6 +189,7 @@ try {
                     form.classList.add('hide-pdf');
                 }
                 const chatterVisible = localStorage.getItem('cotizacion_chatter_visible') === 'true';
+                repositionPdf(form, newVisible, chatterVisible);
                 updateButtonStates(form, newVisible, chatterVisible);
             }
             return;
@@ -177,6 +208,7 @@ try {
                     form.classList.add('hide-chatter');
                 }
                 const pdfVisible = localStorage.getItem('cotizacion_pdf_visible') === 'true';
+                repositionPdf(form, pdfVisible, newVisible);
                 updateButtonStates(form, pdfVisible, newVisible);
             }
             return;

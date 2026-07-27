@@ -256,7 +256,6 @@ class CotizacionExpress(models.Model):
 
     def action_send_to_client(self):
         self.ensure_one()
-        self.state = 'sent'
         template = self.env.ref('cotizaciones_express.email_template_cotizacion', raise_if_not_found=False)
         compose_form = self.env.ref('mail.email_compose_message_wizard_form')
         ctx = {
@@ -277,6 +276,14 @@ class CotizacionExpress(models.Model):
             'target': 'new',
             'context': ctx,
         }
+
+    def _message_post_after_hook(self, message, msg_dict):
+        res = super()._message_post_after_hook(message, msg_dict)
+        for record in self:
+            if record.state == 'draft' and msg_dict.get('message_type') == 'email':
+                stage = self.env['cotizacion.express.stage'].search([('state_type', '=', 'sent')], limit=1)
+                record.write({'state': 'sent', 'stage_id': stage.id if stage else False})
+        return res
 
     def action_confirm(self):
         self.ensure_one()
