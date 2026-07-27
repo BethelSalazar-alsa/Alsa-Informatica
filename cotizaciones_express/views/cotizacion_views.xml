@@ -44,7 +44,8 @@
                     </div>
 
                     <div style="display: flex; width: 100%; gap: 16px;">
-                        <div class="o_cotizacion_left_column" style="flex: 1.2; min-width: 0; border-right: 1px solid #dee2e6; padding-right: 16px;">
+                        <!-- Columna Izquierda: Crear Cotización -->
+                        <div class="o_cotizacion_left_column" style="flex: 1.2; min-width: 0; padding-right: 8px;">
                             <div class="oe_title">
                                 <h1><field name="name" placeholder="Cotización"/></h1>
                             </div>
@@ -84,18 +85,23 @@
                             </notebook>
                         </div>
 
+                        <!-- Columna Derecha: Vista Previa PDF -->
                         <div class="o_cotizacion_right_column" style="flex: 1.2; position: sticky; top: 0; align-self: flex-start; background: #f8f9fa; border-radius: 6px; padding: 12px; min-width: 0; height: calc(100vh - 110px); min-height: 750px; display: flex; flex-direction: column;">
                             <div style="width: 100%; height: 100%; background: #fff; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; flex: 1;">
                                 <field name="preview_html" widget="html" nolabel="1" readonly="1" style="height: 100%; width: 100%; flex: 1; display: flex;"/>
                             </div>
                         </div>
+
+                        <!-- Columna Chatter (Tercera Columna) -->
+                        <div class="o_cotizacion_chatter_column" style="flex: 1.2; min-width: 0; background: #f8f9fa; border-radius: 6px; padding: 12px; border: 1px solid #dee2e6; height: calc(100vh - 110px); min-height: 750px; display: flex; flex-direction: column; overflow-y: auto;">
+                            <div class="oe_chatter" style="width: 100%; min-width: 100%;">
+                                <field name="message_follower_ids"/>
+                                <field name="activity_ids"/>
+                                <field name="message_ids"/>
+                            </div>
+                        </div>
                     </div>
                 </sheet>
-                <div class="oe_chatter">
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
-                </div>
             </form>
         </field>
     </record>

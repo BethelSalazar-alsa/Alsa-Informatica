@@ -106,9 +106,9 @@ try {
     }
 
     function initializeFormState(form) {
-        // Si no se han definido en localStorage, por defecto son visibles (true)
+        // Por defecto, PDF es visible (true) y Chatter es oculto (false) si no se han definido en localStorage
         const pdfVisible = localStorage.getItem('cotizacion_pdf_visible') !== 'false';
-        const chatterVisible = localStorage.getItem('cotizacion_chatter_visible') !== 'false';
+        const chatterVisible = localStorage.getItem('cotizacion_chatter_visible') === 'true';
         
         if (!pdfVisible) {
             form.classList.add('hide-pdf');
@@ -158,7 +158,7 @@ try {
                 } else {
                     form.classList.add('hide-pdf');
                 }
-                const chatterVisible = localStorage.getItem('cotizacion_chatter_visible') !== 'false';
+                const chatterVisible = localStorage.getItem('cotizacion_chatter_visible') === 'true';
                 updateButtonStates(form, newVisible, chatterVisible);
             }
             return;

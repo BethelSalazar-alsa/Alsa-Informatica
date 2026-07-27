@@ -93,7 +93,7 @@
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18) !important;
 }
 
-/* Toggle button styling */
+/* Toggle button styling (Active/Visible State) */
 .o_cotizacion_express_controls .btn-toggle {
     width: 36px !important;
     height: 36px !important;
@@ -102,29 +102,35 @@
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
-    background-color: #1C355E !important; /* Premium ALSA Blue */
-    color: #ffffff !important;
-    border: none !important;
+    background-color: #EBF3FC !important; /* Soft Blue */
+    color: #1C355E !important; /* Dark ALSA Blue icon */
+    border: 1px solid #C2D6EC !important;
+    box-shadow: 0 2px 6px rgba(28, 53, 94, 0.15) !important;
     transition: all 0.2s ease-in-out !important;
     position: relative !important;
 }
 
-/* Hover effect on button */
+/* Hover effect on active button */
 .o_cotizacion_express_controls .btn-toggle:hover {
     transform: scale(1.1) !important;
-    background-color: #162b4d !important;
+    background-color: #dbeafe !important;
+    box-shadow: 0 4px 10px rgba(28, 53, 94, 0.25) !important;
 }
 
-/* Inactive state styling (when section is hidden) */
+/* Inactive state styling (when section is hidden / Collapsed) */
 .o_cotizacion_express_controls .btn-toggle.collapsed {
-    background-color: #e2e8f0 !important;
-    color: #64748b !important;
-    border: 1px solid #cbd5e1 !important;
+    background-color: #ffffff !important;
+    color: #94a3b8 !important; /* Slate grey icon */
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
 }
 
+/* Hover effect on inactive button */
 .o_cotizacion_express_controls .btn-toggle.collapsed:hover {
-    background-color: #cbd5e1 !important;
-    color: #334155 !important;
+    transform: scale(1.1) !important;
+    background-color: #f8fafc !important;
+    color: #475569 !important;
+    border-color: #cbd5e1 !important;
 }
 
 /* Tooltip indicator */
@@ -151,19 +157,20 @@
     transform: translateX(0);
 }
 
-/* Classes for Collapsing PDF View */
+/* Three-column dynamic flex layout */
+.o_cotizacion_left_column,
+.o_cotizacion_right_column,
+.o_cotizacion_chatter_column {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* Hide rules */
 .o_cotizacion_express_form.hide-pdf .o_cotizacion_right_column {
     display: none !important;
 }
 
-.o_cotizacion_express_form.hide-pdf .o_cotizacion_left_column {
-    flex: 1 1 100% !important;
-    width: 100% !important;
-    border-right: none !important;
-    padding-right: 0 !important;
-}
-
-/* Classes for Collapsing Chatter */
-.o_cotizacion_express_form.hide-chatter .oe_chatter {
+.o_cotizacion_express_form.hide-chatter .o_cotizacion_chatter_column {
     display: none !important;
 }
