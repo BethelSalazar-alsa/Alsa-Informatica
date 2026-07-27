@@ -35,10 +35,10 @@
                 <sheet class="o_cotizacion_express_sheet">
                     <!-- Control de plegado de vistas -->
                     <div class="o_cotizacion_express_controls">
-                        <div class="btn-toggle btn-toggle-pdf" data-tooltip="Mostrar/Ocultar PDF">
+                        <div class="btn-toggle btn-toggle-pdf">
                             <i class="fa fa-file-pdf-o"/>
                         </div>
-                        <div class="btn-toggle btn-toggle-chatter" data-tooltip="Mostrar/Ocultar Chatter">
+                        <div class="btn-toggle btn-toggle-chatter">
                             <i class="fa fa-comments"/>
                         </div>
                     </div>

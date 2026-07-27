@@ -87,6 +87,7 @@ try {
         const chatterBtn = form.querySelector('.btn-toggle-chatter');
         
         if (pdfBtn) {
+            pdfBtn.setAttribute('data-tooltip', 'Mostrar/Ocultar PDF');
             if (pdfVisible) {
                 pdfBtn.classList.remove('collapsed');
             } else {
@@ -95,6 +96,7 @@ try {
         }
         
         if (chatterBtn) {
+            chatterBtn.setAttribute('data-tooltip', 'Mostrar/Ocultar Chatter');
             if (chatterVisible) {
                 chatterBtn.classList.remove('collapsed');
             } else {
