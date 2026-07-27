@@ -59,6 +59,11 @@ class CotizacionExpress(models.Model):
     state_location = fields.Char(string='Estado (Ubicación)', default='Col.')
 
     user_id = fields.Many2one('res.users', string='Vendedor', default=lambda self: self.env.user, required=True)
+    reply_to = fields.Char(
+        string='Responder a (Email)',
+        help="El cliente responderá a esta dirección de correo al contestar el correo de la cotización.",
+        default=lambda self: self.env.user.email or self.env.user.login
+    )
     signature_id = fields.Many2one('seller.signature', string='Firma del Vendedor',
                                    domain="[('user_id', '=', user_id)]")
 
@@ -259,6 +264,7 @@ class CotizacionExpress(models.Model):
             'default_res_ids': self.ids,
             'default_template_id': template.id if template else False,
             'default_composition_mode': 'comment',
+            'default_reply_to': self.reply_to or (self.env.user.email or self.env.user.login),
             'force_email': True,
         }
         return {
