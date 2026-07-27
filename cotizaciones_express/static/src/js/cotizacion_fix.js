@@ -105,39 +105,6 @@ try {
         }
     }
 
-    function getFormView(form) {
-        return form.closest('.o_form_view');
-    }
-
-    function getSheetBg(formView) {
-        return formView ? formView.querySelector('.o_form_sheet_bg') : null;
-    }
-
-    function movePdfToChatterPosition(form) {
-        const rightCol = form.querySelector('.o_cotizacion_right_column');
-        const formView = getFormView(form);
-        const sheetBg = getSheetBg(formView);
-        if (rightCol && sheetBg && formView) {
-            sheetBg.after(rightCol);
-        }
-    }
-
-    function movePdfToOriginalPosition(form) {
-        const rightCol = form.querySelector('.o_cotizacion_right_column');
-        const flexContainer = form.querySelector('.o_cotizacion_flex_container');
-        if (rightCol && flexContainer) {
-            flexContainer.appendChild(rightCol);
-        }
-    }
-
-    function repositionPdf(form, pdfVisible, chatterVisible) {
-        if (pdfVisible && !chatterVisible) {
-            movePdfToChatterPosition(form);
-        } else if (pdfVisible && chatterVisible) {
-            movePdfToOriginalPosition(form);
-        }
-    }
-
     function initializeFormState(form) {
         const pdfVisible = localStorage.getItem('cotizacion_pdf_visible') === 'true';
         const chatterVisible = localStorage.getItem('cotizacion_chatter_visible') === 'true';
@@ -154,7 +121,6 @@ try {
             form.classList.remove('hide-chatter');
         }
         
-        repositionPdf(form, pdfVisible, chatterVisible);
         updateButtonStates(form, pdfVisible, chatterVisible);
     }
 
@@ -189,7 +155,6 @@ try {
                     form.classList.add('hide-pdf');
                 }
                 const chatterVisible = localStorage.getItem('cotizacion_chatter_visible') === 'true';
-                repositionPdf(form, newVisible, chatterVisible);
                 updateButtonStates(form, newVisible, chatterVisible);
             }
             return;
@@ -208,7 +173,6 @@ try {
                     form.classList.add('hide-chatter');
                 }
                 const pdfVisible = localStorage.getItem('cotizacion_pdf_visible') === 'true';
-                repositionPdf(form, pdfVisible, newVisible);
                 updateButtonStates(form, pdfVisible, newVisible);
             }
             return;
