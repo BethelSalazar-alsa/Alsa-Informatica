@@ -81,94 +81,106 @@ window.addEventListener('error', function(event) {
 }, true);
 
 // --- MANEJO DE PLEGADO DE VISTAS (PDF Y CHATTER) ---
-
-function updateButtonStates(form, pdfVisible, chatterVisible) {
-    const pdfBtn = form.querySelector('.btn-toggle-pdf');
-    const chatterBtn = form.querySelector('.btn-toggle-chatter');
-    
-    if (pdfBtn) {
-        if (pdfVisible) {
-            pdfBtn.classList.remove('collapsed');
-        } else {
-            pdfBtn.classList.add('collapsed');
-        }
-    }
-    
-    if (chatterBtn) {
-        if (chatterVisible) {
-            chatterBtn.classList.remove('collapsed');
-        } else {
-            chatterBtn.classList.add('collapsed');
-        }
-    }
-}
-
-function initializeFormState(form) {
-    // Si no se han definido en localStorage, por defecto son visibles (true)
-    const pdfVisible = localStorage.getItem('cotizacion_pdf_visible') !== 'false';
-    const chatterVisible = localStorage.getItem('cotizacion_chatter_visible') !== 'false';
-    
-    if (!pdfVisible) {
-        form.classList.add('hide-pdf');
-    } else {
-        form.classList.remove('hide-pdf');
-    }
-    
-    if (!chatterVisible) {
-        form.classList.add('hide-chatter');
-    } else {
-        form.classList.remove('hide-chatter');
-    }
-    
-    updateButtonStates(form, pdfVisible, chatterVisible);
-}
-
-// Escuchar creación/inserción de formularios en el DOM mediante MutationObserver
-const formObserver = new MutationObserver(function(mutations) {
-    const form = document.querySelector('.o_cotizacion_express_form');
-    if (form && !form.dataset.viewInitialized) {
-        form.dataset.viewInitialized = 'true';
-        initializeFormState(form);
-    }
-});
-formObserver.observe(document.body, { childList: true, subtree: true });
-
-// Manejo de eventos click con delegación en document
-document.addEventListener('click', function(e) {
-    const pdfBtn = e.target.closest('.btn-toggle-pdf');
-    if (pdfBtn) {
-        const form = pdfBtn.closest('.o_cotizacion_express_form');
-        if (form) {
-            const isVisible = !form.classList.contains('hide-pdf');
-            const newVisible = !isVisible;
-            localStorage.setItem('cotizacion_pdf_visible', newVisible);
-            if (newVisible) {
-                form.classList.remove('hide-pdf');
+try {
+    function updateButtonStates(form, pdfVisible, chatterVisible) {
+        const pdfBtn = form.querySelector('.btn-toggle-pdf');
+        const chatterBtn = form.querySelector('.btn-toggle-chatter');
+        
+        if (pdfBtn) {
+            if (pdfVisible) {
+                pdfBtn.classList.remove('collapsed');
             } else {
-                form.classList.add('hide-pdf');
+                pdfBtn.classList.add('collapsed');
             }
-            const chatterVisible = localStorage.getItem('cotizacion_chatter_visible') !== 'false';
-            updateButtonStates(form, newVisible, chatterVisible);
         }
-        return;
-    }
-    
-    const chatterBtn = e.target.closest('.btn-toggle-chatter');
-    if (chatterBtn) {
-        const form = chatterBtn.closest('.o_cotizacion_express_form');
-        if (form) {
-            const isVisible = !form.classList.contains('hide-chatter');
-            const newVisible = !isVisible;
-            localStorage.setItem('cotizacion_chatter_visible', newVisible);
-            if (newVisible) {
-                form.classList.remove('hide-chatter');
+        
+        if (chatterBtn) {
+            if (chatterVisible) {
+                chatterBtn.classList.remove('collapsed');
             } else {
-                form.classList.add('hide-chatter');
+                chatterBtn.classList.add('collapsed');
             }
-            const pdfVisible = localStorage.getItem('cotizacion_pdf_visible') !== 'false';
-            updateButtonStates(form, pdfVisible, newVisible);
         }
-        return;
     }
-});
+
+    function initializeFormState(form) {
+        // Si no se han definido en localStorage, por defecto son visibles (true)
+        const pdfVisible = localStorage.getItem('cotizacion_pdf_visible') !== 'false';
+        const chatterVisible = localStorage.getItem('cotizacion_chatter_visible') !== 'false';
+        
+        if (!pdfVisible) {
+            form.classList.add('hide-pdf');
+        } else {
+            form.classList.remove('hide-pdf');
+        }
+        
+        if (!chatterVisible) {
+            form.classList.add('hide-chatter');
+        } else {
+            form.classList.remove('hide-chatter');
+        }
+        
+        updateButtonStates(form, pdfVisible, chatterVisible);
+    }
+
+    // Escuchar creación/inserción de formularios en el DOM mediante MutationObserver
+    const formObserver = new MutationObserver(function(mutations) {
+        const form = document.querySelector('.o_cotizacion_express_form');
+        if (form && !form.dataset.viewInitialized) {
+            form.dataset.viewInitialized = 'true';
+            initializeFormState(form);
+        }
+    });
+
+    function startObserving() {
+        if (document.body) {
+            formObserver.observe(document.body, { childList: true, subtree: true });
+        } else {
+            // Reintento en caso de carga temprana
+            setTimeout(startObserving, 50);
+        }
+    }
+    startObserving();
+
+    // Manejo de eventos click con delegación en document
+    document.addEventListener('click', function(e) {
+        const pdfBtn = e.target.closest('.btn-toggle-pdf');
+        if (pdfBtn) {
+            const form = pdfBtn.closest('.o_cotizacion_express_form');
+            if (form) {
+                const isVisible = !form.classList.contains('hide-pdf');
+                const newVisible = !isVisible;
+                localStorage.setItem('cotizacion_pdf_visible', newVisible);
+                if (newVisible) {
+                    form.classList.remove('hide-pdf');
+                } else {
+                    form.classList.add('hide-pdf');
+                }
+                const chatterVisible = localStorage.getItem('cotizacion_chatter_visible') !== 'false';
+                updateButtonStates(form, newVisible, chatterVisible);
+            }
+            return;
+        }
+        
+        const chatterBtn = e.target.closest('.btn-toggle-chatter');
+        if (chatterBtn) {
+            const form = chatterBtn.closest('.o_cotizacion_express_form');
+            if (form) {
+                const isVisible = !form.classList.contains('hide-chatter');
+                const newVisible = !isVisible;
+                localStorage.setItem('cotizacion_chatter_visible', newVisible);
+                if (newVisible) {
+                    form.classList.remove('hide-chatter');
+                } else {
+                    form.classList.add('hide-chatter');
+                }
+                const pdfVisible = localStorage.getItem('cotizacion_pdf_visible') !== 'false';
+                updateButtonStates(form, pdfVisible, newVisible);
+            }
+            return;
+        }
+    });
+} catch (e) {
+    console.error("Error in cotizacion_express UI controls:", e);
+}
 
