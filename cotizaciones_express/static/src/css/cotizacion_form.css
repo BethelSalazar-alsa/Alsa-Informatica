@@ -1,57 +1,4 @@
-/* Remove max-width and margins from Odoo's sheet container when chatter is hidden */
-.o_form_view:has(.o_cotizacion_express_form.hide-chatter) .o_form_sheet_bg {
-    display: block !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    padding: 0 !important;
-}
-
-/* Make the form sheet container span the full width of the screen when chatter is hidden */
-.o_form_view:has(.o_cotizacion_express_form.hide-chatter) .o_form_sheet_bg .o_form_sheet.o_cotizacion_express_sheet {
-    max-width: 100% !important;
-    width: 100% !important;
-    margin: 0 !important;
-    box-sizing: border-box;
-    padding-left: 24px !important;
-    padding-right: 24px !important;
-    box-shadow: none !important;
-    border: none !important;
-}
-
-/* Ensure the form renderer container also stretches to full width */
-.o_form_renderer.o_cotizacion_express_form {
-    width: 100% !important;
-    max-width: 100% !important;
-}
-
-/* Base flex wrapper for form view to enable perfect side-by-side view with Odoo chatter */
-.o_form_view:has(.o_cotizacion_express_form) {
-    display: flex !important;
-    flex-flow: row nowrap !important;
-    width: 100% !important;
-    max-width: 100% !important;
-}
-
-/* Sheet BG width rules depending on chatter visibility */
-.o_form_view:has(.o_cotizacion_express_form:not(.hide-chatter)) .o_form_sheet_bg {
-    width: 65% !important;
-    max-width: 65% !important;
-    flex: 1 1 65% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-/* Chatter width rules for the official sidebar */
-.o_form_view:has(.o_cotizacion_express_form:not(.hide-chatter)) .o-mail-Chatter,
-.o_form_view:has(.o_cotizacion_express_form:not(.hide-chatter)) .o_chatter {
-    width: 35% !important;
-    max-width: 35% !important;
-    flex: 1 1 35% !important;
-    box-sizing: border-box !important;
-    display: block !important;
-}
-
-/* Ensure the sheet itself is always full width inside its container */
+/* Sheet full width */
 .o_form_view .o_form_sheet_bg .o_form_sheet.o_cotizacion_express_sheet {
     max-width: 100% !important;
     width: 100% !important;
@@ -63,11 +10,15 @@
     border: none !important;
 }
 
-/* Force HTML field preview_html container to stretch vertically and fill the height */
+.o_form_renderer.o_cotizacion_express_form {
+    width: 100% !important;
+    max-width: 100% !important;
+}
+
+/* Preview HTML - fill column */
 .o_cotizacion_express_sheet [name="preview_html"] {
     width: 100% !important;
     height: 100% !important;
-    min-height: calc(100vh - 120px) !important;
     display: flex !important;
     flex-direction: column !important;
     flex: 1 !important;
@@ -76,7 +27,6 @@
 .o_cotizacion_express_sheet [name="preview_html"] > div {
     width: 100% !important;
     height: 100% !important;
-    min-height: calc(100vh - 120px) !important;
     display: flex !important;
     flex-direction: column !important;
     flex: 1 !important;
@@ -85,13 +35,12 @@
 .o_cotizacion_express_sheet [name="preview_html"] iframe {
     width: 100% !important;
     height: 100% !important;
-    min-height: calc(100vh - 130px) !important;
     flex: 1 !important;
     border: none !important;
     display: block !important;
 }
 
-/* Fix option_ids list column widths to prevent squishing */
+/* Option list column widths */
 .o_cotizacion_express_sheet [name="option_ids"] th[data-name="name"],
 .o_cotizacion_express_sheet [name="option_ids"] td[name="name"] {
     min-width: 250px !important;
@@ -105,9 +54,7 @@
     text-align: center !important;
 }
 
-/* --- VIEW COLLAPSING & FLOATING CONTROLS --- */
-
-/* Floating controls panel */
+/* Floating controls */
 .o_cotizacion_express_controls {
     position: fixed !important;
     right: 20px !important;
@@ -122,16 +69,8 @@
     border-radius: 24px !important;
     border: 1px solid rgba(0, 0, 0, 0.1) !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-/* Hover effect on panel */
-.o_cotizacion_express_controls:hover {
-    background: rgba(255, 255, 255, 0.95) !important;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18) !important;
-}
-
-/* Toggle button styling (Active/Visible State) */
 .o_cotizacion_express_controls .btn-toggle {
     width: 36px !important;
     height: 36px !important;
@@ -140,68 +79,33 @@
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
-    background-color: #EBF3FC !important; /* Soft Blue */
-    color: #1C355E !important; /* Dark ALSA Blue icon */
+    background-color: #EBF3FC !important;
+    color: #1C355E !important;
     border: 1px solid #C2D6EC !important;
     box-shadow: 0 2px 6px rgba(28, 53, 94, 0.15) !important;
     transition: all 0.2s ease-in-out !important;
     position: relative !important;
 }
 
-/* Hover effect on active button */
 .o_cotizacion_express_controls .btn-toggle:hover {
     transform: scale(1.1) !important;
     background-color: #dbeafe !important;
-    box-shadow: 0 4px 10px rgba(28, 53, 94, 0.25) !important;
 }
 
-/* Inactive state styling (when section is hidden / Collapsed) */
 .o_cotizacion_express_controls .btn-toggle.collapsed {
     background-color: #ffffff !important;
-    color: #94a3b8 !important; /* Slate grey icon */
+    color: #94a3b8 !important;
     border: 1px solid #e2e8f0 !important;
     box-shadow: none !important;
 }
 
-/* Hover effect on inactive button */
 .o_cotizacion_express_controls .btn-toggle.collapsed:hover {
     transform: scale(1.1) !important;
     background-color: #f8fafc !important;
     color: #475569 !important;
-    border-color: #cbd5e1 !important;
 }
 
-/* Tooltip indicator */
-.o_cotizacion_express_controls .btn-toggle::after {
-    content: attr(data-tooltip);
-    position: absolute;
-    right: 48px;
-    background-color: #1e293b;
-    color: #ffffff;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 11px;
-    font-family: inherit;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease;
-    transform: translateX(10px);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.o_cotizacion_express_controls .btn-toggle:hover::after {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-/* Two-column dynamic flex layout inside the sheet */
-.o_cotizacion_left_column,
-.o_cotizacion_right_column {
-    min-width: 0 !important;
-}
-
-/* Hide PDF rules */
+/* Hide PDF */
 .o_cotizacion_express_form.hide-pdf .o_cotizacion_right_column {
     display: none !important;
 }
@@ -209,21 +113,4 @@
 .o_cotizacion_express_form.hide-pdf .o_cotizacion_left_column {
     flex: 1 1 100% !important;
     width: 100% !important;
-}
-
-/* Hide Chatter rules */
-.o_cotizacion_express_form.hide-chatter .o-mail-Chatter,
-.o_cotizacion_express_form.hide-chatter .o_chatter,
-.o_cotizacion_express_form.hide-chatter .oe_chatter,
-.o_form_view:has(.hide-chatter) .o-mail-Chatter,
-.o_form_view:has(.hide-chatter) .o_chatter {
-    display: none !important;
-}
-
-/* Fallback safety: Hide any duplicate chatter fields rendered inside the sheet container */
-.o_cotizacion_express_sheet [name="message_follower_ids"],
-.o_cotizacion_express_sheet [name="activity_ids"],
-.o_cotizacion_express_sheet [name="message_ids"],
-.o_cotizacion_express_sheet .oe_chatter {
-    display: none !important;
 }
