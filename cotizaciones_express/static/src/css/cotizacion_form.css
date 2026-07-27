@@ -196,16 +196,9 @@
 }
 
 /* Two-column dynamic flex layout inside the sheet */
-.o_cotizacion_left_column {
-    flex: 3 1 0% !important;
-    min-width: 0 !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-}
-
+.o_cotizacion_left_column,
 .o_cotizacion_right_column {
-    flex: 2 1 0% !important;
     min-width: 0 !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 /* Hide PDF rules */

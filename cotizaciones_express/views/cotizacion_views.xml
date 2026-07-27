@@ -45,7 +45,7 @@
 
                     <div class="o_cotizacion_flex_container" style="display: flex; width: 100%; gap: 16px;">
                         <!-- Columna Izquierda: Crear Cotización -->
-                        <div class="o_cotizacion_left_column" style="flex: 1.2; min-width: 0; padding-right: 8px;">
+                        <div class="o_cotizacion_left_column" style="flex: 3; min-width: 0; padding-right: 8px;">
                             <div class="oe_title">
                                 <h1><field name="name" placeholder="Cotización"/></h1>
                             </div>
@@ -86,7 +86,7 @@
                         </div>
 
                         <!-- Columna Derecha: Vista Previa PDF -->
-                        <div class="o_cotizacion_right_column" style="flex: 1.2; position: sticky; top: 0; align-self: flex-start; background: #f8f9fa; border-radius: 6px; padding: 12px; min-width: 0; height: calc(100vh - 110px); min-height: 750px; display: flex; flex-direction: column;">
+                        <div class="o_cotizacion_right_column" style="flex: 2; position: sticky; top: 0; align-self: flex-start; background: #f8f9fa; border-radius: 6px; padding: 12px; min-width: 0; height: calc(100vh - 110px); min-height: 750px; display: flex; flex-direction: column;">
                             <div style="width: 100%; height: 100%; background: #fff; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; flex: 1;">
                                 <field name="preview_html" widget="html" nolabel="1" readonly="1" style="height: 100%; width: 100%; flex: 1; display: flex;"/>
                             </div>
