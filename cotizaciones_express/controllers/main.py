@@ -13,7 +13,7 @@ class CotizacionExpressController(http.Controller):
         else:
             cotizacion = request.env['cotizacion.express'].new({'name': 'Nueva'})
 
-        response = request.render('cotizaciones_express.cotizacion_preview_template', {
+        response = request.render('cotizaciones_express.cotizacion_preview_v3', {
             'docs': cotizacion,
             'preview_mode': True,
         })
@@ -83,7 +83,7 @@ class CotizacionExpressController(http.Controller):
                 var pdfLink = pDoc.getElementById('cotizacion_pdf_link');
                 if (pdfLink) {
                     if (parentId > 0) {
-                        pdfLink.href = "/report/pdf/cotizaciones_express.cotizacion_preview_template/" + parentId;
+                        pdfLink.href = "/report/pdf/cotizaciones_express.cotizacion_preview_v3/" + parentId;
                         pdfLink.style.display = "";
                     } else {
                         pdfLink.style.display = "none";

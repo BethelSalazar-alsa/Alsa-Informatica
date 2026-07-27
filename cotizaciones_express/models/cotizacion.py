@@ -26,6 +26,27 @@ class CotizacionExpress(models.Model):
     _rec_name = 'name'
     _inherit = ['mail.thread', 'mail.activity.mixin']
 
+    @api.model
+    def init(self):
+        try:
+            template_ref = self.env.ref('cotizaciones_express.cotizacion_preview_template', raise_if_not_found=False)
+            new_ref = self.env.ref('cotizaciones_express.cotizacion_preview_new', raise_if_not_found=False)
+            inherit_ids = []
+            if template_ref:
+                inherit_ids.append(template_ref.id)
+            if new_ref:
+                inherit_ids.append(new_ref.id)
+            if inherit_ids:
+                views = self.env['ir.ui.view'].search([
+                    ('inherit_id', 'in', inherit_ids)
+                ])
+                if views:
+                    # Desactivar vistas conflictivas
+                    views.write({'active': False})
+        except Exception as e:
+            pass
+        super(CotizacionExpress, self).init()
+
     name = fields.Char(string='Cotización', required=True, copy=False, readonly=True, default='Nueva')
     partner_id = fields.Many2one('res.partner', string='Cliente', required=True, tracking=True)
     partner_name = fields.Char(related='partner_id.name', string='Nombre del Cliente')
@@ -93,9 +114,10 @@ class CotizacionExpress(models.Model):
         for rec in self:
             if rec.id and isinstance(rec.id, int):
                 t = int(rec.write_date.timestamp()) if rec.write_date else 0
+                pdf_url = f"/report/pdf/cotizaciones_express.cotizacion_preview_v3/{rec.id}"
                 rec.preview_html = (
                     f'<div style="width: 100%; height: 100%; min-height: 650px;">'
-                    f'<iframe src="/report/pdf/cotizaciones_express.cotizacion_preview_template/{rec.id}?t={t}#zoom=page-width&view=FitH" '
+                    f'<iframe src="{pdf_url}?t={t}#zoom=page-width&view=FitH" '
                     f'style="width: 100%; height: 100%; border: none; min-height: 650px;" '
                     f'title="Preview PDF"></iframe>'
                     f'</div>'
@@ -148,7 +170,18 @@ class CotizacionExpress(models.Model):
     def create(self, vals_list):
         for vals in vals_list:
             if not vals.get('name') or vals.get('name') == 'Nueva':
-                vals['name'] = self.env['ir.sequence'].next_by_code('cotizacion.express') or 'Nueva'
+                seq_name = self.env['ir.sequence'].next_by_code('cotizacion.express') or 'Nueva'
+                # Eliminar prefijos antiguos como COT- o COT si la secuencia los tuviera
+                for prefix in ['COT-', 'COT', 'cot-', 'cot']:
+                    if seq_name.startswith(prefix):
+                        seq_name = seq_name[len(prefix):]
+                # Asegurar que termine en el año en curso (ej. -26 para 2026, -27 para 2027)
+                import datetime
+                import re
+                year_suffix = f"-{str(datetime.date.today().year)[-2:]}"
+                if not re.search(r'-\d{2}$', seq_name):
+                    seq_name = f"{seq_name}{year_suffix}"
+                vals['name'] = seq_name
             if 'state' in vals and 'stage_id' not in vals:
                 stage = self.env['cotizacion.express.stage'].search([('state_type', '=', vals['state'])], limit=1)
                 if stage:
@@ -172,6 +205,49 @@ class CotizacionExpress(models.Model):
                 
         res = super(CotizacionExpress, self).write(vals)
         return res
+
+    def copy(self, default=None):
+        self.ensure_one()
+        default = dict(default or {})
+        
+        # Resetear estado a borrador y etapa por defecto
+        default['state'] = 'draft'
+        default['stage_id'] = self._default_stage_id()
+        
+        seq_name = self.env['ir.sequence'].next_by_code('cotizacion.express') or 'Nueva'
+        for prefix in ['COT-', 'COT', 'cot-', 'cot']:
+            if seq_name.startswith(prefix):
+                seq_name = seq_name[len(prefix):]
+        import datetime
+        import re
+        year_suffix = f"-{str(datetime.date.today().year)[-2:]}"
+        if not re.search(r'-\d{2}$', seq_name):
+            seq_name = f"{seq_name}{year_suffix}"
+        default['name'] = seq_name
+        
+        copied_options = []
+        for option in self.option_ids:
+            copied_lines = []
+            for line in option.line_ids:
+                copied_lines.append((0, 0, {
+                    'name': line.name,
+                    'description': line.description,
+                    'quantity': line.quantity,
+                    'price_unit': line.price_unit,
+                    'iva_percent': line.iva_percent,
+                    'discount': line.discount,
+                    'sequence': line.sequence,
+                }))
+            copied_options.append((0, 0, {
+                'name': option.name,
+                'description': option.description,
+                'selected': option.selected,
+                'sequence': option.sequence,
+                'discount_general': option.discount_general,
+                'line_ids': copied_lines,
+            }))
+        default['option_ids'] = copied_options
+        return super(CotizacionExpress, self).copy(default=default)
 
     def action_send_to_client(self):
         self.ensure_one()
@@ -276,11 +352,24 @@ class CotizacionExpress(models.Model):
             'context': {'show_express_orders': True},
         }
 
+    def action_print_pdf(self):
+        self.ensure_one()
+        return self.env.ref('cotizaciones_express.report_cotizacion_express').report_action(self)
+
+    def action_print_direct(self):
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_url',
+            'url': f'/report/html/cotizaciones_express.cotizacion_preview_v3/{self.id}',
+            'target': 'new',
+        }
+
     def action_cancel(self):
         self.state = 'cancelled'
 
     def action_draft(self):
         self.state = 'draft'
+
 
 
 class CotizacionExpressOption(models.Model):
@@ -296,6 +385,9 @@ class CotizacionExpressOption(models.Model):
     sequence = fields.Integer(string='Secuencia', default=10)
 
     discount_general = fields.Float(string='Descuento General %', default=0.0)
+    amount_lines_before_discount = fields.Monetary(string='Subtotal sin Descuento', compute='_compute_option_totals', store=True)
+    discount_lines_amount = fields.Monetary(string='Descuento en Líneas', compute='_compute_option_totals', store=True)
+    discount_total = fields.Monetary(string='Descuento Total', compute='_compute_option_totals', store=True)
     amount_lines_subtotal = fields.Monetary(string='Subtotal Líneas', compute='_compute_option_totals', store=True)
     amount_lines_iva = fields.Monetary(string='IVA Líneas', compute='_compute_option_totals', store=True)
     discount_general_amount = fields.Monetary(string='Monto Descuento General', compute='_compute_option_totals', store=True)
@@ -304,14 +396,18 @@ class CotizacionExpressOption(models.Model):
     total = fields.Monetary(string='Total', compute='_compute_option_totals', store=True)
     currency_id = fields.Many2one('res.currency', related='cotizacion_id.currency_id')
 
-    @api.depends('line_ids.subtotal', 'line_ids.iva_amount', 'discount_general')
+    @api.depends('line_ids.subtotal', 'line_ids.iva_amount', 'line_ids.price_unit', 'line_ids.quantity', 'discount_general')
     def _compute_option_totals(self):
         for rec in self:
+            lines_before_discount = sum(line.price_unit * line.quantity for line in rec.line_ids)
+            rec.amount_lines_before_discount = lines_before_discount
             rec.amount_lines_subtotal = sum(rec.line_ids.mapped('subtotal'))
+            rec.discount_lines_amount = lines_before_discount - rec.amount_lines_subtotal
             rec.amount_lines_iva = sum(rec.line_ids.mapped('iva_amount'))
             rec.discount_general_amount = rec.amount_lines_subtotal * (rec.discount_general / 100.0)
             rec.subtotal = rec.amount_lines_subtotal - rec.discount_general_amount
             rec.iva_total = rec.amount_lines_iva * (1.0 - rec.discount_general / 100.0)
+            rec.discount_total = rec.discount_lines_amount + rec.discount_general_amount
             rec.total = rec.subtotal + rec.iva_total
 
     def action_duplicate(self):

@@ -9,7 +9,7 @@
         <field name="page_height">279</field>
         <field name="orientation">Portrait</field>
         <field name="margin_top">30</field>
-        <field name="margin_bottom">28</field>
+        <field name="margin_bottom">16</field>
         <field name="margin_left">10</field>
         <field name="margin_right">10</field>
         <field name="header_line" eval="False"/>
@@ -21,9 +21,11 @@
         <field name="name">Cotización Express</field>
         <field name="model">cotizacion.express</field>
         <field name="report_type">qweb-pdf</field>
-        <field name="report_name">cotizaciones_express.cotizacion_preview_template</field>
-        <field name="report_file">cotizaciones_express.cotizacion_preview_template</field>
+        <field name="report_name">cotizaciones_express.cotizacion_preview_v3</field>
+        <field name="report_file">cotizaciones_express.cotizacion_preview_v3</field>
         <field name="print_report_name">'Cotizacion_' + (object.name or '')</field>
+        <field name="binding_model_id" ref="model_cotizacion_express"/>
+        <field name="binding_type">report</field>
         <field name="paperformat_id" ref="paperformat_cotizacion_carta"/>
     </record>
 </odoo>
