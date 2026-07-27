@@ -15,11 +15,10 @@
     max-width: 100% !important;
 }
 
-/* Preview HTML inside sheet */
+/* Preview HTML */
 .o_cotizacion_express_sheet [name="preview_html"] {
     width: 100% !important;
     height: 100% !important;
-    min-height: calc(100vh - 120px) !important;
     display: flex !important;
     flex-direction: column !important;
     flex: 1 !important;
@@ -28,7 +27,6 @@
 .o_cotizacion_express_sheet [name="preview_html"] > div {
     width: 100% !important;
     height: 100% !important;
-    min-height: calc(100vh - 120px) !important;
     display: flex !important;
     flex-direction: column !important;
     flex: 1 !important;
@@ -37,7 +35,6 @@
 .o_cotizacion_express_sheet [name="preview_html"] iframe {
     width: 100% !important;
     height: 100% !important;
-    min-height: calc(100vh - 130px) !important;
     flex: 1 !important;
     border: none !important;
     display: block !important;
@@ -55,152 +52,4 @@
     width: 110px !important;
     min-width: 110px !important;
     text-align: center !important;
-}
-
-/* Floating controls */
-.o_cotizacion_express_controls {
-    position: fixed !important;
-    right: 20px !important;
-    top: 150px !important;
-    z-index: 1050 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 10px !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(8px) !important;
-    padding: 8px !important;
-    border-radius: 24px !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
-}
-
-.o_cotizacion_express_controls .btn-toggle {
-    width: 36px !important;
-    height: 36px !important;
-    border-radius: 50% !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    cursor: pointer !important;
-    background-color: #EBF3FC !important;
-    color: #1C355E !important;
-    border: 1px solid #C2D6EC !important;
-    box-shadow: 0 2px 6px rgba(28, 53, 94, 0.15) !important;
-    transition: all 0.2s ease-in-out !important;
-    position: relative !important;
-}
-
-.o_cotizacion_express_controls .btn-toggle:hover {
-    transform: scale(1.1) !important;
-    background-color: #dbeafe !important;
-}
-
-.o_cotizacion_express_controls .btn-toggle.collapsed {
-    background-color: #ffffff !important;
-    color: #94a3b8 !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: none !important;
-}
-
-/* === VIEW SHARING GRID LAYOUT === */
-
-/* Base container styling */
-.o_form_view:has(.o_cotizacion_express_form) {
-    display: flex !important;
-    flex-flow: row nowrap !important;
-    width: 100% !important;
-    max-width: 100% !important;
-}
-
-/* 1. Sheet container width based on Chatter visibility */
-.o_form_view:has(.o_cotizacion_express_form.hide-chatter) .o_form_sheet_bg {
-    width: 100% !important;
-    max-width: 100% !important;
-    flex: 1 1 100% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-.o_form_view:has(.o_cotizacion_express_form:not(.hide-chatter)) .o_form_sheet_bg {
-    width: 65% !important;
-    max-width: 65% !important;
-    flex: 1 1 65% !important;
-    padding: 0 !important;
-    margin: 0 !important;
-}
-
-/* 2. Chatter sidebar styling when visible */
-.o_form_view:has(.o_cotizacion_express_form:not(.hide-chatter)) .o-mail-Chatter,
-.o_form_view:has(.o_cotizacion_express_form:not(.hide-chatter)) .o_chatter {
-    width: 35% !important;
-    max-width: 35% !important;
-    flex: 1 1 35% !important;
-    box-sizing: border-box !important;
-    display: block !important;
-}
-
-.o_form_view:has(.o_cotizacion_express_form.hide-chatter) .o-mail-Chatter,
-.o_form_view:has(.o_cotizacion_express_form.hide-chatter) .o_chatter {
-    display: none !important;
-}
-
-/* 3. Sheet container interior columns (Editor & PDF) */
-.o_cotizacion_left_column {
-    min-width: 0 !important;
-    transition: all 0.3s ease !important;
-}
-
-.o_cotizacion_right_column {
-    min-width: 0 !important;
-    transition: all 0.3s ease !important;
-}
-
-/* STATE A: Chatter is hidden, PDF is visible (Editor 65%, PDF 35% of the screen) */
-.o_cotizacion_express_form.hide-chatter:not(.hide-pdf) .o_cotizacion_left_column {
-    flex: 1 1 65% !important;
-    width: 65% !important;
-    border-right: 1px solid #dee2e6 !important;
-    padding-right: 16px !important;
-}
-
-.o_cotizacion_express_form.hide-chatter:not(.hide-pdf) .o_cotizacion_right_column {
-    flex: 1 1 35% !important;
-    width: 35% !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-/* STATE B: Chatter is visible, PDF is visible (Editor 50%, PDF 50% inside the 65% sheet) */
-.o_cotizacion_express_form:not(.hide-chatter):not(.hide-pdf) .o_cotizacion_left_column {
-    flex: 1 1 50% !important;
-    width: 50% !important;
-    border-right: 1px solid #dee2e6 !important;
-    padding-right: 16px !important;
-}
-
-.o_cotizacion_express_form:not(.hide-chatter):not(.hide-pdf) .o_cotizacion_right_column {
-    flex: 1 1 50% !important;
-    width: 50% !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-/* STATE C: PDF is hidden (Editor takes 100% of the sheet) */
-.o_cotizacion_express_form.hide-pdf .o_cotizacion_right_column {
-    display: none !important;
-}
-
-.o_cotizacion_express_form.hide-pdf .o_cotizacion_left_column {
-    flex: 1 1 100% !important;
-    width: 100% !important;
-    border-right: none !important;
-    padding-right: 0 !important;
-}
-
-/* Fallback safety: Hide any duplicate chatter fields rendered inside the sheet container */
-.o_cotizacion_express_sheet [name="message_follower_ids"],
-.o_cotizacion_express_sheet [name="activity_ids"],
-.o_cotizacion_express_sheet [name="message_ids"],
-.o_cotizacion_express_sheet .oe_chatter {
-    display: none !important;
 }
