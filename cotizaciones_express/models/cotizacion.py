@@ -114,12 +114,14 @@ class CotizacionExpress(models.Model):
         if self.stage_id:
             self.state = self.stage_id.state_type
 
-    @api.depends('write_date')
+    @api.depends('write_date', 'name')
     def _compute_preview_html(self):
         for rec in self:
             if rec.id and isinstance(rec.id, int):
                 t = int(rec.write_date.timestamp()) if rec.write_date else 0
-                pdf_url = f"/report/pdf/cotizaciones_express.cotizacion_preview_v3/{rec.id}"
+                safe_name = (rec.name or '').replace('/', '_').replace('\\', '_').strip()
+                filename = f"Cotizacion_{safe_name}.pdf" if safe_name else "Cotizacion.pdf"
+                pdf_url = f"/report/pdf/cotizaciones_express.cotizacion_preview_v3/{rec.id}/{filename}"
                 rec.preview_html = (
                     f'<div style="width: 100%; height: 100%; min-height: 650px;">'
                     f'<iframe src="{pdf_url}?t={t}#zoom=page-width&view=FitH" '
