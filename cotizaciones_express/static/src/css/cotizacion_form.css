@@ -113,29 +113,29 @@
 }
 
 /* Switch styling when Chatter is active */
-.o_form_view:has(.o_cotizacion_express_form.show-chatter) .btn-toggle-mode {
+.o_form_view.show-chatter .btn-toggle-mode {
     background-color: #2e7d32 !important; /* Green color for chat */
     border-color: #a5d6a7 !important;
     box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3) !important;
 }
 
-.o_form_view:has(.o_cotizacion_express_form.show-chatter) .btn-toggle-mode:hover {
+.o_form_view.show-chatter .btn-toggle-mode:hover {
     background-color: #388e3c !important;
     box-shadow: 0 6px 16px rgba(46, 125, 50, 0.4) !important;
 }
 
-.o_form_view:has(.o_cotizacion_express_form.show-chatter) .btn-toggle-mode .icon-pdf {
+.o_form_view.show-chatter .btn-toggle-mode .icon-pdf {
     display: inline-block !important;
 }
 
-.o_form_view:has(.o_cotizacion_express_form.show-chatter) .btn-toggle-mode .icon-chatter {
+.o_form_view.show-chatter .btn-toggle-mode .icon-chatter {
     display: none !important;
 }
 
 /* === VIEW SHARING GRID LAYOUT === */
 
 /* Base container styling */
-.o_form_view:has(.o_cotizacion_express_form) {
+.o_form_view:has(.o_cotizacion_express_sheet) {
     display: flex !important;
     flex-flow: row nowrap !important;
     width: 100% !important;
@@ -144,7 +144,7 @@
 
 /* 1. Sheet container width based on Chatter visibility */
 /* In PDF Mode (default, show-chatter not present) */
-.o_form_view:has(.o_cotizacion_express_form:not(.show-chatter)) .o_form_sheet_bg {
+.o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o_form_sheet_bg {
     width: 100% !important;
     max-width: 100% !important;
     flex: 1 1 100% !important;
@@ -153,7 +153,7 @@
 }
 
 /* In Chatter Mode (show-chatter active) */
-.o_form_view:has(.o_cotizacion_express_form.show-chatter) .o_form_sheet_bg {
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_form_sheet_bg {
     width: 50% !important;
     max-width: 50% !important;
     flex: 1 1 50% !important;
@@ -162,8 +162,10 @@
 }
 
 /* 2. Chatter sidebar styling when visible */
-.o_form_view:has(.o_cotizacion_express_form.show-chatter) .o-mail-Chatter,
-.o_form_view:has(.o_cotizacion_express_form.show-chatter) .o_chatter {
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Chatter,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_chatter,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Form-chatter,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_FormRenderer_chatter {
     width: 50% !important;
     max-width: 50% !important;
     flex: 1 1 50% !important;
@@ -180,31 +182,33 @@
 }
 
 /* Hide chatter when in PDF Mode */
-.o_form_view:has(.o_cotizacion_express_form:not(.show-chatter)) .o-mail-Chatter,
-.o_form_view:has(.o_cotizacion_express_form:not(.show-chatter)) .o_chatter {
+.o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o-mail-Chatter,
+.o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o_chatter,
+.o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o-mail-Form-chatter,
+.o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o_FormRenderer_chatter {
     display: none !important;
 }
 
 /* 3. Sheet container interior columns (Editor & PDF) */
-.o_cotizacion_left_column {
+.o_form_view:has(.o_cotizacion_express_sheet) .o_cotizacion_left_column {
     min-width: 0 !important;
     transition: all 0.3s ease !important;
 }
 
-.o_cotizacion_right_column {
+.o_form_view:has(.o_cotizacion_express_sheet) .o_cotizacion_right_column {
     min-width: 0 !important;
     transition: all 0.3s ease !important;
 }
 
 /* STATE A (PDF Mode): Left Column (Editor) 50%, Right Column (PDF) 50% */
-.o_cotizacion_express_form:not(.show-chatter) .o_cotizacion_left_column {
+.o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o_cotizacion_left_column {
     flex: 1 1 50% !important;
     width: 50% !important;
     border-right: 1px solid #dee2e6 !important;
     padding-right: 16px !important;
 }
 
-.o_cotizacion_express_form:not(.show-chatter) .o_cotizacion_right_column {
+.o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o_cotizacion_right_column {
     flex: 1 1 50% !important;
     width: 50% !important;
     display: flex !important;
@@ -212,14 +216,14 @@
 }
 
 /* STATE B (Chatter Mode): Left Column (Editor) takes 100% of the 50% sheet, PDF hidden */
-.o_cotizacion_express_form.show-chatter .o_cotizacion_left_column {
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_cotizacion_left_column {
     flex: 1 1 100% !important;
     width: 100% !important;
     border-right: none !important;
     padding-right: 0 !important;
 }
 
-.o_cotizacion_express_form.show-chatter .o_cotizacion_right_column {
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_cotizacion_right_column {
     display: none !important;
 }
 

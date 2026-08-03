@@ -80,13 +80,14 @@ window.addEventListener('error', function(event) {
 
 // --- TOGGLES ---
 document.addEventListener('click', function(e) {
-    var form = e.target.closest('.o_cotizacion_express_form');
-    if (!form) return;
-
     var modeBtn = e.target.closest('.btn-toggle-mode');
-    if (modeBtn) {
-        var isChatter = form.classList.toggle('show-chatter');
-        modeBtn.setAttribute('title', isChatter ? 'Ver PDF' : 'Ver Chatter');
-        return;
-    }
+    if (!modeBtn) return;
+
+    // Find the Odoo form view container
+    var formView = modeBtn.closest('.o_form_view');
+    if (!formView) return;
+
+    // Toggle the class on the top-level form view container
+    var isChatter = formView.classList.toggle('show-chatter');
+    modeBtn.setAttribute('title', isChatter ? 'Ver PDF' : 'Ver Chatter');
 });
