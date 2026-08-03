@@ -170,7 +170,9 @@
     max-width: 50% !important;
     flex: 1 1 50% !important;
     box-sizing: border-box !important;
-    display: block !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
     height: calc(100vh - 110px) !important;
     position: sticky !important;
     top: 0 !important;
@@ -179,6 +181,14 @@
     padding-left: 20px !important;
     padding-right: 20px !important;
     border-left: 1px solid #dee2e6 !important;
+}
+
+/* Ensure all nested elements inside the chatter span the full available width */
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Chatter *,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_chatter *,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Form-chatter *,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_FormRenderer_chatter * {
+    max-width: 100% !important;
 }
 
 /* Hide chatter when in PDF Mode */
