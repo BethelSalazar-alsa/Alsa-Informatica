@@ -74,42 +74,62 @@
     top: 150px !important;
     z-index: 1050 !important;
     display: flex !important;
-    flex-direction: column !important;
-    gap: 10px !important;
-    background: rgba(255, 255, 255, 0.85) !important;
-    backdrop-filter: blur(8px) !important;
-    padding: 8px !important;
-    border-radius: 24px !important;
-    border: 1px solid rgba(0, 0, 0, 0.1) !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
 }
 
-.o_cotizacion_express_controls .btn-toggle {
-    width: 36px !important;
-    height: 36px !important;
+.o_cotizacion_express_controls .btn-toggle-mode {
+    width: 46px !important;
+    height: 46px !important;
     border-radius: 50% !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
     cursor: pointer !important;
-    background-color: #EBF3FC !important;
-    color: #1C355E !important;
+    background-color: #1C355E !important;
+    color: #ffffff !important;
     border: 1px solid #C2D6EC !important;
-    box-shadow: 0 2px 6px rgba(28, 53, 94, 0.15) !important;
-    transition: all 0.2s ease-in-out !important;
-    position: relative !important;
+    box-shadow: 0 4px 12px rgba(28, 53, 94, 0.3) !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
-.o_cotizacion_express_controls .btn-toggle:hover {
-    transform: scale(1.1) !important;
-    background-color: #dbeafe !important;
+.o_cotizacion_express_controls .btn-toggle-mode:hover {
+    transform: scale(1.1) rotate(15deg) !important;
+    background-color: #244376 !important;
+    box-shadow: 0 6px 16px rgba(28, 53, 94, 0.4) !important;
 }
 
-.o_cotizacion_express_controls .btn-toggle.collapsed {
-    background-color: #ffffff !important;
-    color: #94a3b8 !important;
-    border: 1px solid #e2e8f0 !important;
-    box-shadow: none !important;
+/* Dynamic icons switching */
+.o_cotizacion_express_controls .btn-toggle-mode .icon-pdf {
+    display: none !important;
+    font-size: 20px !important;
+}
+
+.o_cotizacion_express_controls .btn-toggle-mode .icon-chatter {
+    display: inline-block !important;
+    font-size: 20px !important;
+}
+
+/* Switch styling when Chatter is active */
+.o_form_view:has(.o_cotizacion_express_form.show-chatter) .btn-toggle-mode {
+    background-color: #2e7d32 !important; /* Green color for chat */
+    border-color: #a5d6a7 !important;
+    box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3) !important;
+}
+
+.o_form_view:has(.o_cotizacion_express_form.show-chatter) .btn-toggle-mode:hover {
+    background-color: #388e3c !important;
+    box-shadow: 0 6px 16px rgba(46, 125, 50, 0.4) !important;
+}
+
+.o_form_view:has(.o_cotizacion_express_form.show-chatter) .btn-toggle-mode .icon-pdf {
+    display: inline-block !important;
+}
+
+.o_form_view:has(.o_cotizacion_express_form.show-chatter) .btn-toggle-mode .icon-chatter {
+    display: none !important;
 }
 
 /* === VIEW SHARING GRID LAYOUT === */
@@ -123,7 +143,8 @@
 }
 
 /* 1. Sheet container width based on Chatter visibility */
-.o_form_view:has(.o_cotizacion_express_form.hide-chatter) .o_form_sheet_bg {
+/* In PDF Mode (default, show-chatter not present) */
+.o_form_view:has(.o_cotizacion_express_form:not(.show-chatter)) .o_form_sheet_bg {
     width: 100% !important;
     max-width: 100% !important;
     flex: 1 1 100% !important;
@@ -131,26 +152,36 @@
     margin: 0 !important;
 }
 
-.o_form_view:has(.o_cotizacion_express_form:not(.hide-chatter)) .o_form_sheet_bg {
-    width: 65% !important;
-    max-width: 65% !important;
-    flex: 1 1 65% !important;
+/* In Chatter Mode (show-chatter active) */
+.o_form_view:has(.o_cotizacion_express_form.show-chatter) .o_form_sheet_bg {
+    width: 50% !important;
+    max-width: 50% !important;
+    flex: 1 1 50% !important;
     padding: 0 !important;
     margin: 0 !important;
 }
 
 /* 2. Chatter sidebar styling when visible */
-.o_form_view:has(.o_cotizacion_express_form:not(.hide-chatter)) .o-mail-Chatter,
-.o_form_view:has(.o_cotizacion_express_form:not(.hide-chatter)) .o_chatter {
-    width: 35% !important;
-    max-width: 35% !important;
-    flex: 1 1 35% !important;
+.o_form_view:has(.o_cotizacion_express_form.show-chatter) .o-mail-Chatter,
+.o_form_view:has(.o_cotizacion_express_form.show-chatter) .o_chatter {
+    width: 50% !important;
+    max-width: 50% !important;
+    flex: 1 1 50% !important;
     box-sizing: border-box !important;
     display: block !important;
+    height: calc(100vh - 110px) !important;
+    position: sticky !important;
+    top: 0 !important;
+    overflow-y: auto !important;
+    background: #ffffff !important;
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+    border-left: 1px solid #dee2e6 !important;
 }
 
-.o_form_view:has(.o_cotizacion_express_form.hide-chatter) .o-mail-Chatter,
-.o_form_view:has(.o_cotizacion_express_form.hide-chatter) .o_chatter {
+/* Hide chatter when in PDF Mode */
+.o_form_view:has(.o_cotizacion_express_form:not(.show-chatter)) .o-mail-Chatter,
+.o_form_view:has(.o_cotizacion_express_form:not(.show-chatter)) .o_chatter {
     display: none !important;
 }
 
@@ -165,46 +196,31 @@
     transition: all 0.3s ease !important;
 }
 
-/* STATE A: Chatter is hidden, PDF is visible (Editor 65%, PDF 35% of the screen) */
-.o_cotizacion_express_form.hide-chatter:not(.hide-pdf) .o_cotizacion_left_column {
-    flex: 1 1 65% !important;
-    width: 65% !important;
-    border-right: 1px solid #dee2e6 !important;
-    padding-right: 16px !important;
-}
-
-.o_cotizacion_express_form.hide-chatter:not(.hide-pdf) .o_cotizacion_right_column {
-    flex: 1 1 35% !important;
-    width: 35% !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-/* STATE B: Chatter is visible, PDF is visible (Editor 50%, PDF 50% inside the 65% sheet) */
-.o_cotizacion_express_form:not(.hide-chatter):not(.hide-pdf) .o_cotizacion_left_column {
+/* STATE A (PDF Mode): Left Column (Editor) 50%, Right Column (PDF) 50% */
+.o_cotizacion_express_form:not(.show-chatter) .o_cotizacion_left_column {
     flex: 1 1 50% !important;
     width: 50% !important;
     border-right: 1px solid #dee2e6 !important;
     padding-right: 16px !important;
 }
 
-.o_cotizacion_express_form:not(.hide-chatter):not(.hide-pdf) .o_cotizacion_right_column {
+.o_cotizacion_express_form:not(.show-chatter) .o_cotizacion_right_column {
     flex: 1 1 50% !important;
     width: 50% !important;
     display: flex !important;
     flex-direction: column !important;
 }
 
-/* STATE C: PDF is hidden (Editor takes 100% of the sheet) */
-.o_cotizacion_express_form.hide-pdf .o_cotizacion_right_column {
-    display: none !important;
-}
-
-.o_cotizacion_express_form.hide-pdf .o_cotizacion_left_column {
+/* STATE B (Chatter Mode): Left Column (Editor) takes 100% of the 50% sheet, PDF hidden */
+.o_cotizacion_express_form.show-chatter .o_cotizacion_left_column {
     flex: 1 1 100% !important;
     width: 100% !important;
     border-right: none !important;
     padding-right: 0 !important;
+}
+
+.o_cotizacion_express_form.show-chatter .o_cotizacion_right_column {
+    display: none !important;
 }
 
 /* Fallback safety: Hide any duplicate chatter fields rendered inside the sheet container */

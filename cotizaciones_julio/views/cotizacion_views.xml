@@ -22,7 +22,7 @@
         <field name="name">cotizacion.express.form</field>
         <field name="model">cotizacion.express</field>
         <field name="arch" type="xml">
-            <form class="o_cotizacion_express_form hide-pdf hide-chatter">
+            <form class="o_cotizacion_express_form">
                 <header>
                     <button name="action_send_to_client" string="Enviar al Cliente" type="object" class="oe_highlight" invisible="state not in ['draft']"/>
                     <button name="action_confirm" string="Confirmar Venta" type="object" class="oe_highlight" invisible="state not in ['draft', 'sent']"/>
@@ -33,16 +33,8 @@
                 </header>
 
                 <sheet class="o_cotizacion_express_sheet">
-                    <div class="o_cotizacion_express_controls">
-                        <div class="btn-toggle btn-toggle-pdf collapsed">
-                            <i class="fa fa-file-pdf-o"/>
-                        </div>
-                        <div class="btn-toggle btn-toggle-chatter collapsed">
-                            <i class="fa fa-comments"/>
-                        </div>
-                    </div>
                     <div style="display: flex; width: 100%; gap: 16px;">
-                        <div class="o_cotizacion_left_column" style="flex: 1.2; min-width: 0; border-right: 1px solid #dee2e6; padding-right: 16px;">
+                        <div style="flex: 1.2; min-width: 0; border-right: 1px solid #dee2e6; padding-right: 16px;">
                             <div class="oe_title">
                                 <h1><field name="name" placeholder="Cotización"/></h1>
                             </div>
@@ -56,7 +48,6 @@
                                 </group>
                                 <group>
                                     <field name="user_id"/>
-                                    <field name="reply_to" placeholder="ejemplo@correo.com"/>
                                     <field name="signature_id" options="{'no_create': True}"/>
                                     <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
                                 </group>
@@ -82,18 +73,13 @@
                             </notebook>
                         </div>
 
-                        <div class="o_cotizacion_right_column" style="flex: 1.2; position: sticky; top: 0; align-self: flex-start; background: #f8f9fa; border-radius: 6px; padding: 12px; min-width: 0; height: calc(100vh - 110px); min-height: 750px; display: flex; flex-direction: column;">
+                        <div style="flex: 1.2; position: sticky; top: 0; align-self: flex-start; background: #f8f9fa; border-radius: 6px; padding: 12px; min-width: 0; height: calc(100vh - 110px); min-height: 750px; display: flex; flex-direction: column;">
                             <div style="width: 100%; height: 100%; background: #fff; border-radius: 4px; overflow: hidden; display: flex; flex-direction: column; flex: 1;">
                                 <field name="preview_html" widget="html" nolabel="1" readonly="1" style="height: 100%; width: 100%; flex: 1; display: flex;"/>
                             </div>
                         </div>
                     </div>
                 </sheet>
-                <chatter>
-                    <field name="message_follower_ids"/>
-                    <field name="activity_ids"/>
-                    <field name="message_ids"/>
-                </chatter>
             </form>
         </field>
     </record>

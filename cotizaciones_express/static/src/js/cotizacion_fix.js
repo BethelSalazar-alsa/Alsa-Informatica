@@ -83,17 +83,10 @@ document.addEventListener('click', function(e) {
     var form = e.target.closest('.o_cotizacion_express_form');
     if (!form) return;
 
-    var pdfBtn = e.target.closest('.btn-toggle-pdf');
-    if (pdfBtn) {
-        form.classList.toggle('hide-pdf');
-        pdfBtn.classList.toggle('collapsed');
-        return;
-    }
-
-    var chatterBtn = e.target.closest('.btn-toggle-chatter');
-    if (chatterBtn) {
-        form.classList.toggle('hide-chatter');
-        chatterBtn.classList.toggle('collapsed');
+    var modeBtn = e.target.closest('.btn-toggle-mode');
+    if (modeBtn) {
+        var isChatter = form.classList.toggle('show-chatter');
+        modeBtn.setAttribute('title', isChatter ? 'Ver PDF' : 'Ver Chatter');
         return;
     }
 });

@@ -34,8 +34,8 @@ Características Principales:
     ],
     'assets': {
         'web.assets_backend': [
-            'cotizaciones_julio/static/src/css/cotizacion_form.css',
-            'cotizaciones_julio/static/src/js/cotizacion_fix.js',
+            'cotizaciones_express/static/src/css/cotizacion_form.css',
+            'cotizaciones_express/static/src/js/cotizacion_fix.js',
         ],
     },
     'images': ['static/description/icon.png'],
