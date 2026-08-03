@@ -191,6 +191,31 @@
     max-width: 100% !important;
 }
 
+/* Force the chatter content, thread list, composer, messages, and internal email tables to stretch to full width */
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Chatter-content,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Thread,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Message,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Message-core,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Message-content,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Message-bubble,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Message-body,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Message-body table,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Message-body td,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Message-body div,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Composer,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Composer-core,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Composer-content,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_chatter_content,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_mail_thread,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_message,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_composer,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_message_body,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_message_body table,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_message_body td,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_message_body div {
+    width: 100% !important;
+}
+
 /* Hide chatter when in PDF Mode */
 .o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o-mail-Chatter,
 .o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o_chatter,
