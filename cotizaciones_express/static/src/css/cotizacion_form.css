@@ -162,12 +162,17 @@
 }
 
 /* 2. Chatter sidebar styling when visible */
+/* Force the outer chatter container wrapper to occupy exactly 50% width */
 .o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Chatter,
 .o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_chatter,
 .o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Form-chatter,
-.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_FormRenderer_chatter {
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_FormRenderer_chatter,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_FormRenderer_chatterContainer,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_chatter_container,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-ChatterContainer {
     width: 50% !important;
     max-width: 50% !important;
+    min-width: 50% !important;
     flex: 1 1 50% !important;
     box-sizing: border-box !important;
     display: flex !important;
@@ -181,6 +186,20 @@
     padding-left: 20px !important;
     padding-right: 20px !important;
     border-left: 1px solid #dee2e6 !important;
+}
+
+/* Inner nested chatter components must stretch to fill 100% of the 50% wide outer container */
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Form-chatter .o-mail-Chatter,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_FormRenderer_chatterContainer .o-mail-Chatter,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o_chatter_container .o_chatter,
+.o_form_view:has(.o_cotizacion_express_sheet).show-chatter .o-mail-Form-chatter .o_chatter {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 100% !important;
+    flex: 1 1 100% !important;
+    border-left: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 /* Ensure all nested elements inside the chatter span the full available width */
@@ -220,7 +239,10 @@
 .o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o-mail-Chatter,
 .o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o_chatter,
 .o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o-mail-Form-chatter,
-.o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o_FormRenderer_chatter {
+.o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o_FormRenderer_chatter,
+.o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o_FormRenderer_chatterContainer,
+.o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o_chatter_container,
+.o_form_view:has(.o_cotizacion_express_sheet):not(.show-chatter) .o-mail-ChatterContainer {
     display: none !important;
 }
 
