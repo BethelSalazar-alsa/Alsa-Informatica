@@ -22,12 +22,13 @@ function getErrorChainDetails(errorObj) {
                 if (current.stack) parts.push(String(current.stack));
                 parts.push(String(current));
             }
-        } catch(e) {}
+        } catch (e) { }
 
+        // Traverse cause (ES2022 Error cause), error, or reason properties
         var next = null;
         try {
             next = current.cause || current.error || current.reason;
-        } catch(e) {}
+        } catch (e) { }
 
         current = next;
         depth++;
@@ -50,17 +51,18 @@ function isCrossOriginCleanupError(event) {
         var hasEarlyListener = details.indexOf('useEarlyExternalListener') !== -1;
         var hasOwlLifecycle = details.indexOf('owl lifecycle') !== -1 || details.indexOf('OwlError') !== -1;
 
-        if (hasRemoveListener || 
-            (hasCrossOrigin && hasEarlyListener) || 
+        if (hasRemoveListener ||
+            (hasCrossOrigin && hasEarlyListener) ||
             (hasCrossOrigin && hasRemoveListener) ||
             (hasOwlLifecycle && (hasCrossOrigin || hasRemoveListener || hasEarlyListener))) {
             return true;
         }
-    } catch(e) {}
+    } catch (e) { }
     return false;
 }
 
-window.addEventListener('unhandledrejection', function(event) {
+// Interceptor global de errores cross-origin para evitar la ventana emergente de Owl al desmontar la vista previa iframe
+window.addEventListener('unhandledrejection', function (event) {
     if (isCrossOriginCleanupError(event)) {
         event.preventDefault();
         if (event.stopImmediatePropagation) {
@@ -69,7 +71,7 @@ window.addEventListener('unhandledrejection', function(event) {
     }
 }, true);
 
-window.addEventListener('error', function(event) {
+window.addEventListener('error', function (event) {
     if (isCrossOriginCleanupError(event)) {
         event.preventDefault();
         if (event.stopImmediatePropagation) {
@@ -78,16 +80,3 @@ window.addEventListener('error', function(event) {
     }
 }, true);
 
-// --- TOGGLES ---
-document.addEventListener('click', function(e) {
-    var modeBtn = e.target.closest('.btn-toggle-mode');
-    if (!modeBtn) return;
-
-    // Find the Odoo form view container
-    var formView = modeBtn.closest('.o_form_view');
-    if (!formView) return;
-
-    // Toggle the class on the top-level form view container
-    var isChatter = formView.classList.toggle('show-chatter');
-    modeBtn.setAttribute('title', isChatter ? 'Ver PDF' : 'Ver Chatter');
-});

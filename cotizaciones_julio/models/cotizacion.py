@@ -59,11 +59,6 @@ class CotizacionExpress(models.Model):
     state_location = fields.Char(string='Estado (Ubicación)', default='Col.')
 
     user_id = fields.Many2one('res.users', string='Vendedor', default=lambda self: self.env.user, required=True)
-    reply_to = fields.Char(
-        string='Responder a (Email)',
-        help="El cliente responderá a esta dirección de correo al contestar el correo de la cotización.",
-        default=lambda self: self.env.user.email or self.env.user.login
-    )
     signature_id = fields.Many2one('seller.signature', string='Firma del Vendedor',
                                    domain="[('user_id', '=', user_id)]")
 
@@ -114,17 +109,15 @@ class CotizacionExpress(models.Model):
         if self.stage_id:
             self.state = self.stage_id.state_type
 
-    @api.depends('write_date', 'name')
+    @api.depends('write_date')
     def _compute_preview_html(self):
         for rec in self:
             if rec.id and isinstance(rec.id, int):
                 t = int(rec.write_date.timestamp()) if rec.write_date else 0
-                safe_name = (rec.name or '').replace('/', '_').replace('\\', '_').strip()
-                filename = f"Cotizacion_{safe_name}.pdf" if safe_name else "Cotizacion.pdf"
                 pdf_url = f"/report/pdf/cotizaciones_express.cotizacion_preview_v3/{rec.id}"
                 rec.preview_html = (
                     f'<div style="width: 100%; height: 100%; min-height: 650px;">'
-                    f'<iframe src="{pdf_url}?filename={filename}&t={t}#zoom=page-width&view=FitH" '
+                    f'<iframe src="{pdf_url}?t={t}#zoom=page-width&view=FitH" '
                     f'style="width: 100%; height: 100%; border: none; min-height: 650px;" '
                     f'title="Preview PDF"></iframe>'
                     f'</div>'
@@ -258,6 +251,7 @@ class CotizacionExpress(models.Model):
 
     def action_send_to_client(self):
         self.ensure_one()
+        self.state = 'sent'
         template = self.env.ref('cotizaciones_express.email_template_cotizacion', raise_if_not_found=False)
         compose_form = self.env.ref('mail.email_compose_message_wizard_form')
         ctx = {
@@ -265,7 +259,6 @@ class CotizacionExpress(models.Model):
             'default_res_ids': self.ids,
             'default_template_id': template.id if template else False,
             'default_composition_mode': 'comment',
-            'default_reply_to': self.reply_to or (self.env.user.email or self.env.user.login),
             'force_email': True,
         }
         return {
@@ -278,14 +271,6 @@ class CotizacionExpress(models.Model):
             'target': 'new',
             'context': ctx,
         }
-
-    def _message_post_after_hook(self, message, msg_dict):
-        res = super()._message_post_after_hook(message, msg_dict)
-        for record in self:
-            if record.state == 'draft' and msg_dict.get('message_type') == 'email':
-                stage = self.env['cotizacion.express.stage'].search([('state_type', '=', 'sent')], limit=1)
-                record.write({'state': 'sent', 'stage_id': stage.id if stage else False})
-        return res
 
     def action_confirm(self):
         self.ensure_one()
