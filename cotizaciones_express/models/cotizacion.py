@@ -62,7 +62,7 @@ class CotizacionExpress(models.Model):
     reply_to = fields.Char(
         string='Responder a (Email)',
         help="El cliente responderá a esta dirección de correo al contestar el correo de la cotización.",
-        default=lambda self: self.env.user.email or self.env.user.login
+        default='julio.hardware@alsainformatica.com.mx'
     )
     signature_id = fields.Many2one('seller.signature', string='Firma del Vendedor',
                                    domain="[('user_id', '=', user_id)]")
@@ -281,10 +281,15 @@ class CotizacionExpress(models.Model):
 
     def _message_post_after_hook(self, message, msg_dict):
         res = super()._message_post_after_hook(message, msg_dict)
+        if self.env.context.get('skip_stage_update_on_message'):
+            return res
         for record in self:
-            if record.state == 'draft' and msg_dict.get('message_type') == 'email':
+            if record.state == 'draft' and msg_dict.get('message_type') in ('email', 'comment'):
                 stage = self.env['cotizacion.express.stage'].search([('state_type', '=', 'sent')], limit=1)
-                record.write({'state': 'sent', 'stage_id': stage.id if stage else False})
+                record.with_context(skip_stage_update_on_message=True).write({
+                    'state': 'sent',
+                    'stage_id': stage.id if stage else False
+                })
         return res
 
     def action_confirm(self):
