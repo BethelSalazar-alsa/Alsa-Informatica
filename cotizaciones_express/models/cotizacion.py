@@ -260,7 +260,7 @@ class CotizacionExpress(models.Model):
             'default_res_ids': self.ids,
             'default_template_id': template.id if template else False,
             'default_composition_mode': 'comment',
-            'default_reply_to': 'julio.hardware@alsainformatica.com.mx',
+            'default_reply_to': self.env.user.email or self.env.user.login,
             'force_email': True,
         }
         return {
@@ -277,7 +277,7 @@ class CotizacionExpress(models.Model):
     def _message_post_after_hook(self, message, msg_dict):
         res = super()._message_post_after_hook(message, msg_dict)
         for record in self:
-            if record.state == 'draft' and msg_dict.get('message_type') in ('email', 'comment'):
+            if record.state == 'draft' and msg_dict.get('message_type') == 'email':
                 stage = self.env['cotizacion.express.stage'].search([('state_type', '=', 'sent')], limit=1)
                 record.write({'state': 'sent', 'stage_id': stage.id if stage else False})
         return res
