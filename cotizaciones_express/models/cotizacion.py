@@ -578,13 +578,16 @@ class CotizacionConfirmWizard(models.TransientModel):
         for line in self.line_ids:
             line.option_id.selected = line.selected
         
-        res = self.cotizacion_id.with_context(from_wizard=True).action_confirm_sale_order()
+        self.cotizacion_id.with_context(from_wizard=True).action_confirm_sale_order()
         
         stage = self.env['cotizacion.express.stage'].search([('state_type', '=', 'confirmed')], limit=1)
         if stage:
             self.cotizacion_id.with_context(from_wizard=True).stage_id = stage.id
             
-        return res
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'reload',
+        }
 
 
 class CotizacionConfirmWizardLine(models.TransientModel):
