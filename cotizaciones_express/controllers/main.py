@@ -24,7 +24,7 @@ class CotizacionExpressReportController(ReportController):
                         rec = request.env['cotizacion.express'].browse(ids[0])
                         if rec.exists():
                             safe_name = (rec.name or '').replace('/', '_').replace('\\', '_').strip()
-                            filename = f"Cotizacion_{safe_name}.pdf" if safe_name else "Cotizacion.pdf"
+                            filename = f"{safe_name}.pdf" if safe_name else "Cotizacion.pdf"
                 except Exception:
                     pass
 

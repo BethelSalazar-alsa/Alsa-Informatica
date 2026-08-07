@@ -1,6 +1,6 @@
 import logging
 from odoo import models, fields, api, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, RedirectWarning
 
 _logger = logging.getLogger(__name__)
 
@@ -209,6 +209,17 @@ class CotizacionExpress(models.Model):
             stage = self.env['cotizacion.express.stage'].search([('state_type', '=', vals['state'])], limit=1)
             if stage:
                 vals['stage_id'] = stage.id
+
+        is_confirming = vals.get('state') == 'confirmed'
+        if is_confirming and not self.env.context.get('from_wizard'):
+            self.ensure_one()
+            action = self.env.ref('cotizaciones_express.action_cotizacion_confirm_wizard')
+            raise RedirectWarning(
+                _("Para confirmar esta cotización, por favor seleccione las opciones de venta confirmadas."),
+                action.id,
+                _("Seleccionar Opciones"),
+                {'default_cotizacion_id': self.id, 'active_id': self.id}
+            )
                 
         res = super(CotizacionExpress, self).write(vals)
         return res
@@ -530,17 +541,35 @@ class CotizacionConfirmWizard(models.TransientModel):
     cotizacion_id = fields.Many2one('cotizacion.express', string='Cotización', required=True)
     line_ids = fields.One2many('cotizacion.confirm.wizard.line', 'wizard_id', string='Opciones')
 
+    @api.model
+    def default_get(self, fields_list):
+        res = super(CotizacionConfirmWizard, self).default_get(fields_list)
+        cotizacion_id = self.env.context.get('default_cotizacion_id') or self.env.context.get('active_id')
+        if cotizacion_id:
+            cotizacion = self.env['cotizacion.express'].browse(cotizacion_id)
+            if cotizacion.exists():
+                res['cotizacion_id'] = cotizacion.id
+                lines = []
+                for option in cotizacion.option_ids:
+                    lines.append((0, 0, {
+                        'option_id': option.id,
+                        'selected': option.selected,
+                    }))
+                res['line_ids'] = lines
+        return res
+
     def action_confirm(self):
         self.ensure_one()
         for line in self.line_ids:
             line.option_id.selected = line.selected
         
-        self.cotizacion_id.state = 'confirmed'
+        res = self.cotizacion_id.with_context(from_wizard=True).action_confirm_sale_order()
         
         stage = self.env['cotizacion.express.stage'].search([('state_type', '=', 'confirmed')], limit=1)
         if stage:
-            self.cotizacion_id.stage_id = stage.id
-        return {'type': 'ir.actions.act_window_close'}
+            self.cotizacion_id.with_context(from_wizard=True).stage_id = stage.id
+            
+        return res
 
 
 class CotizacionConfirmWizardLine(models.TransientModel):

@@ -381,6 +381,14 @@
     </record>
 
     <menuitem id="menu_cotizacion_express_tag" name="Etiquetas" parent="menu_cotizaciones_root" action="action_cotizacion_express_tag" sequence="45"/>
+
+    <record id="action_cotizacion_confirm_wizard" model="ir.actions.act_window">
+        <field name="name">Confirmar Venta - Seleccionar Opciones</field>
+        <field name="res_model">cotizacion.confirm.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+    </record>
+
     <record id="view_cotizacion_confirm_wizard_form" model="ir.ui.view">
         <field name="name">cotizacion.confirm.wizard.form</field>
         <field name="model">cotizacion.confirm.wizard</field>
