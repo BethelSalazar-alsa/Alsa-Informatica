@@ -7,21 +7,15 @@ from urllib.parse import quote
 class CotizacionExpressReportController(ReportController):
 
     @http.route([
-        '/report/pdf/<path:converter>/<string:docids>',
-        '/report/pdf/<path:converter>/<string:docids>/<string:reportname>',
+        '/report/<path:converter>/<reportname>',
+        '/report/<path:converter>/<reportname>/<docids>',
     ], type='http', auth="user", website=True)
     def report_routes(self, reportname, docids=None, converter=None, **data):
         response = super(CotizacionExpressReportController, self).report_routes(
             reportname, docids=docids, converter=converter, **data
         )
         
-        is_preview_report = False
-        if reportname == 'cotizaciones_express.cotizacion_preview_v3':
-            is_preview_report = True
-        elif converter and 'cotizaciones_express.cotizacion_preview_v3' in converter:
-            is_preview_report = True
-
-        if is_preview_report and response and hasattr(response, 'headers'):
+        if reportname == 'cotizaciones_express.cotizacion_preview_v3' and response and hasattr(response, 'headers'):
             filename = request.params.get('filename')
             if not filename and docids:
                 try:
