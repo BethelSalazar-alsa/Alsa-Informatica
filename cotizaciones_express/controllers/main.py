@@ -1,5 +1,47 @@
 from odoo import http
 from odoo.http import request
+from odoo.addons.web.controllers.report import ReportController
+from urllib.parse import quote
+
+
+class CotizacionExpressReportController(ReportController):
+
+    @http.route([
+        '/report/pdf/<path:converter>/<string:docids>',
+        '/report/pdf/<path:converter>/<string:docids>/<string:reportname>',
+    ], type='http', auth="user", website=True)
+    def report_routes(self, reportname, docids=None, converter=None, **data):
+        response = super(CotizacionExpressReportController, self).report_routes(
+            reportname, docids=docids, converter=converter, **data
+        )
+        
+        is_preview_report = False
+        if reportname == 'cotizaciones_express.cotizacion_preview_v3':
+            is_preview_report = True
+        elif converter and 'cotizaciones_express.cotizacion_preview_v3' in converter:
+            is_preview_report = True
+
+        if is_preview_report and response and hasattr(response, 'headers'):
+            filename = request.params.get('filename')
+            if not filename and docids:
+                try:
+                    ids = [int(x) for x in docids.split(',')]
+                    if ids:
+                        rec = request.env['cotizacion.express'].browse(ids[0])
+                        if rec.exists():
+                            safe_name = (rec.name or '').replace('/', '_').replace('\\', '_').strip()
+                            filename = f"Cotizacion_{safe_name}.pdf" if safe_name else "Cotizacion.pdf"
+                except Exception:
+                    pass
+
+            if filename:
+                try:
+                    encoded_filename = quote(filename)
+                    response.headers.set('Content-Disposition', f'inline; filename="{filename}"; filename*=UTF-8\'\'{encoded_filename}')
+                except Exception:
+                    response.headers.set('Content-Disposition', f'inline; filename="{filename}"')
+        
+        return response
 
 
 class CotizacionExpressController(http.Controller):
