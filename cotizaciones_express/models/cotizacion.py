@@ -577,7 +577,7 @@ class CotizacionConfirmWizardLine(models.TransientModel):
     _description = 'Línea de Confirmación de Opción'
 
     wizard_id = fields.Many2one('cotizacion.confirm.wizard', required=True, ondelete='cascade')
-    option_id = fields.Many2one('cotizacion.express.option', string='Opción', required=True, readonly=True)
+    option_id = fields.Many2one('cotizacion.express.option', string='Opción', required=True)
     name = fields.Char(related='option_id.name', string='Nombre de la Opción', readonly=True)
     total = fields.Monetary(related='option_id.total', string='Total', currency_field='currency_id', readonly=True)
     currency_id = fields.Many2one('res.currency', related='option_id.currency_id')
