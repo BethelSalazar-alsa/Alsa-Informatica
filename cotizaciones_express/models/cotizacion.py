@@ -342,14 +342,14 @@ class CotizacionExpress(models.Model):
             'order_line': [],
             'is_express': True,
         }
-        order = self.env['sale.order'].create(vals)
+        order = self.env['sale.order'].sudo().create(vals)
         for option in selected:
             for line in option.line_ids:
-                product = self.env['product.product'].search([('name', '=', line.name)], limit=1)
+                product = self.env['product.product'].sudo().search([('name', '=', line.name)], limit=1)
                 if not product:
-                    product = self.env['product.product'].search([('name', '=', 'Concepto Cotización')], limit=1)
+                    product = self.env['product.product'].sudo().search([('name', '=', 'Concepto Cotización')], limit=1)
                 if not product:
-                    product = self.env['product.product'].create({
+                    product = self.env['product.product'].sudo().create({
                         'name': 'Concepto Cotización',
                         'type': 'service',
                         'sale_ok': True,
@@ -364,24 +364,39 @@ class CotizacionExpress(models.Model):
                     'product_uom_qty': line.quantity,
                     'price_unit': line.price_unit,
                     'discount': final_discount,
-                    'tax_ids': [(6, 0, self.env['account.tax'].search([
+                    'tax_ids': [(6, 0, self.env['account.tax'].sudo().search([
                         ('amount', '=', line.iva_percent),
                         ('type_tax_use', '=', 'sale'),
                     ], limit=1).ids)] if line.iva_percent else False,
                 }
-                self.env['sale.order.line'].create(order_line_vals)
+                self.env['sale.order.line'].sudo().create(order_line_vals)
                 
         if 'crm_lead_id' in self._fields and self.crm_lead_id and 'sale_order_id' in self.crm_lead_id._fields:
-            self.crm_lead_id.write({'sale_order_id': order.id})
+            self.crm_lead_id.sudo().write({'sale_order_id': order.id})
         self.state = 'confirmed'
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'sale.order',
-            'view_mode': 'form',
-            'res_id': order.id,
-            'name': _('Orden de Venta'),
-            'context': {'show_express_orders': True},
-        }
+        
+        has_access = self.env['sale.order'].check_access_rights('read', raise_exception=False)
+        if has_access:
+            return {
+                'type': 'ir.actions.act_window',
+                'res_model': 'sale.order',
+                'view_mode': 'form',
+                'res_id': order.id,
+                'name': _('Orden de Venta'),
+                'context': {'show_express_orders': True},
+            }
+        else:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _('Cotización Confirmada'),
+                    'message': _('La cotización se ha confirmado y el pedido de venta fue creado exitosamente por el sistema.'),
+                    'sticky': False,
+                    'type': 'success',
+                    'next': {'type': 'ir.actions.act_window_close'},
+                }
+            }
 
     def action_print_pdf(self):
         self.ensure_one()
