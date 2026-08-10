@@ -7,7 +7,10 @@ class HelpdeskTicket(models.Model):
                                       tracking=True, help='Para pre-cargar información de la venta')
     
     licencia_id = fields.Many2one('licencia.contpaqi', string='Licencia', tracking=True)
-    equipo_id = fields.Many2one('licencia.linea', string='Equipo/Terminal', tracking=True)
+    
+    # Campo relacionado para obtener automáticamente y en tiempo real todos los equipos de la licencia
+    equipo_ids = fields.One2many('licencia.linea', related='licencia_id.linea_ids', 
+                                  string='Equipos Instalados', readonly=True)
 
     @api.onchange('sale_order_id')
     def _onchange_sale_order_id(self):
@@ -21,16 +24,5 @@ class HelpdeskTicket(models.Model):
         if self.partner_id:
             if self.licencia_id and self.licencia_id.partner_id != self.partner_id:
                 self.licencia_id = False
-                self.equipo_id = False
         else:
             self.licencia_id = False
-            self.equipo_id = False
-
-    @api.onchange('licencia_id')
-    def _onchange_licencia_id_equipo(self):
-        """Limpia el equipo si cambia la licencia y no coincide"""
-        if self.licencia_id:
-            if self.equipo_id and self.equipo_id.licencia_id != self.licencia_id:
-                self.equipo_id = False
-        else:
-            self.equipo_id = False

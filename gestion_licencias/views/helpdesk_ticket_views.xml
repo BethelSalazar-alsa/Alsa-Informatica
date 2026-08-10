@@ -6,9 +6,9 @@
         <field name="model">helpdesk.ticket</field>
         <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
         <field name="arch" type="xml">
-            <!-- Insertar una pestaña dedicada en el notebook con campos agrupados -->
+            <!-- Insertar una pestaña dedicada en el notebook con la licencia y la lista de equipos relacionados -->
             <xpath expr="//notebook" position="inside">
-                <page string="Licencia y Equipo" name="licencia_equipo_tab">
+                <page string="Licencia y Equipos" name="licencia_equipo_tab">
                     <group>
                         <group string="Datos de la Licencia">
                             <field name="sale_order_id" help="Venta de origen para precargar el cliente"/>
@@ -17,12 +17,18 @@
                                    options="{'no_create': True}"
                                    placeholder="Seleccione la licencia..."/>
                         </group>
-                        <group string="Datos del Equipo/Terminal" invisible="not licencia_id">
-                            <field name="equipo_id" 
-                                   domain="[('licencia_id', '=', licencia_id)]"
-                                   options="{'no_create': True}"
-                                   placeholder="Seleccione el equipo/terminal..."/>
-                        </group>
+                    </group>
+                    <!-- Mostramos la lista completa de equipos asociados a la licencia en el ancho completo -->
+                    <group string="Equipos/Terminales Instaladas bajo esta Licencia" invisible="not licencia_id">
+                        <field name="equipo_ids" nolabel="1">
+                            <list create="false" edit="false" delete="false">
+                                <field name="nombre_equipo"/>
+                                <field name="tipo"/>
+                                <field name="caracteristicas"/>
+                                <field name="empleado_id" widget="many2one_avatar_user"/>
+                                <field name="vencimiento_id" string="Vencimiento Equipo"/>
+                            </list>
+                        </field>
                     </group>
                 </page>
             </xpath>
