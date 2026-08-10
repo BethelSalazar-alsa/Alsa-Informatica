@@ -8,7 +8,21 @@ class SaleOrder(models.Model):
                                           readonly=True, 
                                           help='Licencias registradas desde esta venta')
     
+    partner_licencia_ids = fields.One2many('licencia.contpaqi', related='partner_id.licencia_ids',
+                                            string='Licencias del Cliente', readonly=True)
+    
+    partner_equipo_ids = fields.Many2many('licencia.linea', compute='_compute_partner_equipo_ids',
+                                           string='Equipos del Cliente')
+    
     licencia_count = fields.Integer(compute='_compute_licencia_count', string='Número de Licencias Creadas')
+
+    @api.depends('partner_id', 'partner_id.licencia_ids', 'partner_id.licencia_ids.linea_ids')
+    def _compute_partner_equipo_ids(self):
+        for order in self:
+            if order.partner_id:
+                order.partner_equipo_ids = order.partner_id.licencia_ids.mapped('linea_ids')
+            else:
+                order.partner_equipo_ids = self.env['licencia.linea']
 
     @api.depends('licencia_creada_ids')
     def _compute_licencia_count(self):

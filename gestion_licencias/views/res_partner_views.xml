@@ -19,14 +19,27 @@
 
             <!-- 2. Insertar la PESTAÑA de licencias en el cuerpo del formulario -->
             <xpath expr="//notebook" position="inside">
-                <page string="Licencias" name="licencias_contpaqi">
-                    <field name="licencia_ids">
-                        <list>
-                            <field name="name" string="Serie"/>
-                            <field name="fecha_vencimiento"/>
-                            <field name="vendedor_id" widget="many2one_avatar_user"/>
-                        </list>
-                    </field>
+                <page string="Licencias y Equipos" name="licencias_contpaqi">
+                    <group string="Licencias Contpaqi">
+                        <field name="licencia_ids" nolabel="1">
+                            <list>
+                                <field name="name" string="Serie"/>
+                                <field name="software_type"/>
+                                <field name="fecha_vencimiento"/>
+                                <field name="state" widget="badge" decoration-success="state == 'renovada'" decoration-info="state == 'activa'" decoration-danger="state == 'cancelada'"/>
+                            </list>
+                        </field>
+                    </group>
+                    <group string="Equipos Instalados">
+                        <field name="partner_equipo_ids" nolabel="1">
+                            <list edit="false" create="false" delete="false">
+                                <field name="nombre_equipo"/>
+                                <field name="tipo"/>
+                                <field name="caracteristicas"/>
+                                <field name="licencia_id" string="Licencia"/>
+                            </list>
+                        </field>
+                    </group>
                 </page>
             </xpath>
             

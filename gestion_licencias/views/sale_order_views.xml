@@ -21,6 +21,32 @@
                 <button name="action_crear_licencia_rapida" string="📋 Registrar Licencia Rápida" 
                     type="object" class="btn-info" />
             </xpath>
+
+            <!-- 3. Agregar pestaña de Licencias y Equipos del Cliente -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Licencias y Equipos del Cliente" name="licencias_equipos_cliente" invisible="not partner_id">
+                    <group string="Licencias Activas del Cliente">
+                        <field name="partner_licencia_ids" nolabel="1">
+                            <list create="false" edit="false" delete="false">
+                                <field name="name" string="Serie"/>
+                                <field name="software_type"/>
+                                <field name="fecha_vencimiento"/>
+                                <field name="state" widget="badge" decoration-success="state == 'renovada'" decoration-info="state == 'activa'" decoration-danger="state == 'cancelada'"/>
+                            </list>
+                        </field>
+                    </group>
+                    <group string="Equipos del Cliente">
+                        <field name="partner_equipo_ids" nolabel="1">
+                            <list create="false" edit="false" delete="false">
+                                <field name="nombre_equipo"/>
+                                <field name="tipo"/>
+                                <field name="caracteristicas"/>
+                                <field name="licencia_id" string="Licencia"/>
+                            </list>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
         </field>
     </record>
 </odoo>

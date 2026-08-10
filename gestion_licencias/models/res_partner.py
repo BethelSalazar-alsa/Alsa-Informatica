@@ -11,6 +11,17 @@ class ResPartner(models.Model):
     )
     
     licencia_count = fields.Integer(compute='_compute_licencia_count', string='Número de Licencias')
+    
+    partner_equipo_ids = fields.Many2many(
+        'licencia.linea',
+        compute='_compute_partner_equipo_ids',
+        string='Equipos del Cliente'
+    )
+
+    @api.depends('licencia_ids', 'licencia_ids.linea_ids')
+    def _compute_partner_equipo_ids(self):
+        for partner in self:
+            partner.partner_equipo_ids = partner.licencia_ids.mapped('linea_ids')
 
     @api.depends('licencia_ids')
     def _compute_licencia_count(self):
@@ -28,3 +39,4 @@ class ResPartner(models.Model):
             'domain': [('id', 'in', self.licencia_ids.ids)],
             'context': {'default_partner_id': self.id},
         }
+
