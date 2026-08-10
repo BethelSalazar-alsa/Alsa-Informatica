@@ -6,18 +6,25 @@
         <field name="model">helpdesk.ticket</field>
         <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
         <field name="arch" type="xml">
-            <!-- Insertar campos de licencias y equipos directamente después del cliente -->
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="sale_order_id" help="Venta de origen para precargar el cliente"/>
-                <field name="licencia_id" 
-                       domain="[('partner_id', '=', partner_id)]"
-                       options="{'no_create': True}"
-                       placeholder="Seleccione la licencia..."/>
-                <field name="equipo_id" 
-                       domain="[('licencia_id', '=', licencia_id)]"
-                       options="{'no_create': True}"
-                       placeholder="Seleccione el equipo/terminal..."
-                       invisible="not licencia_id"/>
+            <!-- Insertar una pestaña dedicada en el notebook con campos agrupados -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Licencia y Equipo" name="licencia_equipo_tab">
+                    <group>
+                        <group string="Datos de la Licencia">
+                            <field name="sale_order_id" help="Venta de origen para precargar el cliente"/>
+                            <field name="licencia_id" 
+                                   domain="[('partner_id', '=', partner_id)]"
+                                   options="{'no_create': True}"
+                                   placeholder="Seleccione la licencia..."/>
+                        </group>
+                        <group string="Datos del Equipo/Terminal" invisible="not licencia_id">
+                            <field name="equipo_id" 
+                                   domain="[('licencia_id', '=', licencia_id)]"
+                                   options="{'no_create': True}"
+                                   placeholder="Seleccione el equipo/terminal..."/>
+                        </group>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>
