@@ -1,11 +1,11 @@
 import datetime
 from odoo import models, fields, api
 
+
 class LicenciaContpaqi(models.Model):
     _name = 'licencia.contpaqi'
     _description = 'Gestión de Licencias'
-    # Añadimos 'website.published.mixin' para habilitar funciones web
-    _inherit = ['mail.thread', 'mail.activity.mixin', 'website.published.mixin']
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _rec_name = 'name'
 
     name = fields.Char(string='Número de Serie', required=True, tracking=True)
@@ -100,11 +100,11 @@ class LicenciaContpaqi(models.Model):
 
     @api.model
     def website_form_input_filter(self, request, values):
-        # Esto le dice a Odoo: "Si alguien envía datos desde la web, acéptalos"
+        """Filter and validate data from website form submissions"""
         if 'name' in values:
-            # Forzamos el tipo de software si no viene en el form
+            # Ensure software_type is set
             values.setdefault('software_type', 'contpaqi')
-            # Asignamos el partner_id si el usuario está logueado
+            # Assign partner_id if user is logged in
             if not values.get('partner_id') and request.env.user.partner_id:
                 values['partner_id'] = request.env.user.partner_id.id
         return values

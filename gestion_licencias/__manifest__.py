@@ -4,18 +4,23 @@
     'category': 'Sales',
     'summary': 'Administración de series y vencimientos de software',
     'author': 'Alsa',
-    'depends': ['base', 'contacts', 'sale', 'mail', 'helpdesk', 'website', 'website_sale'], 
+    'depends': ['base', 'contacts', 'sale', 'mail', 'helpdesk', 'website', 'website_sale', 'hr_timesheet'], 
     'data': [
+        # Security must be loaded first
         'security/ir.model.access.csv',
-        'data/ir_cron.xml',
+        # Views for base model (licencia.contpaqi) must be loaded before inherited views
         'views/licencia_views.xml',
+        # Inherited views for other models
         'views/res_partner_views.xml',
         'views/sale_order_views.xml',
-        'views/helpdesk_ticket_views.xml', 
+        'views/helpdesk_ticket_views.xml',
+        # Website views
         'views/website_form_licencia.xml',
         'views/website_snippets.xml',
+        # Cron jobs last
+        'data/ir_cron.xml',
     ],
-
+    'qweb': [],
     'installable': True,
     'application': True,
     'license': 'LGPL-3',
