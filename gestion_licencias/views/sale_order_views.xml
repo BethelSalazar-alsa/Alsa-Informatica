@@ -5,58 +5,22 @@
         <field name="model">sale.order</field>
         <field name="inherit_id" ref="sale.view_order_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//notebook" position="inside">
-                <!-- PESTAÑA 1: Licencias Existentes del Cliente -->
-                <page string="Licencias del Cliente" name="licencias_cliente_tab">
-                    <p class="oe_hint">Licencias registradas anteriormente para este cliente</p>
-                    <field name="licencia_ids">
-                        <list editable="bottom">
-                            <field name="name" string="Número de Serie"/>
-                            <field name="software_type"/>
-                            <field name="fecha_vencimiento"/>
-                            <field name="state" widget="badge" />
-                            <field name="vendedor_id" widget="many2one_avatar_user"/>
-                        </list>
-                    </field>
-                </page>
-                
-                <!-- PESTAÑA 2: Licencias Creadas DESDE ESTA VENTA -->
-                <page string="Licencias Creadas en Esta Venta" name="licencias_creadas_tab">
-                    <div class="oe_title">
-                        <h2>Licencias registradas desde esta venta</h2>
-                    </div>
-                    <p class="oe_hint" invisible="licencia_creada_ids">
-                        No hay licencias registradas aún. Use el botón "Registrar Licencia Rápida" para crear una.
-                    </p>
-                    <field name="licencia_creada_ids" readonly="1">
-                        <list>
-                            <field name="name" string="Número de Serie"/>
-                            <field name="product_id"/>
-                            <field name="software_type"/>
-                            <field name="fecha_vencimiento"/>
-                            <field name="state" widget="badge"/>
-                        </list>
-                    </field>
-                </page>
+            <!-- 1. Insertar el botón inteligente en la caja de botones (button_box) -->
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_licencias_creadas" 
+                        type="object" 
+                        class="oe_stat_button" 
+                        icon="fa-id-card-o" 
+                        invisible="licencia_count == 0">
+                    <field name="licencia_count" widget="statinfo" string="Licencias Creadas"/>
+                </button>
             </xpath>
             
-            <!-- AGREGAR BOTÓN RÁPIDO EN EL HEADER -->
+            <!-- 2. Agregar botón rápido en el header -->
             <xpath expr="//button[@name='action_quotation_send']" position="before">
                 <button name="action_crear_licencia_rapida" string="📋 Registrar Licencia Rápida" 
                     type="object" class="btn-info" />
             </xpath>
         </field>
     </record>
-
-    <record id="view_sales_order_filter_licencia_inherit" model="ir.ui.view">
-        <field name="name">sale.order.search.licencia.inherit</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_sales_order_filter"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="licencia_ids" string="Número de Serie"/>
-            </xpath>
-        </field>
-    </record>
-
 </odoo>

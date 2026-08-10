@@ -98,18 +98,6 @@ class LicenciaContpaqi(models.Model):
                     subtype_xmlid="mail.mt_comment"
                 )
 
-    @api.model
-    def website_form_input_filter(self, request, values):
-        """Filter and validate data from website form submissions"""
-        if 'name' in values:
-            # Ensure software_type is set
-            values.setdefault('software_type', 'contpaqi')
-            # Assign partner_id if user is logged in
-            if not values.get('partner_id') and request.env.user.partner_id:
-                values['partner_id'] = request.env.user.partner_id.id
-        return values
-
-
 
 class LicenciaLinea(models.Model):
     _name = 'licencia.linea'
