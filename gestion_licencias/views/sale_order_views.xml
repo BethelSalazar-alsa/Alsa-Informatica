@@ -1,52 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_order_form_licencia_inherit" model="ir.ui.view">
-        <field name="name">sale.order.form.licencia.inherit</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
-        <field name="arch" type="xml">
-            <!-- 1. Insertar el botón inteligente en la caja de botones (button_box) -->
-            <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_view_licencias_creadas" 
-                        type="object" 
-                        class="oe_stat_button" 
-                        icon="fa-id-card-o" 
-                        invisible="licencia_count == 0">
-                    <field name="licencia_count" widget="statinfo" string="Licencias Creadas"/>
-                </button>
-            </xpath>
-            
-            <!-- 2. Agregar botón rápido en el header -->
-            <xpath expr="//button[@name='action_quotation_send']" position="before">
-                <button name="action_crear_licencia_rapida" string="📋 Registrar Licencia Rápida" 
-                    type="object" class="btn-info" />
+    <record id="view_order_form_inherit_licencia" model="ir.ui.view">
+        <name>sale.order.form.inherit.licencia</name>
+        <model>sale.order</model>
+        <inherit_id ref="sale.view_order_form"/>
+        <arch type="xml">
+            <!-- Add Licencia selection field after Partner -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="licencia_id" options="{'no_create': True, 'no_open': False}" placeholder="Seleccione una licencia si aplica..."/>
             </xpath>
 
-            <!-- 3. Agregar pestaña de Licencias y Equipos del Cliente -->
+            <!-- Add tab with partner licenses and their equipment details -->
             <xpath expr="//notebook" position="inside">
-                <page string="Licencias y Equipos del Cliente" name="licencias_equipos_cliente" invisible="not partner_id">
-                    <group string="Licencias Activas del Cliente">
-                        <field name="partner_licencia_ids" nolabel="1">
-                            <list create="false" edit="false" delete="false">
-                                <field name="name" string="Serie"/>
+                <page string="Licencias del Cliente" name="client_licencias" attrs="{'invisible': [('partner_id', '=', False)]}">
+                    <group string="Detalles de Licencias y Equipos Vinculados">
+                        <field name="partner_licencia_ids" nolabel="1" readonly="1">
+                            <tree>
                                 <field name="software_type"/>
-                                <field name="fecha_vencimiento"/>
-                                <field name="state" widget="badge" decoration-success="state == 'renovada'" decoration-info="state == 'activa'" decoration-danger="state == 'cancelada'"/>
-                            </list>
-                        </field>
-                    </group>
-                    <group string="Equipos del Cliente">
-                        <field name="partner_equipo_ids" nolabel="1">
-                            <list create="false" edit="false" delete="false">
-                                <field name="nombre_equipo"/>
-                                <field name="tipo"/>
-                                <field name="caracteristicas"/>
-                                <field name="licencia_id" string="Licencia"/>
-                            </list>
+                                <field name="name"/>
+                                <field name="expiracion_date"/>
+                                <field name="status" widget="badge" decoration-success="status == 'activo'" decoration-danger="status == 'vencido'" decoration-warning="status == 'suspendido'"/>
+                                <field name="equipo_ids" widget="many2many_tags" string="Equipos"/>
+                            </tree>
                         </field>
                     </group>
                 </page>
             </xpath>
-        </field>
+        </arch>
     </record>
 </odoo>

@@ -1,59 +1,19 @@
-from odoo import models, fields, api
+# -*- coding: utf-8 -*-
+from odoo import models, fields
 
 class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
-    licencia_creada_ids = fields.One2many('licencia.contpaqi', 'sale_order_id', 
-                                          string='Licencias Creadas', 
-                                          readonly=True, 
-                                          help='Licencias registradas desde esta venta')
-    
-    partner_licencia_ids = fields.One2many('licencia.contpaqi', related='partner_id.licencia_ids',
-                                            string='Licencias del Cliente', readonly=True)
-    
-    partner_equipo_ids = fields.Many2many('licencia.linea', compute='_compute_partner_equipo_ids',
-                                           string='Equipos del Cliente')
-    
-    licencia_count = fields.Integer(compute='_compute_licencia_count', string='Número de Licencias Creadas')
+    licencia_id = fields.Many2one(
+        'licencia.licencia',
+        string='Licencia Contpaqi',
+        domain="[('partner_id', '=', partner_id)]",
+        help='Seleccione la licencia del cliente Contpaqi relacionada a este pedido.'
+    )
 
-    @api.depends('partner_id', 'partner_id.licencia_ids', 'partner_id.licencia_ids.linea_ids')
-    def _compute_partner_equipo_ids(self):
-        for order in self:
-            if order.partner_id:
-                order.partner_equipo_ids = order.partner_id.licencia_ids.mapped('linea_ids')
-            else:
-                order.partner_equipo_ids = self.env['licencia.linea']
+    partner_licencia_ids = fields.One2many(
+        related='partner_id.licencia_ids',
+        string='Licencias del Cliente',
+        readonly=True
+    )
 
-    @api.depends('licencia_creada_ids')
-    def _compute_licencia_count(self):
-        for order in self:
-            order.licencia_count = len(order.licencia_creada_ids)
-
-    def action_view_licencias_creadas(self):
-        """Abre la lista de licencias creadas desde esta venta"""
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Licencias Creadas',
-            'view_mode': 'list,form',
-            'res_model': 'licencia.contpaqi',
-            'domain': [('sale_order_id', '=', self.id)],
-            'context': {
-                'default_sale_order_id': self.id,
-                'default_partner_id': self.partner_id.id,
-            },
-        }
-
-    def action_crear_licencia_rapida(self):
-        """Abre el formulario para crear una licencia rápidamente desde la venta"""
-        self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'res_model': 'licencia.contpaqi',
-            'view_mode': 'form',
-            'target': 'new',
-            'context': {
-                'default_sale_order_id': self.id,
-                'default_partner_id': self.partner_id.id,
-            }
-        }

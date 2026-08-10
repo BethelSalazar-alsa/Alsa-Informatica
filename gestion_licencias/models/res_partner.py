@@ -1,27 +1,11 @@
-
+# -*- coding: utf-8 -*-
 from odoo import models, fields, api
 
 class ResPartner(models.Model):
     _inherit = 'res.partner'
 
-    licencia_ids = fields.One2many(
-        'licencia.contpaqi', 
-        'partner_id', 
-        string='Licencias Contpaqi'
-    )
-    
-    licencia_count = fields.Integer(compute='_compute_licencia_count', string='Número de Licencias')
-    
-    partner_equipo_ids = fields.Many2many(
-        'licencia.linea',
-        compute='_compute_partner_equipo_ids',
-        string='Equipos del Cliente'
-    )
-
-    @api.depends('licencia_ids', 'licencia_ids.linea_ids')
-    def _compute_partner_equipo_ids(self):
-        for partner in self:
-            partner.partner_equipo_ids = partner.licencia_ids.mapped('linea_ids')
+    licencia_ids = fields.One2many('licencia.licencia', 'partner_id', string='Licencias Contpaqi')
+    licencia_count = fields.Integer(string='Cantidad de Licencias', compute='_compute_licencia_count')
 
     @api.depends('licencia_ids')
     def _compute_licencia_count(self):
@@ -29,14 +13,8 @@ class ResPartner(models.Model):
             partner.licencia_count = len(partner.licencia_ids)
 
     def action_view_licencias(self):
-        # Esta función define qué pasa al hacer clic en el botón
         self.ensure_one()
-        return {
-            'type': 'ir.actions.act_window',
-            'name': 'Licencias Contpaqi',
-            'view_mode': 'list,form',
-            'res_model': 'licencia.contpaqi',
-            'domain': [('id', 'in', self.licencia_ids.ids)],
-            'context': {'default_partner_id': self.id},
-        }
-
+        action = self.env["ir.actions.actions"]._for_xml_id("gestion_licencias.action_licencia_licencia")
+        action['domain'] = [('partner_id', '=', self.id)]
+        action['context'] = {'default_partner_id': self.id}
+        return action

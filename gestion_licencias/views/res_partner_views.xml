@@ -1,48 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="view_partner_form_licencias_inherit" model="ir.ui.view">
-        <field name="name">res.partner.form.licencias.inherit</field>
-        <field name="model">res.partner</field>
-        <field name="inherit_id" ref="base.view_partner_form"/>
-        <field name="arch" type="xml">
-            
-            <!-- 1. Insertar el BOTÓN inteligente arriba a la derecha -->
+    <record id="view_partner_form_inherit_licencia" model="ir.ui.view">
+        <name>res.partner.form.inherit.licencia</name>
+        <model>res.partner</model>
+        <inherit_id ref="base.view_partner_form"/>
+        <arch type="xml">
+            <!-- Smart Button for Licenses -->
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_view_licencias" 
-                        type="object" 
-                        class="oe_stat_button" 
-                        icon="fa-id-card-o" 
-                        invisible="licencia_count == 0">
-                    <field name="licencia_count" widget="statinfo" string="Licencias"/>
+                <button class="oe_stat_button" type="object" name="action_view_licencias" icon="fa-key" attrs="{'invisible': [('is_company', '=', False), ('parent_id', '!=', False)]}">
+                    <field string="Licencias" name="licencia_count" widget="statinfo"/>
                 </button>
             </xpath>
 
-            <!-- 2. Insertar la PESTAÑA de licencias en el cuerpo del formulario -->
+            <!-- Notebook Tab for Licenses and Equipment -->
             <xpath expr="//notebook" position="inside">
-                <page string="Licencias y Equipos" name="licencias_contpaqi">
-                    <group string="Licencias Contpaqi">
-                        <field name="licencia_ids" nolabel="1">
-                            <list>
-                                <field name="name" string="Serie"/>
+                <page string="Licencias y Equipos" name="licencias_equipos" attrs="{'invisible': [('is_company', '=', False), ('parent_id', '!=', False)]}">
+                    <group string="Resumen de Licencias Activas">
+                        <field name="licencia_ids" nolabel="1" mode="tree">
+                            <tree create="true" edit="true" delete="true">
                                 <field name="software_type"/>
-                                <field name="fecha_vencimiento"/>
-                                <field name="state" widget="badge" decoration-success="state == 'renovada'" decoration-info="state == 'activa'" decoration-danger="state == 'cancelada'"/>
-                            </list>
-                        </field>
-                    </group>
-                    <group string="Equipos Instalados">
-                        <field name="partner_equipo_ids" nolabel="1">
-                            <list edit="false" create="false" delete="false">
-                                <field name="nombre_equipo"/>
-                                <field name="tipo"/>
-                                <field name="caracteristicas"/>
-                                <field name="licencia_id" string="Licencia"/>
-                            </list>
+                                <field name="name"/>
+                                <field name="adquisicion_date"/>
+                                <field name="expiracion_date"/>
+                                <field name="status" widget="badge" decoration-success="status == 'activo'" decoration-danger="status == 'vencido'" decoration-warning="status == 'suspendido'"/>
+                            </tree>
                         </field>
                     </group>
                 </page>
             </xpath>
-            
-        </field>
+        </arch>
     </record>
 </odoo>

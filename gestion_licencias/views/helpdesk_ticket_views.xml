@@ -1,37 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <!-- Extensión del Ticket de Helpdesk para agregar Licencias y Equipos -->
-    <record id="helpdesk_ticket_view_form_inherit_licencias" model="ir.ui.view">
-        <field name="name">helpdesk.ticket.form.inherit.licencias</field>
-        <field name="model">helpdesk.ticket</field>
-        <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
-        <field name="arch" type="xml">
-            <!-- Insertar una pestaña dedicada en el notebook con la licencia y la lista de equipos relacionados -->
-            <xpath expr="//notebook" position="inside">
-                <page string="Licencia y Equipos" name="licencia_equipo_tab">
-                    <group>
-                        <group string="Datos de la Licencia">
-                            <field name="sale_order_id" help="Venta de origen para precargar el cliente"/>
-                            <field name="licencia_id" 
-                                   domain="[('partner_id', '=', partner_id)]"
-                                   options="{'no_create': True}"
-                                   placeholder="Seleccione la licencia..."/>
-                        </group>
-                    </group>
-                    <!-- Mostramos la lista completa de equipos asociados a la licencia en el ancho completo -->
-                    <group string="Equipos/Terminales Instaladas bajo esta Licencia" invisible="not licencia_id">
-                        <field name="equipo_ids" nolabel="1">
-                            <list create="false" edit="false" delete="false">
-                                <field name="nombre_equipo"/>
-                                <field name="tipo"/>
-                                <field name="caracteristicas"/>
-                                <field name="empleado_id" widget="many2one_avatar_user"/>
-                                <field name="vencimiento_id" string="Vencimiento Equipo"/>
-                            </list>
-                        </field>
-                    </group>
-                </page>
+    <record id="helpdesk_ticket_view_form_inherit_licencia" model="ir.ui.view">
+        <name>helpdesk.ticket.form.inherit.licencia</name>
+        <model>helpdesk.ticket</model>
+        <inherit_id ref="helpdesk.helpdesk_ticket_view_form"/>
+        <arch type="xml">
+            <!-- Add Licencia selection field after Partner -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="licencia_id" options="{'no_create': True, 'no_open': False}" placeholder="Seleccione la licencia afectada..."/>
             </xpath>
-        </field>
+
+            <!-- Add notebook at the bottom of the sheet to list licenses and equipment -->
+            <xpath expr="//sheet" position="inside">
+                <notebook attrs="{'invisible': [('partner_id', '=', False)]}">
+                    <page string="Licencias del Cliente" name="client_licencias">
+                        <group string="Detalles de Licencias y Equipos Vinculados">
+                            <field name="partner_licencia_ids" nolabel="1" readonly="1">
+                                <tree>
+                                    <field name="software_type"/>
+                                    <field name="name"/>
+                                    <field name="expiracion_date"/>
+                                    <field name="status" widget="badge" decoration-success="status == 'activo'" decoration-danger="status == 'vencido'" decoration-warning="status == 'suspendido'"/>
+                                    <field name="equipo_ids" widget="many2many_tags" string="Equipos"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </arch>
     </record>
 </odoo>
