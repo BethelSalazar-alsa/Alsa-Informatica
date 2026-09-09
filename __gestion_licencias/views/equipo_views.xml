@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Tree View -->
+    <record id="view_licencia_equipo_tree" model="ir.ui.view">
+        <name>licencia.equipo.tree</name>
+        <model>licencia.equipo</model>
+        <arch type="xml">
+            <tree decoration-info="tipo == 'servidor'">
+                <field name="name"/>
+                <field name="tipo" widget="badge" decoration-info="tipo == 'servidor'" decoration-muted="tipo == 'terminal'"/>
+                <field name="licencia_id"/>
+                <field name="partner_id"/>
+                <field name="ip_address"/>
+                <field name="usuario_responsable"/>
+            </tree>
+        </arch>
+    </record>
+
+    <!-- Form View -->
+    <record id="view_licencia_equipo_form" model="ir.ui.view">
+        <name>licencia.equipo.form</name>
+        <model>licencia.equipo</model>
+        <arch type="xml">
+            <form>
+                <sheet>
+                    <group>
+                        <group>
+                            <field name="name" placeholder="Nombre de la PC / Equipo..."/>
+                            <field name="tipo"/>
+                            <field name="licencia_id"/>
+                        </group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="ip_address"/>
+                            <field name="usuario_responsable"/>
+                        </group>
+                    </group>
+                    <group>
+                        <field name="notes" placeholder="Notas adicionales sobre este equipo..."/>
+                    </group>
+                </sheet>
+            </form>
+        </arch>
+    </record>
+
+    <!-- Search View -->
+    <record id="view_licencia_equipo_search" model="ir.ui.view">
+        <name>licencia.equipo.search</name>
+        <model>licencia.equipo</model>
+        <arch type="xml">
+            <search>
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="licencia_id"/>
+                <filter string="Servidores" name="role_servidor" domain="[('tipo', '=', 'servidor')]"/>
+                <filter string="Terminales" name="role_terminal" domain="[('tipo', '=', 'terminal')]"/>
+                <group expand="0" string="Agrupar Por">
+                    <filter string="Licencia" name="group_by_licencia" context="{'group_by': 'licencia_id'}"/>
+                    <filter string="Cliente" name="group_by_partner" context="{'group_by': 'partner_id'}"/>
+                    <filter string="Tipo de Rol" name="group_by_role" context="{'group_by': 'tipo'}"/>
+                </group>
+            </search>
+        </arch>
+    </record>
+
+    <!-- Action -->
+    <record id="action_licencia_equipo" model="ir.actions.act_window">
+        <name>Equipos de Clientes</name>
+        <res_model>licencia.equipo</res_model>
+        <view_mode>tree,form</view_mode>
+        <search_view_id ref="view_licencia_equipo_search"/>
+        <help type="html">
+            <p class="o_view_nocontent_smiling_face">
+                Registra un equipo o terminal.
+            </p>
+            <p>
+                Los equipos se asocian a licencias de software Contpaqi para saber dónde están instaladas.
+            </p>
+        </help>
+    </record>
+</odoo>

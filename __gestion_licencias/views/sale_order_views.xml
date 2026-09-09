@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_order_form_inherit_licencia" model="ir.ui.view">
+        <name>sale.order.form.inherit.licencia</name>
+        <model>sale.order</model>
+        <inherit_id ref="sale.view_order_form"/>
+        <arch type="xml">
+            <!-- Add Licencia selection field after Partner -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="licencia_id" options="{'no_create': True, 'no_open': False}" placeholder="Seleccione una licencia si aplica..."/>
+            </xpath>
+
+            <!-- Add tab with partner licenses and their equipment details -->
+            <xpath expr="//notebook" position="inside">
+                <page string="Licencias del Cliente" name="client_licencias" attrs="{'invisible': [('partner_id', '=', False)]}">
+                    <group string="Detalles de Licencias y Equipos Vinculados">
+                        <field name="partner_licencia_ids" nolabel="1" readonly="1">
+                            <tree>
+                                <field name="software_type"/>
+                                <field name="name"/>
+                                <field name="expiracion_date"/>
+                                <field name="status" widget="badge" decoration-success="status == 'activo'" decoration-danger="status == 'vencido'" decoration-warning="status == 'suspendido'"/>
+                                <field name="equipo_ids" widget="many2many_tags" string="Equipos"/>
+                            </tree>
+                        </field>
+                    </group>
+                </page>
+            </xpath>
+        </arch>
+    </record>
+</odoo>

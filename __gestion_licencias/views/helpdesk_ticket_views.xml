@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="helpdesk_ticket_view_form_inherit_licencia" model="ir.ui.view">
+        <name>helpdesk.ticket.form.inherit.licencia</name>
+        <model>helpdesk.ticket</model>
+        <inherit_id ref="helpdesk.helpdesk_ticket_view_form"/>
+        <arch type="xml">
+            <!-- Add Licencia selection field after Partner -->
+            <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="licencia_id" options="{'no_create': True, 'no_open': False}" placeholder="Seleccione la licencia afectada..."/>
+            </xpath>
+
+            <!-- Add notebook at the bottom of the sheet to list licenses and equipment -->
+            <xpath expr="//sheet" position="inside">
+                <notebook attrs="{'invisible': [('partner_id', '=', False)]}">
+                    <page string="Licencias del Cliente" name="client_licencias">
+                        <group string="Detalles de Licencias y Equipos Vinculados">
+                            <field name="partner_licencia_ids" nolabel="1" readonly="1">
+                                <tree>
+                                    <field name="software_type"/>
+                                    <field name="name"/>
+                                    <field name="expiracion_date"/>
+                                    <field name="status" widget="badge" decoration-success="status == 'activo'" decoration-danger="status == 'vencido'" decoration-warning="status == 'suspendido'"/>
+                                    <field name="equipo_ids" widget="many2many_tags" string="Equipos"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </page>
+                </notebook>
+            </xpath>
+        </arch>
+    </record>
+</odoo>
