@@ -248,6 +248,14 @@ class CotizacionExpress(models.Model):
         return res
 
     def copy(self, default=None):
+        if not self:
+            return self
+        if len(self) > 1:
+            copied_records = self.env[self._name]
+            for record in self:
+                copied_records |= record.copy(default)
+            return copied_records
+
         self.ensure_one()
         default = dict(default or {})
         

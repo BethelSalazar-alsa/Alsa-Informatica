@@ -34,10 +34,10 @@
 
                 <sheet class="o_cotizacion_express_sheet">
                     <div class="o_cotizacion_express_controls">
-                        <div class="btn-toggle btn-toggle-mode" title="Ver Chatter">
+                        <a class="btn-toggle btn-toggle-mode" role="button" title="Ver Chatter">
                             <i class="fa fa-comments icon-chatter"/>
                             <i class="fa fa-file-pdf-o icon-pdf"/>
-                        </div>
+                        </a>
                     </div>
                     <div style="display: flex; width: 100%; gap: 16px;">
                         <div class="o_cotizacion_left_column" style="flex: 1.2; min-width: 0; border-right: 1px solid #dee2e6; padding-right: 16px;">
