@@ -1,7 +1,9 @@
-from odoo import http
-from odoo.http import request
-from odoo.addons.web.controllers.report import ReportController
+import re
 from urllib.parse import quote
+
+from odoo import http
+from odoo.addons.web.controllers.report import ReportController
+from odoo.http import content_disposition, request
 
 
 class CotizacionExpressReportController(ReportController):
@@ -39,6 +41,34 @@ class CotizacionExpressReportController(ReportController):
 
 
 class CotizacionExpressController(http.Controller):
+
+    @http.route('/cotizacion/pdf/<int:cotizacion_id>', type='http', auth='user', website=False)
+    def cotizacion_pdf(self, cotizacion_id, **kwargs):
+        cotizacion = request.env['cotizacion.express'].browse(cotizacion_id)
+        if not cotizacion.exists():
+            return request.not_found(description='Cotización no encontrada')
+
+        report = request.env.ref('cotizaciones_express.report_cotizacion_express')
+        pdf_content, _ = report._render_qweb_pdf(
+            report.report_name,
+            res_ids=[cotizacion.id],
+        )
+
+        quotation_number = re.sub(
+            r'[^\w.-]+',
+            '_',
+            cotizacion.name or str(cotizacion.id),
+        ).strip('._') or str(cotizacion.id)
+        filename = f'Cotizacion_{quotation_number}.pdf'
+
+        return request.make_response(pdf_content, headers=[
+            ('Content-Type', 'application/pdf'),
+            ('Content-Length', str(len(pdf_content))),
+            ('Content-Disposition', content_disposition(filename, disposition_type='inline')),
+            ('Cache-Control', 'no-cache, no-store, must-revalidate'),
+            ('Pragma', 'no-cache'),
+            ('Expires', '0'),
+        ])
 
     @http.route('/cotizacion/preview_html/<int:cotizacion_id>', type='http', auth='user', website=False)
     def preview_cotizacion_html(self, cotizacion_id, **kwargs):
@@ -119,7 +149,7 @@ class CotizacionExpressController(http.Controller):
                 var pdfLink = pDoc.getElementById('cotizacion_pdf_link');
                 if (pdfLink) {
                     if (parentId > 0) {
-                        pdfLink.href = "/report/pdf/cotizaciones_express.cotizacion_preview_v3/" + parentId;
+                        pdfLink.href = "/cotizacion/pdf/" + parentId;
                         pdfLink.style.display = "";
                     } else {
                         pdfLink.style.display = "none";

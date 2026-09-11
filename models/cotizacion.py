@@ -4,6 +4,12 @@ from odoo.exceptions import UserError, RedirectWarning
 
 _logger = logging.getLogger(__name__)
 
+DEFAULT_TERMS_HTML = """
+<p>1.- Los precios incluyen IVA y son válidos por 10 días y/o agotar existencias.</p>
+<p>2.- Tiempo de entrega: 2 - 3 días contra confirmación del pedido.</p>
+<p>3.- Forma de pago: Contado anticipado para ordenar.</p>
+"""
+
 class CotizacionExpressStage(models.Model):
     _name = 'cotizacion.express.stage'
     _description = 'Etapa de Cotización Express'
@@ -87,7 +93,10 @@ class CotizacionExpress(models.Model):
 
     company_id = fields.Many2one('res.company', string='Compañía', default=lambda self: self.env.company)
     currency_id = fields.Many2one('res.currency', related='company_id.currency_id', string='Moneda')
-    notes = fields.Html(string='Notas / Términos')
+    notes = fields.Html(
+        string='Notas / Términos',
+        default=DEFAULT_TERMS_HTML,
+    )
     preview_html = fields.Html(string='Vista Previa', compute='_compute_preview_html', sanitize=False)
     template_id = fields.Many2one('cotizacion.express.template', string='Cargar Plantilla')
     tag_ids = fields.Many2many('cotizacion.express.tag', string='Etiquetas')
@@ -114,14 +123,28 @@ class CotizacionExpress(models.Model):
         if self.stage_id:
             self.state = self.stage_id.state_type
 
-    @api.depends('write_date', 'name')
+    @api.depends(
+        'write_date',
+        'name',
+        'option_ids.sequence',
+        'option_ids.write_date',
+        'option_ids.line_ids.sequence',
+        'option_ids.line_ids.write_date',
+    )
     def _compute_preview_html(self):
         for rec in self:
             if rec.id and isinstance(rec.id, int):
-                t = int(rec.write_date.timestamp()) if rec.write_date else 0
+                # Las líneas y opciones se guardan en modelos hijos, por lo que
+                # moverlas no siempre actualiza el write_date de la cotización.
+                # Usar la fecha más reciente evita mostrar un PDF en caché.
+                write_dates = [rec.write_date]
+                write_dates += rec.option_ids.mapped('write_date')
+                write_dates += rec.option_ids.line_ids.mapped('write_date')
+                latest_write = max((date for date in write_dates if date), default=False)
+                t = int(latest_write.timestamp() * 1000000) if latest_write else 0
                 safe_name = (rec.name or '').replace('/', '_').replace('\\', '_').strip()
                 filename = f"Cotizacion_{safe_name}.pdf" if safe_name else "Cotizacion.pdf"
-                pdf_url = f"/report/pdf/cotizaciones_express.cotizacion_preview_v3/{rec.id}"
+                pdf_url = f"/cotizacion/pdf/{rec.id}"
                 rec.preview_html = (
                     f'<div style="width: 100%; height: 100%; min-height: 650px;">'
                     f'<iframe src="{pdf_url}?filename={filename}&t={t}#zoom=page-width&view=FitH" '
@@ -422,6 +445,7 @@ class CotizacionExpressOption(models.Model):
     _name = 'cotizacion.express.option'
     _description = 'Opción / Paquete de Cotización'
     _rec_name = 'name'
+    _order = 'sequence, id'
 
     cotizacion_id = fields.Many2one('cotizacion.express', string='Cotización', ondelete='cascade')
     name = fields.Char(string='Nombre de la Opción', required=True, default='Opción')
@@ -478,6 +502,7 @@ class CotizacionExpressOptionLine(models.Model):
     _name = 'cotizacion.express.option.line'
     _description = 'Producto de Opción'
     _rec_name = 'name'
+    _order = 'sequence, id'
 
     option_id = fields.Many2one('cotizacion.express.option', string='Opción', ondelete='cascade')
     name = fields.Char(string='Producto', required=True)
@@ -608,7 +633,10 @@ class CotizacionExpressTemplate(models.Model):
 
     name = fields.Char(string='Nombre de la Plantilla', required=True)
     option_ids = fields.One2many('cotizacion.express.template.option', 'template_id', string='Opciones / Paquetes')
-    notes = fields.Html(string='Notas / Términos')
+    notes = fields.Html(
+        string='Notas / Términos',
+        default=DEFAULT_TERMS_HTML,
+    )
 
 
 class CotizacionExpressTemplateOption(models.Model):
