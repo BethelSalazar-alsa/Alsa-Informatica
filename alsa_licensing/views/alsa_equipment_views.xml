@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_alsa_equipment_list" model="ir.ui.view">
+        <field name="name">alsa.equipment.list</field>
+        <field name="model">alsa.equipment</field>
+        <field name="arch" type="xml">
+            <list string="Equipos">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="equipment_type" widget="badge"/>
+                <field name="product_id"/>
+                <field name="license_id" optional="show"/>
+                <field name="specifications" optional="hide"/>
+            </list>
+        </field>
+    </record>
+
+    <record id="view_alsa_equipment_form" model="ir.ui.view">
+        <field name="name">alsa.equipment.form</field>
+        <field name="model">alsa.equipment</field>
+        <field name="arch" type="xml">
+            <form string="Equipo">
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1><field name="name" placeholder="Nombre o identificador del equipo"/></h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="partner_id"/>
+                            <field name="equipment_type"/>
+                        </group>
+                        <group>
+                            <field name="product_id"/>
+                            <field name="license_id" domain="[('partner_id', '=', partner_id)]"/>
+                        </group>
+                    </group>
+                    <group string="Características / Especificaciones técnicas">
+                        <field name="specifications" nolabel="1" placeholder="Procesador, memoria, sistema operativo, dirección IP, número de serie..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_alsa_equipment_search" model="ir.ui.view">
+        <field name="name">alsa.equipment.search</field>
+        <field name="model">alsa.equipment</field>
+        <field name="arch" type="xml">
+            <search string="Buscar equipos">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="product_id"/>
+                <field name="license_id"/>
+                <filter name="terminal" string="Terminales" domain="[('equipment_type', '=', 'terminal')]"/>
+                <filter name="server" string="Servidores" domain="[('equipment_type', '=', 'server')]"/>
+                <separator/>
+                <filter name="group_partner" string="Cliente" context="{'group_by': 'partner_id'}"/>
+                <filter name="group_type" string="Tipo" context="{'group_by': 'equipment_type'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="action_alsa_equipment" model="ir.actions.act_window">
+        <field name="name">Equipos</field>
+        <field name="res_model">alsa.equipment</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id" ref="view_alsa_equipment_search"/>
+    </record>
+
+    <menuitem id="menu_alsa_equipment" name="Equipos" parent="menu_alsa_licensing_root" action="action_alsa_equipment" sequence="20"/>
+</odoo>

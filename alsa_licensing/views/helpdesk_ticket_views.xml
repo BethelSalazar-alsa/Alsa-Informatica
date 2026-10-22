@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="helpdesk_ticket_form_alsa_licensing" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.form.alsa.licensing</field>
+        <field name="model">helpdesk.ticket</field>
+        <field name="inherit_id" ref="helpdesk.helpdesk_ticket_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//form/sheet/notebook" position="inside">
+                <page string="Licencias y Equipos" name="alsa_licensing" invisible="not partner_id">
+                    <group string="Licencias vigentes">
+                        <field name="alsa_active_license_ids" readonly="1" nolabel="1">
+                            <list create="0" delete="0">
+                                <field name="name"/>
+                                <field name="product_id"/>
+                                <field name="start_date"/>
+                                <field name="expiration_date"/>
+                                <field name="allowed_access_count"/>
+                            </list>
+                        </field>
+                    </group>
+                    <group string="Equipos del cliente">
+                        <field name="alsa_available_equipment_ids" readonly="1" nolabel="1">
+                            <list create="0" delete="0">
+                                <field name="name"/>
+                                <field name="equipment_type"/>
+                                <field name="specifications"/>
+                                <field name="product_id"/>
+                                <field name="license_id" optional="show"/>
+                            </list>
+                        </field>
+                    </group>
+                    <group string="Equipos que se atenderán en este ticket">
+                        <field name="alsa_equipment_ids" widget="many2many_tags" domain="[('partner_id', '=', partner_id)]" options="{'no_create': True}" nolabel="1"/>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>
