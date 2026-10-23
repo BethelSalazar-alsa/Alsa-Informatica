@@ -335,7 +335,7 @@ class AlsaSaleOrderEquipmentLine(models.Model):
     equipment_type = fields.Selection(
         related="equipment_id.equipment_type",
         string="Tipo",
-        readonly=True,
+        readonly=False,
     )
     specifications_summary = fields.Char(
         related="equipment_id.specifications_summary",

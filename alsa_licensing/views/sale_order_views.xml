@@ -54,7 +54,7 @@
                         <list editable="bottom" delete="0">
                             <field name="selected" widget="boolean_toggle" width="65px"/>
                             <field name="equipment_id" width="170px" domain="[('partner_id', '=', parent.partner_id)]" context="{'default_partner_id': parent.partner_id}"/>
-                            <field name="equipment_type" width="90px"/>
+                            <field name="equipment_type" width="90px" readonly="False"/>
                             <field name="specifications_summary" width="230px" optional="show"/>
                             <field name="product_id" optional="hide"/>
                             <field name="license_id" width="150px" optional="show"/>
