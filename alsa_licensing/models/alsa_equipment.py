@@ -34,6 +34,28 @@ class AlsaEquipment(models.Model):
         ondelete="set null",
     )
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        prepared_values = []
+        for values in vals_list:
+            values = dict(values)
+            license_id = values.get("license_id")
+            if license_id and not values.get("partner_id"):
+                license_record = self.env["alsa.license"].browse(license_id).exists()
+                if license_record:
+                    values["partner_id"] = license_record.partner_id.id
+            prepared_values.append(values)
+        return super().create(prepared_values)
+
+    def write(self, values):
+        values = dict(values)
+        license_id = values.get("license_id")
+        if license_id and "partner_id" not in values:
+            license_record = self.env["alsa.license"].browse(license_id).exists()
+            if license_record:
+                values["partner_id"] = license_record.partner_id.id
+        return super().write(values)
+
     @api.onchange("partner_id")
     def _onchange_partner_id(self):
         if self.license_id and self.license_id.partner_id != self.partner_id:
