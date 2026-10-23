@@ -17,10 +17,24 @@ class AlsaLicense(models.Model):
     )
     product_id = fields.Many2one(
         comodel_name="product.product",
-        string="Producto / Servicio",
-        required=True,
+        string="Producto / Servicio principal",
         index=True,
         ondelete="restrict",
+        help="Producto principal conservado por compatibilidad. Use las líneas para asociar varios productos.",
+    )
+    product_line_ids = fields.One2many(
+        comodel_name="alsa.license.line",
+        inverse_name="license_id",
+        string="Productos / Servicios",
+        copy=True,
+    )
+    product_count = fields.Integer(
+        string="Productos",
+        compute="_compute_product_summary",
+    )
+    product_summary = fields.Char(
+        string="Productos / Servicios",
+        compute="_compute_product_summary",
     )
     start_date = fields.Date(
         string="Fecha de inicio",
@@ -62,6 +76,54 @@ class AlsaLicense(models.Model):
         inverse_name="license_id",
         string="Equipos",
     )
+    equipment_count = fields.Integer(
+        string="Equipos",
+        compute="_compute_equipment_count",
+    )
+
+    @api.depends("product_id", "product_line_ids.product_id")
+    def _compute_product_summary(self):
+        for license_record in self:
+            products = license_record.product_line_ids.mapped("product_id")
+            if license_record.product_id:
+                products |= license_record.product_id
+            license_record.product_count = len(products)
+            license_record.product_summary = ", ".join(products.mapped("display_name"))
+
+    @api.depends("equipment_ids")
+    def _compute_equipment_count(self):
+        for license_record in self:
+            license_record.equipment_count = len(license_record.equipment_ids)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        licenses = super().create(vals_list)
+        for license_record, values in zip(licenses, vals_list):
+            product_id = values.get("product_id")
+            if product_id and product_id not in license_record.product_line_ids.product_id.ids:
+                self.env["alsa.license.line"].create(
+                    {
+                        "license_id": license_record.id,
+                        "product_id": product_id,
+                        "allowed_access_count": license_record.allowed_access_count,
+                    }
+                )
+        return licenses
+
+    def write(self, values):
+        result = super().write(values)
+        product_id = values.get("product_id")
+        if product_id:
+            for license_record in self:
+                if product_id not in license_record.product_line_ids.product_id.ids:
+                    self.env["alsa.license.line"].create(
+                        {
+                            "license_id": license_record.id,
+                            "product_id": product_id,
+                            "allowed_access_count": license_record.allowed_access_count,
+                        }
+                    )
+        return result
 
     @api.depends("expiration_date")
     def _compute_state(self):
@@ -123,3 +185,68 @@ class AlsaLicense(models.Model):
                 raise ValidationError(
                     "La cantidad de accesos o usuarios permitidos debe ser mayor que cero."
                 )
+
+
+class AlsaLicenseLine(models.Model):
+    _name = "alsa.license.line"
+    _description = "Producto o servicio de una licencia"
+    _order = "sequence, id"
+    _rec_name = "product_id"
+
+    sequence = fields.Integer(default=10)
+    license_id = fields.Many2one(
+        comodel_name="alsa.license",
+        string="Licencia",
+        required=True,
+        index=True,
+        ondelete="cascade",
+    )
+    product_id = fields.Many2one(
+        comodel_name="product.product",
+        string="Producto / Servicio",
+        required=True,
+        index=True,
+        ondelete="restrict",
+    )
+    quantity = fields.Float(string="Cantidad", required=True, default=1.0)
+    allowed_access_count = fields.Integer(
+        string="Accesos / Usuarios",
+        required=True,
+        default=1,
+    )
+    sale_order_line_id = fields.Many2one(
+        comodel_name="sale.order.line",
+        string="Línea de venta",
+        readonly=True,
+        copy=False,
+        ondelete="set null",
+    )
+
+    @api.constrains("quantity", "allowed_access_count")
+    def _check_positive_values(self):
+        for line in self:
+            if line.quantity <= 0:
+                raise ValidationError("La cantidad del producto debe ser mayor que cero.")
+            if line.allowed_access_count < 1:
+                raise ValidationError(
+                    "Los accesos o usuarios de la línea deben ser mayores que cero."
+                )
+
+    def init(self):
+        """Create a product line for licenses created before multi-product support."""
+        self.env.cr.execute(
+            """
+            INSERT INTO alsa_license_line
+                (license_id, sequence, product_id, quantity, allowed_access_count)
+            SELECT license.id, 10, license.product_id, 1.0,
+                   GREATEST(license.allowed_access_count, 1)
+              FROM alsa_license AS license
+             WHERE license.product_id IS NOT NULL
+               AND NOT EXISTS (
+                    SELECT 1
+                      FROM alsa_license_line AS line
+                     WHERE line.license_id = license.id
+                       AND line.product_id = license.product_id
+               )
+            """
+        )

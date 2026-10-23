@@ -7,7 +7,9 @@
             <list string="Licencias" decoration-danger="state == 'expired'" decoration-success="state == 'active'">
                 <field name="name"/>
                 <field name="partner_id"/>
-                <field name="product_id"/>
+                <field name="product_summary"/>
+                <field name="product_count" optional="hide"/>
+                <field name="equipment_count" optional="show"/>
                 <field name="start_date"/>
                 <field name="expiration_date"/>
                 <field name="allowed_access_count"/>
@@ -30,7 +32,6 @@
                     <group>
                         <group>
                             <field name="partner_id"/>
-                            <field name="product_id"/>
                             <field name="allowed_access_count"/>
                         </group>
                         <group>
@@ -40,6 +41,25 @@
                         </group>
                     </group>
                     <notebook>
+                        <page string="Productos / Servicios" name="products">
+                            <field name="product_line_ids" context="{'default_license_id': id}">
+                                <list editable="bottom" open_form_view="1">
+                                    <field name="sequence" widget="handle"/>
+                                    <field name="product_id"/>
+                                    <field name="quantity"/>
+                                    <field name="allowed_access_count"/>
+                                    <field name="sale_order_line_id" optional="hide"/>
+                                </list>
+                                <form string="Producto / Servicio de licencia">
+                                    <group>
+                                        <field name="product_id"/>
+                                        <field name="quantity"/>
+                                        <field name="allowed_access_count"/>
+                                        <field name="sale_order_line_id"/>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
                         <page string="Equipos" name="equipment">
                             <field name="equipment_ids" context="{'default_partner_id': partner_id}">
                                 <list editable="bottom">
@@ -52,6 +72,7 @@
                         </page>
                         <page string="Origen de venta" name="sale_origin">
                             <group>
+                                <field name="product_id" string="Producto principal (histórico)"/>
                                 <field name="sale_order_id"/>
                                 <field name="sale_order_line_id"/>
                             </group>
@@ -62,6 +83,54 @@
         </field>
     </record>
 
+    <record id="view_alsa_license_kanban" model="ir.ui.view">
+        <field name="name">alsa.license.kanban</field>
+        <field name="model">alsa.license</field>
+        <field name="arch" type="xml">
+            <kanban class="o_kanban_small_column" sample="1">
+                <field name="name"/>
+                <field name="partner_id"/>
+                <field name="product_summary"/>
+                <field name="expiration_date"/>
+                <field name="allowed_access_count"/>
+                <field name="product_count"/>
+                <field name="equipment_count"/>
+                <field name="state"/>
+                <templates>
+                    <t t-name="card">
+                        <div class="d-flex justify-content-between align-items-start gap-2">
+                            <strong class="fs-5"><field name="name"/></strong>
+                            <field name="state" widget="badge"/>
+                        </div>
+                        <div class="text-muted mt-2"><field name="partner_id"/></div>
+                        <div class="mt-2 text-truncate"><field name="product_summary"/></div>
+                        <div class="d-flex justify-content-between mt-3">
+                            <span>Vence: <field name="expiration_date"/></span>
+                            <span>Accesos: <field name="allowed_access_count"/></span>
+                        </div>
+                        <footer>
+                            <span><field name="product_count"/> productos</span>
+                            <span class="ms-auto"><field name="equipment_count"/> equipos</span>
+                        </footer>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_alsa_license_calendar" model="ir.ui.view">
+        <field name="name">alsa.license.calendar</field>
+        <field name="model">alsa.license</field>
+        <field name="arch" type="xml">
+            <calendar string="Vencimientos de licencias" date_start="expiration_date" color="partner_id" mode="month" quick_create="false">
+                <field name="partner_id"/>
+                <field name="product_summary"/>
+                <field name="allowed_access_count"/>
+                <field name="state"/>
+            </calendar>
+        </field>
+    </record>
+
     <record id="view_alsa_license_search" model="ir.ui.view">
         <field name="name">alsa.license.search</field>
         <field name="model">alsa.license</field>
@@ -69,7 +138,8 @@
             <search string="Buscar licencias">
                 <field name="name"/>
                 <field name="partner_id"/>
-                <field name="product_id"/>
+                <field name="product_id" string="Producto principal"/>
+                <field name="product_line_ids" string="Productos / Servicios"/>
                 <filter name="active" string="Vigentes" domain="[('state', '=', 'active')]"/>
                 <filter name="expired" string="Expiradas" domain="[('state', '=', 'expired')]"/>
                 <separator/>
@@ -82,7 +152,7 @@
     <record id="action_alsa_license" model="ir.actions.act_window">
         <field name="name">Licencias</field>
         <field name="res_model">alsa.license</field>
-        <field name="view_mode">list,form</field>
+        <field name="view_mode">list,kanban,calendar,form</field>
         <field name="search_view_id" ref="view_alsa_license_search"/>
         <field name="context">{'search_default_active': 1}</field>
     </record>

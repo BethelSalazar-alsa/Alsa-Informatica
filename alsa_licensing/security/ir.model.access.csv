@@ -1,5 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_alsa_license_user,alsa.license user,model_alsa_license,base.group_user,1,1,1,1
 access_alsa_license_admin,alsa.license admin,model_alsa_license,base.group_system,1,1,1,1
+access_alsa_license_line_user,alsa.license.line user,model_alsa_license_line,base.group_user,1,1,1,1
+access_alsa_license_line_admin,alsa.license.line admin,model_alsa_license_line,base.group_system,1,1,1,1
 access_alsa_equipment_user,alsa.equipment user,model_alsa_equipment,base.group_user,1,1,1,1
 access_alsa_equipment_admin,alsa.equipment admin,model_alsa_equipment,base.group_system,1,1,1,1

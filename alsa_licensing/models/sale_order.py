@@ -174,16 +174,25 @@ class SaleOrderLine(models.Model):
         start_date = self.alsa_license_start_date or today
         expiration_date = self.alsa_license_expiration_date
         if not expiration_date:
-            renewal_base = start_date
             if (
                 license_record
+                and license_record.sale_order_id == self.order_id
                 and license_record.expiration_date
-                and license_record.expiration_date >= today
             ):
-                renewal_base = license_record.expiration_date
-            expiration_date = renewal_base + relativedelta(
-                months=product_template.alsa_license_duration_months
-            )
+                # A second product line assigned to the same license in this
+                # order must not renew the license for a second full period.
+                expiration_date = license_record.expiration_date
+            else:
+                renewal_base = start_date
+                if (
+                    license_record
+                    and license_record.expiration_date
+                    and license_record.expiration_date >= today
+                ):
+                    renewal_base = license_record.expiration_date
+                expiration_date = renewal_base + relativedelta(
+                    months=product_template.alsa_license_duration_months
+                )
 
         access_count = self.alsa_license_access_count or max(
             1,
@@ -193,7 +202,6 @@ class SaleOrderLine(models.Model):
         )
         values = {
             "partner_id": partner.id,
-            "product_id": self.product_id.id,
             "start_date": start_date,
             "expiration_date": expiration_date,
             "allowed_access_count": max(
@@ -204,6 +212,11 @@ class SaleOrderLine(models.Model):
             "sale_order_line_id": self.id,
         }
 
+        # Keep the first product as the historical/main product, while every
+        # sold product is represented by its own editable license line.
+        if not license_record or not license_record.product_id:
+            values["product_id"] = self.product_id.id
+
         if license_record:
             license_record.write(values)
         else:
@@ -213,4 +226,24 @@ class SaleOrderLine(models.Model):
             )
             license_record = self.env["alsa.license"].create(values)
             self.alsa_license_id = license_record
+
+        product_line = license_record.product_line_ids.filtered(
+            lambda item: item.sale_order_line_id == self
+        )[:1]
+        if not product_line:
+            product_line = license_record.product_line_ids.filtered(
+                lambda item: item.product_id == self.product_id
+                and not item.sale_order_line_id
+            )[:1]
+        line_values = {
+            "product_id": self.product_id.id,
+            "quantity": self.product_uom_qty,
+            "allowed_access_count": access_count,
+            "sale_order_line_id": self.id,
+        }
+        if product_line:
+            product_line.write(line_values)
+        else:
+            line_values["license_id"] = license_record.id
+            self.env["alsa.license.line"].create(line_values)
         return license_record
