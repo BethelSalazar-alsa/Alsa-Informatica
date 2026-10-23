@@ -154,15 +154,20 @@ class AlsaHelpdeskTicketEquipmentLine(models.Model):
         string="Características",
         readonly=True,
     )
+    specifications = fields.Html(
+        related="equipment_id.specifications",
+        string="Características / Especificaciones",
+        readonly=False,
+    )
     product_id = fields.Many2one(
         related="equipment_id.product_id",
         string="Producto / Servicio",
-        readonly=True,
+        readonly=False,
     )
     license_id = fields.Many2one(
         related="equipment_id.license_id",
         string="Licencia",
-        readonly=True,
+        readonly=False,
     )
 
     @api.onchange("equipment_id")
