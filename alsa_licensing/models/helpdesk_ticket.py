@@ -1,4 +1,5 @@
 from odoo import api, fields, models
+from odoo.exceptions import ValidationError
 
 
 class HelpdeskTicket(models.Model):
@@ -7,12 +8,12 @@ class HelpdeskTicket(models.Model):
     alsa_active_license_ids = fields.Many2many(
         comodel_name="alsa.license",
         string="Licencias vigentes",
-        compute="_compute_alsa_customer_assets",
+        compute="_compute_alsa_active_licenses",
     )
-    alsa_available_equipment_ids = fields.Many2many(
-        comodel_name="alsa.equipment",
+    alsa_customer_equipment_ids = fields.One2many(
+        related="partner_id.alsa_equipment_ids",
         string="Equipos del cliente",
-        compute="_compute_alsa_customer_assets",
+        readonly=False,
     )
     alsa_equipment_ids = fields.Many2many(
         comodel_name="alsa.equipment",
@@ -24,13 +25,11 @@ class HelpdeskTicket(models.Model):
     )
 
     @api.depends("partner_id")
-    def _compute_alsa_customer_assets(self):
+    def _compute_alsa_active_licenses(self):
         today = fields.Date.context_today(self)
         License = self.env["alsa.license"]
-        Equipment = self.env["alsa.equipment"]
         for ticket in self:
             licenses = License
-            equipment = Equipment
             if ticket.partner_id:
                 licenses = License.search(
                     [
@@ -38,11 +37,7 @@ class HelpdeskTicket(models.Model):
                         ("expiration_date", ">=", today),
                     ]
                 )
-                equipment = Equipment.search(
-                    [("partner_id", "=", ticket.partner_id.id)]
-                )
             ticket.alsa_active_license_ids = licenses
-            ticket.alsa_available_equipment_ids = equipment
 
     @api.onchange("partner_id")
     def _onchange_alsa_partner_id(self):
@@ -52,3 +47,14 @@ class HelpdeskTicket(models.Model):
             )
         else:
             self.alsa_equipment_ids = False
+
+    @api.constrains("partner_id", "alsa_equipment_ids")
+    def _check_alsa_equipment_partner(self):
+        for ticket in self:
+            invalid_equipment = ticket.alsa_equipment_ids.filtered(
+                lambda equipment: equipment.partner_id != ticket.partner_id
+            )
+            if invalid_equipment:
+                raise ValidationError(
+                    "Todos los equipos seleccionados deben pertenecer al cliente del ticket."
+                )
