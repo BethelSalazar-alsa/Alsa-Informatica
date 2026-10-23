@@ -47,12 +47,17 @@ class SaleOrder(models.Model):
         string="Licencias vigentes",
         compute="_compute_alsa_customer_assets",
     )
+    alsa_customer_equipment_ids = fields.One2many(
+        related="partner_id.alsa_equipment_ids",
+        string="Equipos del cliente",
+        readonly=False,
+    )
     alsa_equipment_ids = fields.Many2many(
         comodel_name="alsa.equipment",
         relation="alsa_sale_order_equipment_rel",
         column1="order_id",
         column2="equipment_id",
-        string="Equipos relacionados",
+        string="Equipos utilizados en la venta",
         copy=False,
     )
 
@@ -80,6 +85,17 @@ class SaleOrder(models.Model):
             )
         else:
             self.alsa_equipment_ids = False
+
+    @api.constrains("partner_id", "alsa_equipment_ids")
+    def _check_alsa_equipment_partner(self):
+        for order in self:
+            invalid_equipment = order.alsa_equipment_ids.filtered(
+                lambda equipment: equipment.partner_id != order.partner_id
+            )
+            if invalid_equipment:
+                raise ValidationError(
+                    "Todos los equipos seleccionados deben pertenecer al cliente de la venta."
+                )
 
     def action_confirm(self):
         result = super().action_confirm()

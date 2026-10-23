@@ -49,9 +49,9 @@
                             <field name="state" widget="badge"/>
                         </list>
                     </field>
-                    <separator string="Equipos relacionados con esta venta"/>
-                    <field name="alsa_equipment_ids" domain="[('partner_id', '=', partner_id)]" context="{'default_partner_id': partner_id}" nolabel="1">
-                        <list editable="bottom">
+                    <separator string="Equipos del cliente"/>
+                    <field name="alsa_customer_equipment_ids" context="{'default_partner_id': partner_id}" nolabel="1">
+                        <list editable="bottom" delete="0" open_form_view="1">
                             <field name="name"/>
                             <field name="equipment_type"/>
                             <field name="specifications"/>
@@ -59,6 +59,8 @@
                             <field name="license_id" domain="[('partner_id', '=', parent.partner_id)]" optional="show"/>
                         </list>
                     </field>
+                    <separator string="Equipos que se usarán en esta venta"/>
+                    <field name="alsa_equipment_ids" widget="many2many_checkboxes" domain="[('partner_id', '=', partner_id)]" nolabel="1"/>
                 </page>
             </xpath>
         </field>
