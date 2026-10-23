@@ -2,7 +2,7 @@ import math
 
 from dateutil.relativedelta import relativedelta
 
-from odoo import api, fields, models
+from odoo import Command, api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -60,6 +60,12 @@ class SaleOrder(models.Model):
         string="Equipos utilizados en la venta",
         copy=False,
     )
+    alsa_equipment_selection_line_ids = fields.One2many(
+        comodel_name="alsa.sale.order.equipment.line",
+        inverse_name="order_id",
+        string="Equipos del cliente",
+        copy=False,
+    )
 
     @api.depends("partner_id")
     def _compute_alsa_customer_assets(self):
@@ -79,12 +85,67 @@ class SaleOrder(models.Model):
 
     @api.onchange("partner_id")
     def _onchange_alsa_partner_equipment(self):
-        if self.partner_id:
-            self.alsa_equipment_ids = self.alsa_equipment_ids.filtered(
-                lambda equipment: equipment.partner_id == self.partner_id
+        for order in self:
+            if not order.partner_id:
+                order.alsa_equipment_ids = False
+                order.alsa_equipment_selection_line_ids = [Command.clear()]
+                continue
+
+            selected_equipment = order.alsa_equipment_ids.filtered(
+                lambda equipment: equipment.partner_id == order.partner_id
             )
-        else:
-            self.alsa_equipment_ids = False
+            selected_equipment |= order.alsa_equipment_selection_line_ids.filtered(
+                lambda line: line.selected
+                and line.equipment_id.partner_id == order.partner_id
+            ).equipment_id
+            order.alsa_equipment_ids = selected_equipment
+            order.alsa_equipment_selection_line_ids = [
+                Command.clear(),
+                *[
+                    Command.create(
+                        {
+                            "equipment_id": equipment.id,
+                            "selected": equipment in selected_equipment,
+                        }
+                    )
+                    for equipment in order.partner_id.alsa_equipment_ids
+                ],
+            ]
+
+    @api.onchange("alsa_equipment_selection_line_ids")
+    def _onchange_alsa_equipment_selection_lines(self):
+        for order in self:
+            order.alsa_equipment_ids = order.alsa_equipment_selection_line_ids.filtered(
+                "selected"
+            ).equipment_id
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        orders = super().create(vals_list)
+        for order, values in zip(orders, vals_list):
+            if "alsa_equipment_selection_line_ids" in values:
+                order._alsa_sync_selected_equipment()
+        return orders
+
+    def write(self, values):
+        result = super().write(values)
+        if (
+            "alsa_equipment_selection_line_ids" in values
+            and not self.env.context.get("alsa_skip_equipment_selection_sync")
+        ):
+            self._alsa_sync_selected_equipment()
+        return result
+
+    def _alsa_sync_selected_equipment(self):
+        for order in self:
+            if not order.alsa_equipment_selection_line_ids:
+                continue
+            equipment_ids = order.alsa_equipment_selection_line_ids.filtered(
+                "selected"
+            ).equipment_id.ids
+            order.with_context(alsa_skip_equipment_selection_sync=True).write(
+                {"alsa_equipment_ids": [Command.set(equipment_ids)]}
+            )
 
     @api.constrains("partner_id", "alsa_equipment_ids")
     def _check_alsa_equipment_partner(self):
@@ -98,6 +159,7 @@ class SaleOrder(models.Model):
                 )
 
     def action_confirm(self):
+        self._alsa_sync_selected_equipment()
         result = super().action_confirm()
         for order in self:
             for line in order.order_line.filtered(
@@ -247,3 +309,100 @@ class SaleOrderLine(models.Model):
             line_values["license_id"] = license_record.id
             self.env["alsa.license.line"].create(line_values)
         return license_record
+
+
+class AlsaSaleOrderEquipmentLine(models.Model):
+    _name = "alsa.sale.order.equipment.line"
+    _description = "Selección de equipo en una venta"
+    _order = "selected desc, equipment_id"
+    _rec_name = "equipment_id"
+
+    order_id = fields.Many2one(
+        comodel_name="sale.order",
+        string="Venta",
+        required=True,
+        index=True,
+        ondelete="cascade",
+    )
+    selected = fields.Boolean(string="Usar", default=True)
+    equipment_id = fields.Many2one(
+        comodel_name="alsa.equipment",
+        string="Equipo",
+        required=True,
+        index=True,
+        ondelete="cascade",
+    )
+    equipment_type = fields.Selection(
+        related="equipment_id.equipment_type",
+        string="Tipo",
+        readonly=True,
+    )
+    specifications = fields.Text(
+        related="equipment_id.specifications",
+        string="Características / Especificaciones",
+        readonly=True,
+    )
+    product_id = fields.Many2one(
+        related="equipment_id.product_id",
+        string="Producto / Servicio relacionado",
+        readonly=True,
+    )
+    license_id = fields.Many2one(
+        related="equipment_id.license_id",
+        string="Licencia asociada",
+        readonly=True,
+    )
+
+    @api.onchange("equipment_id")
+    def _onchange_equipment_id(self):
+        if self.equipment_id:
+            self.selected = True
+
+    @api.constrains("order_id", "equipment_id")
+    def _check_equipment_partner(self):
+        for line in self:
+            if (
+                line.order_id.partner_id
+                and line.equipment_id.partner_id != line.order_id.partner_id
+            ):
+                raise ValidationError(
+                    "El equipo seleccionado debe pertenecer al cliente de la venta."
+                )
+            duplicate = self.search(
+                [
+                    ("order_id", "=", line.order_id.id),
+                    ("equipment_id", "=", line.equipment_id.id),
+                    ("id", "!=", line.id),
+                ],
+                limit=1,
+            )
+            if duplicate:
+                raise ValidationError(
+                    "Cada equipo sólo puede aparecer una vez en la tabla de la venta."
+                )
+
+    def init(self):
+        """Preserve existing selections and prepare compact rows for saved orders."""
+        self.env.cr.execute(
+            """
+            INSERT INTO alsa_sale_order_equipment_line
+                (order_id, equipment_id, selected)
+            SELECT sale_order.id,
+                   equipment.id,
+                   EXISTS (
+                       SELECT 1
+                         FROM alsa_sale_order_equipment_rel AS relation
+                        WHERE relation.order_id = sale_order.id
+                          AND relation.equipment_id = equipment.id
+                   )
+              FROM sale_order
+              JOIN alsa_equipment AS equipment
+                ON equipment.partner_id = sale_order.partner_id
+             WHERE NOT EXISTS (
+                       SELECT 1
+                         FROM alsa_sale_order_equipment_line AS selection_line
+                        WHERE selection_line.order_id = sale_order.id
+                          AND selection_line.equipment_id = equipment.id
+                   )
+            """
+        )

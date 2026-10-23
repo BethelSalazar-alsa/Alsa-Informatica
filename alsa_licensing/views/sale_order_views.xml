@@ -50,17 +50,17 @@
                         </list>
                     </field>
                     <separator string="Equipos del cliente"/>
-                    <field name="alsa_customer_equipment_ids" context="{'default_partner_id': partner_id}" nolabel="1">
-                        <list editable="bottom" delete="0" open_form_view="1">
-                            <field name="name"/>
+                    <field name="alsa_equipment_selection_line_ids" nolabel="1">
+                        <list editable="bottom" delete="0">
+                            <field name="selected" widget="boolean_toggle"/>
+                            <field name="equipment_id" domain="[('partner_id', '=', parent.partner_id)]" context="{'default_partner_id': parent.partner_id}"/>
                             <field name="equipment_type"/>
                             <field name="specifications"/>
                             <field name="product_id"/>
-                            <field name="license_id" domain="[('partner_id', '=', parent.partner_id)]" optional="show"/>
+                            <field name="license_id" optional="show"/>
                         </list>
                     </field>
-                    <separator string="Equipos que se usarán en esta venta"/>
-                    <field name="alsa_equipment_ids" widget="many2many_checkboxes" domain="[('partner_id', '=', partner_id)]" nolabel="1"/>
+                    <field name="alsa_equipment_ids" invisible="1"/>
                 </page>
             </xpath>
         </field>

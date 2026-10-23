@@ -5,3 +5,5 @@ access_alsa_license_line_user,alsa.license.line user,model_alsa_license_line,bas
 access_alsa_license_line_admin,alsa.license.line admin,model_alsa_license_line,base.group_system,1,1,1,1
 access_alsa_equipment_user,alsa.equipment user,model_alsa_equipment,base.group_user,1,1,1,1
 access_alsa_equipment_admin,alsa.equipment admin,model_alsa_equipment,base.group_system,1,1,1,1
+access_alsa_sale_order_equipment_line_user,alsa.sale.order.equipment.line user,model_alsa_sale_order_equipment_line,base.group_user,1,1,1,1
+access_alsa_sale_order_equipment_line_admin,alsa.sale.order.equipment.line admin,model_alsa_sale_order_equipment_line,base.group_system,1,1,1,1
