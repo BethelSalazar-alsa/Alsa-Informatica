@@ -10,7 +10,7 @@
                 <field name="equipment_type" widget="badge"/>
                 <field name="product_id"/>
                 <field name="license_id" optional="show"/>
-                <field name="specifications" optional="hide"/>
+                <field name="specifications_summary" optional="hide"/>
             </list>
         </field>
     </record>
@@ -65,7 +65,7 @@
                         </group>
                     </group>
                     <group string="Características / Especificaciones técnicas">
-                        <field name="specifications" nolabel="1" placeholder="Procesador, memoria, sistema operativo, dirección IP, número de serie..."/>
+                        <field name="specifications" widget="html" nolabel="1" placeholder="Procesador, memoria, sistema operativo, dirección IP, número de serie, notas técnicas..."/>
                     </group>
                 </sheet>
             </form>

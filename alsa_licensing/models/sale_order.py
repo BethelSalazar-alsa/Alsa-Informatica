@@ -337,9 +337,9 @@ class AlsaSaleOrderEquipmentLine(models.Model):
         string="Tipo",
         readonly=True,
     )
-    specifications = fields.Text(
-        related="equipment_id.specifications",
-        string="Características / Especificaciones",
+    specifications_summary = fields.Char(
+        related="equipment_id.specifications_summary",
+        string="Características",
         readonly=True,
     )
     product_id = fields.Many2one(

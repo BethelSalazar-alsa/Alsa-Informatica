@@ -1,3 +1,6 @@
+import html
+import re
+
 from odoo import api, fields, models
 from odoo.exceptions import ValidationError
 
@@ -22,7 +25,14 @@ class AlsaEquipment(models.Model):
         default="terminal",
         index=True,
     )
-    specifications = fields.Text(string="Características / Especificaciones técnicas")
+    specifications = fields.Html(
+        string="Características / Especificaciones técnicas",
+        sanitize=True,
+    )
+    specifications_summary = fields.Char(
+        string="Resumen de características",
+        compute="_compute_specifications_summary",
+    )
     product_id = fields.Many2one(
         comodel_name="product.product",
         string="Producto / Servicio relacionado",
@@ -33,6 +43,15 @@ class AlsaEquipment(models.Model):
         string="Licencia asociada",
         ondelete="set null",
     )
+
+    @api.depends("specifications")
+    def _compute_specifications_summary(self):
+        for equipment in self:
+            plain_text = re.sub(r"<[^>]+>", " ", equipment.specifications or "")
+            plain_text = " ".join(html.unescape(plain_text).split())
+            equipment.specifications_summary = (
+                plain_text[:97] + "..." if len(plain_text) > 100 else plain_text
+            )
 
     @api.model_create_multi
     def create(self, vals_list):

@@ -52,12 +52,12 @@
                     <separator string="Equipos del cliente"/>
                     <field name="alsa_equipment_selection_line_ids" nolabel="1">
                         <list editable="bottom" delete="0">
-                            <field name="selected" widget="boolean_toggle"/>
-                            <field name="equipment_id" domain="[('partner_id', '=', parent.partner_id)]" context="{'default_partner_id': parent.partner_id}"/>
-                            <field name="equipment_type"/>
-                            <field name="specifications"/>
-                            <field name="product_id"/>
-                            <field name="license_id" optional="show"/>
+                            <field name="selected" widget="boolean_toggle" width="65px"/>
+                            <field name="equipment_id" width="170px" domain="[('partner_id', '=', parent.partner_id)]" context="{'default_partner_id': parent.partner_id}"/>
+                            <field name="equipment_type" width="90px"/>
+                            <field name="specifications_summary" width="230px" optional="show"/>
+                            <field name="product_id" optional="hide"/>
+                            <field name="license_id" width="150px" optional="show"/>
                         </list>
                     </field>
                     <field name="alsa_equipment_ids" invisible="1"/>

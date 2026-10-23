@@ -25,11 +25,11 @@
                         </page>
                         <page string="Equipos" name="alsa_partner_equipment">
                             <field name="alsa_equipment_ids" context="{'default_partner_id': id}">
-                                <list editable="bottom">
+                                <list editable="bottom" open_form_view="1">
                                     <field name="name"/>
                                     <field name="equipment_type"/>
-                                    <field name="specifications"/>
-                                    <field name="product_id"/>
+                                    <field name="specifications_summary" width="230px"/>
+                                    <field name="product_id" optional="hide"/>
                                     <field name="license_id" domain="[('partner_id', '=', parent.id)]" optional="show"/>
                                 </list>
                             </field>

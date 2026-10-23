@@ -7,31 +7,28 @@
         <field name="arch" type="xml">
             <xpath expr="//form/sheet/notebook" position="inside">
                 <page string="Licencias y Equipos" name="alsa_licensing" invisible="not partner_id">
-                    <group string="Licencias vigentes">
-                        <field name="alsa_active_license_ids" readonly="1" nolabel="1">
-                            <list create="0" delete="0">
-                                <field name="name"/>
-                                <field name="product_summary"/>
-                                <field name="start_date"/>
-                                <field name="expiration_date"/>
-                                <field name="allowed_access_count"/>
-                            </list>
-                        </field>
-                    </group>
-                    <group string="Equipos del cliente">
-                        <field name="alsa_customer_equipment_ids" context="{'default_partner_id': partner_id}" nolabel="1">
-                            <list editable="bottom" delete="0" open_form_view="1">
-                                <field name="name"/>
-                                <field name="equipment_type"/>
-                                <field name="specifications"/>
-                                <field name="product_id"/>
-                                <field name="license_id" optional="show"/>
-                            </list>
-                        </field>
-                    </group>
-                    <group string="Equipos que se atenderán en este ticket">
-                        <field name="alsa_equipment_ids" widget="many2many_checkboxes" domain="[('partner_id', '=', partner_id)]" nolabel="1"/>
-                    </group>
+                    <separator string="Licencias vigentes"/>
+                    <field name="alsa_active_license_ids" readonly="1" nolabel="1">
+                        <list create="0" delete="0">
+                            <field name="name" width="140px"/>
+                            <field name="product_summary"/>
+                            <field name="start_date" optional="hide"/>
+                            <field name="expiration_date" width="110px"/>
+                            <field name="allowed_access_count" width="80px"/>
+                        </list>
+                    </field>
+                    <separator string="Equipos del cliente"/>
+                    <field name="alsa_equipment_selection_line_ids" nolabel="1">
+                        <list editable="bottom" delete="0">
+                            <field name="selected" widget="boolean_toggle" width="65px"/>
+                            <field name="equipment_id" width="170px" domain="[('partner_id', '=', parent.partner_id)]" context="{'default_partner_id': parent.partner_id}"/>
+                            <field name="equipment_type" width="90px"/>
+                            <field name="specifications_summary" width="230px" optional="show"/>
+                            <field name="product_id" optional="hide"/>
+                            <field name="license_id" width="150px" optional="show"/>
+                        </list>
+                    </field>
+                    <field name="alsa_equipment_ids" invisible="1"/>
                 </page>
             </xpath>
         </field>

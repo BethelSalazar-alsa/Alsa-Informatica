@@ -62,12 +62,12 @@
                         </page>
                         <page string="Equipos" name="equipment">
                             <field name="equipment_ids" context="{'default_partner_id': partner_id}">
-                                <list editable="bottom">
+                                <list editable="bottom" open_form_view="1">
                                     <field name="partner_id" column_invisible="True"/>
                                     <field name="name"/>
                                     <field name="equipment_type"/>
                                     <field name="product_id"/>
-                                    <field name="specifications" optional="show"/>
+                                    <field name="specifications_summary" optional="show"/>
                                 </list>
                             </field>
                         </page>

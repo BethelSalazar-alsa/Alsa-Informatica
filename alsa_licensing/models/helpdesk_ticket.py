@@ -1,4 +1,4 @@
-from odoo import api, fields, models
+from odoo import Command, api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -23,6 +23,12 @@ class HelpdeskTicket(models.Model):
         string="Equipos atendidos",
         copy=False,
     )
+    alsa_equipment_selection_line_ids = fields.One2many(
+        comodel_name="alsa.helpdesk.ticket.equipment.line",
+        inverse_name="ticket_id",
+        string="Equipos del cliente",
+        copy=False,
+    )
 
     @api.depends("partner_id")
     def _compute_alsa_active_licenses(self):
@@ -41,12 +47,69 @@ class HelpdeskTicket(models.Model):
 
     @api.onchange("partner_id")
     def _onchange_alsa_partner_id(self):
-        if self.partner_id:
-            self.alsa_equipment_ids = self.alsa_equipment_ids.filtered(
-                lambda equipment: equipment.partner_id == self.partner_id
+        for ticket in self:
+            if not ticket.partner_id:
+                ticket.alsa_equipment_ids = False
+                ticket.alsa_equipment_selection_line_ids = [Command.clear()]
+                continue
+
+            selected_equipment = ticket.alsa_equipment_ids.filtered(
+                lambda equipment: equipment.partner_id == ticket.partner_id
             )
-        else:
-            self.alsa_equipment_ids = False
+            selected_equipment |= ticket.alsa_equipment_selection_line_ids.filtered(
+                lambda line: line.selected
+                and line.equipment_id.partner_id == ticket.partner_id
+            ).equipment_id
+            ticket.alsa_equipment_ids = selected_equipment
+            ticket.alsa_equipment_selection_line_ids = [
+                Command.clear(),
+                *[
+                    Command.create(
+                        {
+                            "equipment_id": equipment.id,
+                            "selected": equipment in selected_equipment,
+                        }
+                    )
+                    for equipment in ticket.partner_id.alsa_equipment_ids
+                ],
+            ]
+
+    @api.onchange("alsa_equipment_selection_line_ids")
+    def _onchange_alsa_equipment_selection_lines(self):
+        for ticket in self:
+            ticket.alsa_equipment_ids = (
+                ticket.alsa_equipment_selection_line_ids.filtered(
+                    "selected"
+                ).equipment_id
+            )
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        tickets = super().create(vals_list)
+        for ticket, values in zip(tickets, vals_list):
+            if "alsa_equipment_selection_line_ids" in values:
+                ticket._alsa_sync_selected_equipment()
+        return tickets
+
+    def write(self, values):
+        result = super().write(values)
+        if (
+            "alsa_equipment_selection_line_ids" in values
+            and not self.env.context.get("alsa_skip_equipment_selection_sync")
+        ):
+            self._alsa_sync_selected_equipment()
+        return result
+
+    def _alsa_sync_selected_equipment(self):
+        for ticket in self:
+            if not ticket.alsa_equipment_selection_line_ids:
+                continue
+            equipment_ids = ticket.alsa_equipment_selection_line_ids.filtered(
+                "selected"
+            ).equipment_id.ids
+            ticket.with_context(alsa_skip_equipment_selection_sync=True).write(
+                {"alsa_equipment_ids": [Command.set(equipment_ids)]}
+            )
 
     @api.constrains("partner_id", "alsa_equipment_ids")
     def _check_alsa_equipment_partner(self):
@@ -58,3 +121,100 @@ class HelpdeskTicket(models.Model):
                 raise ValidationError(
                     "Todos los equipos seleccionados deben pertenecer al cliente del ticket."
                 )
+
+
+class AlsaHelpdeskTicketEquipmentLine(models.Model):
+    _name = "alsa.helpdesk.ticket.equipment.line"
+    _description = "Selección de equipo en un ticket de soporte"
+    _order = "selected desc, equipment_id"
+    _rec_name = "equipment_id"
+
+    ticket_id = fields.Many2one(
+        comodel_name="helpdesk.ticket",
+        string="Ticket",
+        required=True,
+        index=True,
+        ondelete="cascade",
+    )
+    selected = fields.Boolean(string="Atender", default=True)
+    equipment_id = fields.Many2one(
+        comodel_name="alsa.equipment",
+        string="Equipo",
+        required=True,
+        index=True,
+        ondelete="cascade",
+    )
+    equipment_type = fields.Selection(
+        related="equipment_id.equipment_type",
+        string="Tipo",
+        readonly=True,
+    )
+    specifications_summary = fields.Char(
+        related="equipment_id.specifications_summary",
+        string="Características",
+        readonly=True,
+    )
+    product_id = fields.Many2one(
+        related="equipment_id.product_id",
+        string="Producto / Servicio",
+        readonly=True,
+    )
+    license_id = fields.Many2one(
+        related="equipment_id.license_id",
+        string="Licencia",
+        readonly=True,
+    )
+
+    @api.onchange("equipment_id")
+    def _onchange_equipment_id(self):
+        if self.equipment_id:
+            self.selected = True
+
+    @api.constrains("ticket_id", "equipment_id")
+    def _check_equipment_partner(self):
+        for line in self:
+            if (
+                line.ticket_id.partner_id
+                and line.equipment_id.partner_id != line.ticket_id.partner_id
+            ):
+                raise ValidationError(
+                    "El equipo seleccionado debe pertenecer al cliente del ticket."
+                )
+            duplicate = self.search(
+                [
+                    ("ticket_id", "=", line.ticket_id.id),
+                    ("equipment_id", "=", line.equipment_id.id),
+                    ("id", "!=", line.id),
+                ],
+                limit=1,
+            )
+            if duplicate:
+                raise ValidationError(
+                    "Cada equipo sólo puede aparecer una vez en la tabla del ticket."
+                )
+
+    def init(self):
+        """Preserve selections and prepare compact rows for existing tickets."""
+        self.env.cr.execute(
+            """
+            INSERT INTO alsa_helpdesk_ticket_equipment_line
+                (ticket_id, equipment_id, selected)
+            SELECT ticket.id,
+                   equipment.id,
+                   EXISTS (
+                       SELECT 1
+                         FROM alsa_helpdesk_ticket_equipment_rel AS relation
+                        WHERE relation.ticket_id = ticket.id
+                          AND relation.equipment_id = equipment.id
+                   )
+              FROM helpdesk_ticket AS ticket
+              JOIN alsa_equipment AS equipment
+                ON equipment.partner_id = ticket.partner_id
+             WHERE NOT EXISTS (
+                       SELECT 1
+                         FROM alsa_helpdesk_ticket_equipment_line AS selection_line
+                        WHERE selection_line.ticket_id = ticket.id
+                          AND selection_line.equipment_id = equipment.id
+                   )
+            """
+        )
