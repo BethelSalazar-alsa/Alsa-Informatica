@@ -13,9 +13,10 @@
                     <notebook>
                         <page string="Licencias" name="alsa_partner_licenses">
                             <field name="alsa_license_ids" context="{'default_partner_id': id}">
-                                <list editable="bottom" decoration-danger="state == 'expired'" decoration-success="state == 'active'">
+                                <list editable="bottom" open_form_view="1" decoration-danger="state == 'expired'" decoration-success="state == 'active'">
                                     <field name="name"/>
-                                    <field name="product_summary"/>
+                                    <field name="product_id" string="Producto / Servicio" required="True"/>
+                                    <field name="product_summary" optional="hide"/>
                                     <field name="start_date"/>
                                     <field name="expiration_date"/>
                                     <field name="allowed_access_count"/>
