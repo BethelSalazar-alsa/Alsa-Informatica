@@ -47,6 +47,20 @@ class SaleOrder(models.Model):
         string="Licencias vigentes",
         compute="_compute_alsa_customer_assets",
     )
+    alsa_license_ids = fields.Many2many(
+        comodel_name="alsa.license",
+        relation="alsa_sale_order_license_rel",
+        column1="order_id",
+        column2="license_id",
+        string="Licencias utilizadas en la venta",
+        copy=False,
+    )
+    alsa_license_selection_line_ids = fields.One2many(
+        comodel_name="alsa.sale.order.license.line",
+        inverse_name="order_id",
+        string="Licencias del cliente",
+        copy=False,
+    )
     alsa_customer_equipment_ids = fields.One2many(
         related="partner_id.alsa_equipment_ids",
         string="Equipos del cliente",
@@ -112,6 +126,43 @@ class SaleOrder(models.Model):
                 ],
             ]
 
+    @api.onchange("partner_id")
+    def _onchange_alsa_partner_licenses(self):
+        License = self.env["alsa.license"]
+        today = fields.Date.context_today(self)
+        for order in self:
+            if not order.partner_id:
+                order.alsa_license_ids = False
+                order.alsa_license_selection_line_ids = [Command.clear()]
+                continue
+
+            available_licenses = License.search(
+                [
+                    ("partner_id", "=", order.partner_id.id),
+                    ("expiration_date", ">=", today),
+                ]
+            )
+            selected_licenses = order.alsa_license_ids.filtered(
+                lambda license_record: license_record.partner_id == order.partner_id
+            )
+            selected_licenses |= order.alsa_license_selection_line_ids.filtered(
+                lambda line: line.selected
+                and line.license_id.partner_id == order.partner_id
+            ).license_id
+            order.alsa_license_ids = selected_licenses
+            order.alsa_license_selection_line_ids = [
+                Command.clear(),
+                *[
+                    Command.create(
+                        {
+                            "license_id": license_record.id,
+                            "selected": license_record in selected_licenses,
+                        }
+                    )
+                    for license_record in available_licenses
+                ],
+            ]
+
     @api.onchange("alsa_equipment_selection_line_ids")
     def _onchange_alsa_equipment_selection_lines(self):
         for order in self:
@@ -119,12 +170,21 @@ class SaleOrder(models.Model):
                 "selected"
             ).equipment_id
 
+    @api.onchange("alsa_license_selection_line_ids")
+    def _onchange_alsa_license_selection_lines(self):
+        for order in self:
+            order.alsa_license_ids = order.alsa_license_selection_line_ids.filtered(
+                "selected"
+            ).license_id
+
     @api.model_create_multi
     def create(self, vals_list):
         orders = super().create(vals_list)
         for order, values in zip(orders, vals_list):
             if "alsa_equipment_selection_line_ids" in values:
                 order._alsa_sync_selected_equipment()
+            if "alsa_license_selection_line_ids" in values:
+                order._alsa_sync_selected_licenses()
         return orders
 
     def write(self, values):
@@ -134,6 +194,11 @@ class SaleOrder(models.Model):
             and not self.env.context.get("alsa_skip_equipment_selection_sync")
         ):
             self._alsa_sync_selected_equipment()
+        if (
+            "alsa_license_selection_line_ids" in values
+            and not self.env.context.get("alsa_skip_license_selection_sync")
+        ):
+            self._alsa_sync_selected_licenses()
         return result
 
     def _alsa_sync_selected_equipment(self):
@@ -145,6 +210,17 @@ class SaleOrder(models.Model):
             ).equipment_id.ids
             order.with_context(alsa_skip_equipment_selection_sync=True).write(
                 {"alsa_equipment_ids": [Command.set(equipment_ids)]}
+            )
+
+    def _alsa_sync_selected_licenses(self):
+        for order in self:
+            if not order.alsa_license_selection_line_ids:
+                continue
+            license_ids = order.alsa_license_selection_line_ids.filtered(
+                "selected"
+            ).license_id.ids
+            order.with_context(alsa_skip_license_selection_sync=True).write(
+                {"alsa_license_ids": [Command.set(license_ids)]}
             )
 
     @api.constrains("partner_id", "alsa_equipment_ids")
@@ -160,6 +236,7 @@ class SaleOrder(models.Model):
 
     def action_confirm(self):
         self._alsa_sync_selected_equipment()
+        self._alsa_sync_selected_licenses()
         result = super().action_confirm()
         for order in self:
             for line in order.order_line.filtered(
@@ -403,6 +480,114 @@ class AlsaSaleOrderEquipmentLine(models.Model):
                          FROM alsa_sale_order_equipment_line AS selection_line
                         WHERE selection_line.order_id = sale_order.id
                           AND selection_line.equipment_id = equipment.id
+                   )
+            """
+        )
+
+
+class AlsaSaleOrderLicenseLine(models.Model):
+    _name = "alsa.sale.order.license.line"
+    _description = "Selección de licencia en una venta"
+    _order = "selected desc, license_id"
+    _rec_name = "license_id"
+
+    order_id = fields.Many2one(
+        comodel_name="sale.order",
+        string="Venta",
+        required=True,
+        index=True,
+        ondelete="cascade",
+    )
+    selected = fields.Boolean(string="Usar", default=True)
+    license_id = fields.Many2one(
+        comodel_name="alsa.license",
+        string="Licencia / Código",
+        required=True,
+        index=True,
+        ondelete="cascade",
+    )
+    product_id = fields.Many2one(
+        related="license_id.product_id",
+        string="Producto / Servicio",
+        readonly=False,
+    )
+    product_summary = fields.Char(
+        related="license_id.product_summary",
+        string="Productos / Servicios",
+        readonly=True,
+    )
+    start_date = fields.Date(
+        related="license_id.start_date",
+        string="Fecha de inicio",
+        readonly=False,
+    )
+    expiration_date = fields.Date(
+        related="license_id.expiration_date",
+        string="Fecha de vencimiento",
+        readonly=False,
+    )
+    allowed_access_count = fields.Integer(
+        related="license_id.allowed_access_count",
+        string="Accesos / Usuarios",
+        readonly=False,
+    )
+    state = fields.Selection(
+        related="license_id.state",
+        string="Estado",
+        readonly=True,
+    )
+
+    @api.onchange("license_id")
+    def _onchange_license_id(self):
+        if self.license_id:
+            self.selected = True
+
+    @api.constrains("order_id", "license_id")
+    def _check_license_partner(self):
+        for line in self:
+            if (
+                line.order_id.partner_id
+                and line.license_id.partner_id != line.order_id.partner_id
+            ):
+                raise ValidationError(
+                    "La licencia seleccionada debe pertenecer al cliente de la venta."
+                )
+            duplicate = self.search(
+                [
+                    ("order_id", "=", line.order_id.id),
+                    ("license_id", "=", line.license_id.id),
+                    ("id", "!=", line.id),
+                ],
+                limit=1,
+            )
+            if duplicate:
+                raise ValidationError(
+                    "Cada licencia sólo puede aparecer una vez en la tabla de la venta."
+                )
+
+    def init(self):
+        """Prepare license rows and preserve explicit renewal selections."""
+        self.env.cr.execute(
+            """
+            INSERT INTO alsa_sale_order_license_line
+                (order_id, license_id, selected)
+            SELECT sale_order.id,
+                   license.id,
+                   EXISTS (
+                       SELECT 1
+                         FROM sale_order_line AS sale_line
+                        WHERE sale_line.order_id = sale_order.id
+                          AND sale_line.alsa_license_id = license.id
+                   )
+              FROM sale_order
+              JOIN alsa_license AS license
+                ON license.partner_id = sale_order.partner_id
+               AND license.expiration_date >= CURRENT_DATE
+             WHERE NOT EXISTS (
+                       SELECT 1
+                         FROM alsa_sale_order_license_line AS selection_line
+                        WHERE selection_line.order_id = sale_order.id
+                          AND selection_line.license_id = license.id
                    )
             """
         )
