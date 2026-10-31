@@ -45,7 +45,7 @@
                             <field name="product_line_ids" context="{'default_license_id': id}">
                                 <list editable="bottom" open_form_view="1">
                                     <field name="sequence" widget="handle"/>
-                                    <field name="product_ids" string="Productos / Servicios" widget="many2many_tags"/>
+                                    <field name="product_id"/>
                                     <field name="quantity"/>
                                     <field name="allowed_access_count"/>
                                     <field name="sale_order_line_id" optional="hide"/>
@@ -66,7 +66,7 @@
                                     <field name="partner_id" column_invisible="True"/>
                                     <field name="name"/>
                                     <field name="equipment_type"/>
-                                    <field name="product_id"/>
+                                    <field name="product_ids" string="Productos / Servicios" widget="many2many_tags"/>
                                     <field name="specifications" string="Características" width="360px" optional="show" readonly="False"/>
                                 </list>
                             </field>
