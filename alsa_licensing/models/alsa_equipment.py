@@ -63,6 +63,8 @@ class AlsaEquipment(models.Model):
         comodel_name="alsa.license.line",
         string="Productos / Servicios de la licencia",
         compute="_compute_license_product_line_ids",
+        inverse="_inverse_license_product_line_ids",
+        readonly=False,
     )
     license_expiration_date = fields.Date(
         related="license_id.expiration_date",
@@ -96,6 +98,12 @@ class AlsaEquipment(models.Model):
     def _compute_license_product_line_ids(self):
         for equipment in self:
             equipment.license_product_line_ids = equipment.license_id.product_line_ids
+
+    def _inverse_license_product_line_ids(self):
+        for equipment in self.filtered("license_id"):
+            equipment.license_id.product_line_ids = [
+                Command.set(equipment.license_product_line_ids.ids)
+            ]
 
     def action_open_support_details(self):
         self.ensure_one()

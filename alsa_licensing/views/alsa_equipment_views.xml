@@ -115,17 +115,17 @@
                             <div class="alert alert-info" role="alert">
                                 Estos son los productos y servicios cubiertos por la licencia asociada al equipo.
                             </div>
-                            <field name="license_product_line_ids" readonly="1" nolabel="1" options="{'no_open': True}">
-                                <list create="0" edit="0" delete="0" string="Productos incluidos">
+                            <field name="license_product_line_ids" nolabel="1" context="{'default_license_id': license_id}">
+                                <list editable="bottom" create="1" edit="1" delete="1" open_form_view="1" string="Productos incluidos">
                                     <field name="product_id" string="Producto / Servicio"/>
                                     <field name="quantity" string="Cantidad contratada" width="120px"/>
                                     <field name="allowed_access_count" string="Accesos / Usuarios" width="130px"/>
                                 </list>
                                 <form string="Detalle del producto">
                                     <group>
-                                        <field name="product_id" readonly="1"/>
-                                        <field name="quantity" readonly="1"/>
-                                        <field name="allowed_access_count" readonly="1"/>
+                                        <field name="product_id"/>
+                                        <field name="quantity"/>
+                                        <field name="allowed_access_count"/>
                                     </group>
                                 </form>
                             </field>
