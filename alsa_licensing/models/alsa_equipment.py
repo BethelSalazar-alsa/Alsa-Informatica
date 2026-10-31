@@ -43,6 +43,21 @@ class AlsaEquipment(models.Model):
         string="Licencia asociada",
         ondelete="set null",
     )
+    license_product_summary = fields.Char(
+        related="license_id.product_summary",
+        string="Productos / Servicios de la licencia",
+        readonly=True,
+    )
+    license_expiration_date = fields.Date(
+        related="license_id.expiration_date",
+        string="Vencimiento de licencia",
+        readonly=True,
+    )
+    license_state = fields.Selection(
+        related="license_id.state",
+        string="Estado de licencia",
+        readonly=True,
+    )
 
     @api.depends("specifications")
     def _compute_specifications_summary(self):
@@ -52,6 +67,17 @@ class AlsaEquipment(models.Model):
             equipment.specifications_summary = (
                 plain_text[:97] + "..." if len(plain_text) > 100 else plain_text
             )
+
+    def action_open_support_details(self):
+        self.ensure_one()
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Información del equipo",
+            "res_model": "alsa.equipment",
+            "res_id": self.id,
+            "view_mode": "form",
+            "target": "new",
+        }
 
     @api.model_create_multi
     def create(self, vals_list):

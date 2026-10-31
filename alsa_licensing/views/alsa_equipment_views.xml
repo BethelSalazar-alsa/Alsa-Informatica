@@ -62,7 +62,12 @@
                         <group>
                             <field name="product_id"/>
                             <field name="license_id" domain="[('partner_id', '=', partner_id)]"/>
+                            <field name="license_expiration_date" invisible="not license_id"/>
+                            <field name="license_state" widget="badge" invisible="not license_id"/>
                         </group>
+                    </group>
+                    <group string="Productos / Servicios de la licencia" invisible="not license_id">
+                        <field name="license_product_summary" nolabel="1"/>
                     </group>
                     <group string="Características / Especificaciones técnicas">
                         <field name="specifications" widget="html" nolabel="1" placeholder="Procesador, memoria, sistema operativo, dirección IP, número de serie, notas técnicas..."/>
