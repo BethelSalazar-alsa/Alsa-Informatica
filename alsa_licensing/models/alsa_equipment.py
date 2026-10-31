@@ -48,6 +48,11 @@ class AlsaEquipment(models.Model):
         string="Productos / Servicios de la licencia",
         readonly=True,
     )
+    license_product_line_ids = fields.Many2many(
+        comodel_name="alsa.license.line",
+        string="Productos / Servicios de la licencia",
+        compute="_compute_license_product_line_ids",
+    )
     license_expiration_date = fields.Date(
         related="license_id.expiration_date",
         string="Vencimiento de licencia",
@@ -68,14 +73,23 @@ class AlsaEquipment(models.Model):
                 plain_text[:97] + "..." if len(plain_text) > 100 else plain_text
             )
 
+    @api.depends("license_id", "license_id.product_line_ids")
+    def _compute_license_product_line_ids(self):
+        for equipment in self:
+            equipment.license_product_line_ids = equipment.license_id.product_line_ids
+
     def action_open_support_details(self):
         self.ensure_one()
+        form_view = self.env.ref(
+            "alsa_licensing.view_alsa_equipment_support_modal_form"
+        )
         return {
             "type": "ir.actions.act_window",
             "name": "Información del equipo",
             "res_model": "alsa.equipment",
             "res_id": self.id,
             "view_mode": "form",
+            "views": [(form_view.id, "form")],
             "target": "new",
         }
 

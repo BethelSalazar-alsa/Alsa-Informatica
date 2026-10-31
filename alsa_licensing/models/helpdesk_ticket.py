@@ -48,10 +48,31 @@ class HelpdeskTicket(models.Model):
     @api.onchange("partner_id")
     def _onchange_alsa_partner_id(self):
         for ticket in self:
-            ticket.alsa_equipment_ids = ticket.alsa_equipment_ids.filtered(
-                lambda equipment: ticket.partner_id
-                and equipment.partner_id == ticket.partner_id
+            if not ticket.partner_id:
+                ticket.alsa_equipment_ids = False
+                ticket.alsa_equipment_selection_line_ids = [Command.clear()]
+                continue
+
+            selected_equipment = ticket.alsa_equipment_ids.filtered(
+                lambda equipment: equipment.partner_id == ticket.partner_id
             )
+            selected_equipment |= ticket.alsa_equipment_selection_line_ids.filtered(
+                lambda line: line.selected
+                and line.equipment_id.partner_id == ticket.partner_id
+            ).equipment_id
+            ticket.alsa_equipment_ids = selected_equipment
+            ticket.alsa_equipment_selection_line_ids = [
+                Command.clear(),
+                *[
+                    Command.create(
+                        {
+                            "equipment_id": equipment.id,
+                            "selected": equipment in selected_equipment,
+                        }
+                    )
+                    for equipment in ticket.partner_id.alsa_equipment_ids
+                ],
+            ]
 
     @api.onchange("alsa_equipment_selection_line_ids")
     def _onchange_alsa_equipment_selection_lines(self):
@@ -153,6 +174,10 @@ class AlsaHelpdeskTicketEquipmentLine(models.Model):
     def _onchange_equipment_id(self):
         if self.equipment_id:
             self.selected = True
+
+    def action_open_equipment_details(self):
+        self.ensure_one()
+        return self.equipment_id.action_open_support_details()
 
     @api.constrains("ticket_id", "equipment_id")
     def _check_equipment_partner(self):
