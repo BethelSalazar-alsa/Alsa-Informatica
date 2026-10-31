@@ -1,7 +1,7 @@
 import html
 import re
 
-from odoo import api, fields, models
+from odoo import Command, api, fields, models
 from odoo.exceptions import ValidationError
 
 
@@ -35,8 +35,19 @@ class AlsaEquipment(models.Model):
     )
     product_id = fields.Many2one(
         comodel_name="product.product",
-        string="Producto / Servicio relacionado",
+        string="Producto / Servicio principal",
         ondelete="restrict",
+    )
+    product_ids = fields.Many2many(
+        comodel_name="product.product",
+        relation="alsa_equipment_product_rel",
+        column1="equipment_id",
+        column2="product_id",
+        string="Productos / Servicios relacionados",
+    )
+    product_summary = fields.Char(
+        string="Productos / Servicios relacionados",
+        compute="_compute_product_summary",
     )
     license_id = fields.Many2one(
         comodel_name="alsa.license",
@@ -73,6 +84,14 @@ class AlsaEquipment(models.Model):
                 plain_text[:97] + "..." if len(plain_text) > 100 else plain_text
             )
 
+    @api.depends("product_id", "product_ids")
+    def _compute_product_summary(self):
+        for equipment in self:
+            products = equipment.product_ids
+            if equipment.product_id:
+                products |= equipment.product_id
+            equipment.product_summary = ", ".join(products.mapped("display_name"))
+
     @api.depends("license_id", "license_id.product_line_ids")
     def _compute_license_product_line_ids(self):
         for equipment in self:
@@ -103,6 +122,11 @@ class AlsaEquipment(models.Model):
                 license_record = self.env["alsa.license"].browse(license_id).exists()
                 if license_record:
                     values["partner_id"] = license_record.partner_id.id
+            product_id = values.get("product_id")
+            if product_id:
+                product_commands = list(values.get("product_ids") or [])
+                product_commands.append(Command.link(product_id))
+                values["product_ids"] = product_commands
             prepared_values.append(values)
         return super().create(prepared_values)
 
@@ -113,6 +137,11 @@ class AlsaEquipment(models.Model):
             license_record = self.env["alsa.license"].browse(license_id).exists()
             if license_record:
                 values["partner_id"] = license_record.partner_id.id
+        product_id = values.get("product_id")
+        if product_id:
+            product_commands = list(values.get("product_ids") or [])
+            product_commands.append(Command.link(product_id))
+            values["product_ids"] = product_commands
         return super().write(values)
 
     @api.onchange("partner_id")
@@ -133,6 +162,8 @@ class AlsaEquipment(models.Model):
             self.partner_id = self.license_id.partner_id
             if not self.product_id:
                 self.product_id = self.license_id.product_id
+            if self.license_id.product_id:
+                self.product_ids = self.product_ids | self.license_id.product_id
 
     @api.constrains("partner_id", "license_id")
     def _check_license_partner(self):
@@ -144,3 +175,15 @@ class AlsaEquipment(models.Model):
                 raise ValidationError(
                     "La licencia asociada debe pertenecer al mismo cliente que el equipo."
                 )
+
+    def init(self):
+        """Preserve the former single product as the first related product."""
+        self.env.cr.execute(
+            """
+            INSERT INTO alsa_equipment_product_rel (equipment_id, product_id)
+            SELECT equipment.id, equipment.product_id
+              FROM alsa_equipment AS equipment
+             WHERE equipment.product_id IS NOT NULL
+            ON CONFLICT DO NOTHING
+            """
+        )

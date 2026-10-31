@@ -424,6 +424,11 @@ class AlsaSaleOrderEquipmentLine(models.Model):
         string="Producto / Servicio relacionado",
         readonly=True,
     )
+    product_summary = fields.Char(
+        related="equipment_id.product_summary",
+        string="Productos / Servicios relacionados",
+        readonly=True,
+    )
     license_id = fields.Many2one(
         related="equipment_id.license_id",
         string="Licencia asociada",
