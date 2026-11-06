@@ -103,32 +103,36 @@
                         <page string="Características / Especificaciones" name="support_specifications">
                             <field name="specifications" widget="html" nolabel="1" style="min-height: 320px;" placeholder="Procesador, memoria, sistema operativo, dirección IP, número de serie, notas de soporte..."/>
                         </page>
-                        <page string="Productos / Servicios del equipo" name="support_equipment_products">
+                        <page string="Productos / Servicios relacionados" name="support_related_products">
                             <field name="product_ids" nolabel="1">
                                 <list create="1" delete="1">
-                                    <field name="default_code" optional="show"/>
-                                    <field name="name"/>
+                                    <field name="default_code" string="Código/Número de referencia" optional="show"/>
+                                    <field name="name" string="Producto / Servicio"/>
                                 </list>
                             </field>
                         </page>
-                        <page string="Productos incluidos en la licencia" name="support_license_products" invisible="not license_id">
-                            <div class="alert alert-info" role="alert">
-                                Estos son los productos y servicios cubiertos por la licencia asociada al equipo.
+                        <page string="Productos / Servicios del equipo" name="support_equipment_products">
+                            <div class="alert alert-warning" role="alert" invisible="license_id">
+                                Seleccione una licencia asociada para registrar los productos, servicios y usuarios del equipo.
                             </div>
-                            <field name="license_product_line_ids" nolabel="1" context="{'default_license_id': license_id}">
-                                <list editable="bottom" create="1" edit="1" delete="1" open_form_view="1" string="Productos incluidos">
+                            <field name="license_product_line_ids" nolabel="1" invisible="not license_id" context="{'default_license_id': license_id}">
+                                <list editable="bottom" create="1" edit="1" delete="1" open_form_view="1" string="Productos / Servicios del equipo">
+                                    <field name="product_default_code" string="Código/Número de referencia"/>
                                     <field name="product_id" string="Producto / Servicio"/>
-                                    <field name="quantity" string="Cantidad contratada" width="120px"/>
-                                    <field name="allowed_access_count" string="Accesos / Usuarios" width="130px"/>
+                                    <field name="allowed_access_count" string="Cantidad de usuarios" width="140px"/>
                                 </list>
-                                <form string="Detalle del producto">
+                                <form string="Producto / Servicio del equipo">
                                     <group>
+                                        <field name="product_default_code" string="Código/Número de referencia"/>
                                         <field name="product_id"/>
                                         <field name="quantity"/>
-                                        <field name="allowed_access_count"/>
+                                        <field name="allowed_access_count" string="Cantidad de usuarios"/>
                                     </group>
                                 </form>
                             </field>
+                        </page>
+                        <page string="Observaciones sobre el equipo" name="support_observations">
+                            <field name="observations" widget="html" nolabel="1" style="min-height: 320px;" placeholder="Agregue aquí observaciones relevantes sobre el equipo..."/>
                         </page>
                     </notebook>
                 </sheet>

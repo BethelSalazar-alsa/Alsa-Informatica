@@ -208,6 +208,11 @@ class AlsaLicenseLine(models.Model):
         index=True,
         ondelete="restrict",
     )
+    product_default_code = fields.Char(
+        related="product_id.default_code",
+        string="Código/Número de referencia",
+        readonly=True,
+    )
     quantity = fields.Float(string="Cantidad", required=True, default=1.0)
     allowed_access_count = fields.Integer(
         string="Accesos / Usuarios",

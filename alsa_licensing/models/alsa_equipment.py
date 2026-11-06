@@ -29,6 +29,10 @@ class AlsaEquipment(models.Model):
         string="Características / Especificaciones técnicas",
         sanitize=True,
     )
+    observations = fields.Html(
+        string="Observaciones sobre el equipo",
+        sanitize=True,
+    )
     specifications_summary = fields.Char(
         string="Resumen de características",
         compute="_compute_specifications_summary",
