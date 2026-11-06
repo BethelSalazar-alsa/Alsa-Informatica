@@ -103,24 +103,16 @@
                             <field name="specifications" widget="html" nolabel="1" style="min-height: 320px;" placeholder="Procesador, memoria, sistema operativo, dirección IP, número de serie, notas de soporte..."/>
                         </page>
                         <page string="Productos / Servicios relacionados" name="support_related_products">
-                            <field name="product_ids" nolabel="1">
-                                <list create="1" delete="1">
-                                    <field name="default_code" string="Código/Número de referencia" optional="show"/>
-                                    <field name="name" string="Producto / Servicio"/>
-                                </list>
-                            </field>
-                        </page>
-                        <page string="Productos / Servicios del equipo" name="support_equipment_products">
                             <div class="alert alert-warning" role="alert" invisible="license_id">
-                                Seleccione una licencia asociada para registrar los productos, servicios y usuarios del equipo.
+                                Seleccione una licencia asociada para registrar los productos, servicios y usuarios relacionados.
                             </div>
                             <field name="license_product_line_ids" nolabel="1" invisible="not license_id" context="{'default_license_id': license_id}">
-                                <list editable="bottom" create="1" edit="1" delete="1" open_form_view="1" string="Productos / Servicios del equipo">
+                                <list editable="bottom" create="1" edit="1" delete="1" open_form_view="1" string="Productos / Servicios relacionados">
                                     <field name="product_default_code" string="Código/Número de referencia"/>
                                     <field name="product_id" string="Producto / Servicio"/>
                                     <field name="allowed_access_count" string="Cantidad de usuarios" width="140px"/>
                                 </list>
-                                <form string="Producto / Servicio del equipo">
+                                <form string="Producto / Servicio relacionado">
                                     <group>
                                         <field name="product_default_code" string="Código/Número de referencia"/>
                                         <field name="product_id"/>
