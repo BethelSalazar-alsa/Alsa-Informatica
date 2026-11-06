@@ -40,11 +40,11 @@ class SaleOrder(models.Model):
 
     alsa_active_license_ids = fields.Many2many(
         comodel_name="alsa.license",
-        string="Licencias vigentes",
+        string="Licencias vigentes del cliente",
         compute="_compute_alsa_customer_assets",
     )
     alsa_active_license_count = fields.Integer(
-        string="Licencias vigentes",
+        string="Cantidad de licencias vigentes",
         compute="_compute_alsa_customer_assets",
     )
     alsa_license_ids = fields.Many2many(
@@ -63,7 +63,7 @@ class SaleOrder(models.Model):
     )
     alsa_customer_equipment_ids = fields.One2many(
         related="partner_id.alsa_equipment_ids",
-        string="Equipos del cliente",
+        string="Equipos disponibles del cliente",
         readonly=False,
     )
     alsa_equipment_ids = fields.Many2many(
@@ -77,7 +77,7 @@ class SaleOrder(models.Model):
     alsa_equipment_selection_line_ids = fields.One2many(
         comodel_name="alsa.sale.order.equipment.line",
         inverse_name="order_id",
-        string="Equipos del cliente",
+        string="Selección de equipos para la venta",
         copy=False,
     )
 
