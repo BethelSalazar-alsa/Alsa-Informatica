@@ -41,7 +41,7 @@
                     </group>
                     <separator string="Licencias del cliente"/>
                     <field name="alsa_license_selection_line_ids" nolabel="1">
-                        <list editable="bottom" delete="0" open_form_view="1">
+                        <list editable="bottom" delete="0">
                             <field name="selected" widget="boolean_toggle" width="65px"/>
                             <field name="license_id" width="160px" domain="[('partner_id', '=', parent.partner_id)]" context="{'default_partner_id': parent.partner_id}" options="{'no_quick_create': True}"/>
                             <field name="product_id" readonly="False"/>
@@ -50,24 +50,8 @@
                             <field name="expiration_date" width="115px" readonly="False"/>
                             <field name="allowed_access_count" width="80px" readonly="False"/>
                             <field name="state" widget="badge" width="85px"/>
+                            <button name="action_open_license_details" type="object" string="Información" icon="fa-info-circle"/>
                         </list>
-                        <form string="Licencia de la venta">
-                            <sheet>
-                                <group>
-                                    <group>
-                                        <field name="selected" widget="boolean_toggle"/>
-                                        <field name="license_id" domain="[('partner_id', '=', parent.partner_id)]" context="{'default_partner_id': parent.partner_id}" options="{'no_quick_create': True}"/>
-                                        <field name="product_id" readonly="False"/>
-                                    </group>
-                                    <group>
-                                        <field name="start_date" readonly="False"/>
-                                        <field name="expiration_date" readonly="False"/>
-                                        <field name="allowed_access_count" readonly="False"/>
-                                        <field name="state" widget="badge"/>
-                                    </group>
-                                </group>
-                            </sheet>
-                        </form>
                     </field>
                     <field name="alsa_license_ids" invisible="1"/>
                 </page>

@@ -81,6 +81,21 @@ class AlsaLicense(models.Model):
         compute="_compute_equipment_count",
     )
 
+    def action_open_sales_details(self):
+        self.ensure_one()
+        form_view = self.env.ref(
+            "alsa_licensing.view_alsa_license_sales_modal_form"
+        )
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Información de la licencia",
+            "res_model": "alsa.license",
+            "res_id": self.id,
+            "view_mode": "form",
+            "views": [(form_view.id, "form")],
+            "target": "new",
+        }
+
     @api.depends("product_id", "product_line_ids.product_id")
     def _compute_product_summary(self):
         for license_record in self:

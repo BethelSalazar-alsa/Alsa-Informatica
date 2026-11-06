@@ -547,6 +547,10 @@ class AlsaSaleOrderLicenseLine(models.Model):
         if self.license_id:
             self.selected = True
 
+    def action_open_license_details(self):
+        self.ensure_one()
+        return self.license_id.action_open_sales_details()
+
     @api.constrains("order_id", "license_id")
     def _check_license_partner(self):
         for line in self:
